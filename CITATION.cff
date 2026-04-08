@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both the repository and the associated paper."
+title: "smcdynirredloops"
+authors:
+  - family-names: "Morse"
+    given-names: "Gregory"
+    email: "gregory.morse@live.com"
+repository-code: "https://github.com/GregoryMorse/smcdynirredloops"
+license: "MIT"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Morse"
+      given-names: "Gregory"
+    - family-names: "Alqaradaghi"
+      given-names: "Midya"
+    - family-names: "Kozsik"
+      given-names: "Tamas"
+  title: "Control flow obfuscation with irreducible loops and self-modifying code"
+  journal: "Publicationes Mathematicae Debrecen"
+  volume: 100
+  issue: "Supplementum"
+  start: 617
+  end: 637
+  year: 2022
+  url: "https://konferencia.unideb.hu/sites/default/files/upload_documents/10_5486_pmd.2022.suppl_.5.pdf"

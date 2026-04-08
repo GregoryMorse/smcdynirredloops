@@ -1,0 +1,10 @@
+[requires]
+gmp/6.3.0
+
+[generators]
+MSBuildDeps
+MSBuildToolchain
+
+[options]
+gmp/*:disable_assembly=True
+gmp/*:enable_cxx=True
