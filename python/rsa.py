@@ -81,6 +81,9 @@ def find_cover(b): #An+B+d*b^k
 #find_cover(10)
 
 
+import os as _os
+_OUTDIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', 'generated')
+
 import virt
 
 def rsa32_params():
@@ -292,7 +295,7 @@ def rsa_decrypt_lib(c, pub, priv):
   assert dec == res
   return dec
 def save_rsa_virtual(op, g, inpmap, outp, subg, bits):
-  virt.virt_to_c("rsa" + str(bits), "RSA_" + str(bits), op, g, 10+1, inpmap, outp, subg)
+  virt.virt_to_c(_os.path.join(_OUTDIR, "rsa" + str(bits)), "RSA_" + str(bits), op, g, 10+1, inpmap, outp, subg)
 def gen_rsa(bits, pub, priv):
   p, q, n, phi, lbda, e, d = priv
   #res = virt.modexp(int.from_bytes(c, 'big'), d, n) #pow(int.from_bytes(c, 'big'), d, n)

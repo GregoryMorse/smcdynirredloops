@@ -15,13 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dECDSA.c">
+    <ClCompile Include="aes.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ecdsa.c">
+    <ClCompile Include="aesmain.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ecdsa256vm.c">
+    <ClCompile Include="../generated/aesgraph.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../generated/aes128vm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../generated/aes192vm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../generated/aes256vm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

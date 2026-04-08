@@ -27,4 +27,4 @@ jobs:
 
       - name: Syntax check core scripts
         run: |
-          python -m py_compile virt.py aes.py rsa.py ecdsab.py
+          python -m py_compile python/virt.py python/graph.py python/aes.py python/aes.sage.py python/rsa.py python/ecdsab.py python/ecdsa.py

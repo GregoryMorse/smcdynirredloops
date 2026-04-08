@@ -62,22 +62,15 @@ graph_info.json
 # Reverse engineering / analysis workspaces
 *.rep/
 
-# Generated crypto C artifacts from Python emitters
-*vm.c
-*vmstr.c
-aesgraph.c
-aesc.c
-aesvm.c
+# Generated crypto C artifacts (output of python/ emitters → written to generated/)
+generated/*vm.c
+generated/*vmstr.c
+generated/aesgraph.c
+generated/aesc.c
+generated/aesvm.c
 
 # Generated SAT and temporary result files
 results/
 *.cnf
 *_map.txt
-/cpp/selfmodgraph/.vs
-/cpp/selfmodgraph/.vs
-/cpp/selfmodgraph/.vs
-/cpp/selfmodgraph/.vs
-/cpp/selfmodgraph/.vs
-/cpp/selfmodgraph/.vs
-/cpp/selfmodgraph/.vs
-/cpp/selfmodgraph/.vs
+/native/.vs

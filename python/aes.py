@@ -1028,10 +1028,12 @@ def AES_decrypt_no_tab(inp, k):
 
 #AES_decrypt can be found:
 #https://github.com/openssl/openssl/blob/master/crypto/aes/aes_core.c
+import os as _os
+_OUTDIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', 'generated')
 import virt
 def save_aes_virtual(v, bits):
   op, g, inpmap, outp, subg = v
-  virt.virt_to_c("aes" + str(bits), "AES_" + str(bits), op, g, 10+1, inpmap, outp, subg)
+  virt.virt_to_c(_os.path.join(_OUTDIR, "aes" + str(bits)), "AES_" + str(bits), op, g, 10+1, inpmap, outp, subg)
 def run_aes_virtual(inp, v, ksched=None):
   op, g, inpmap, outp, subg = v
   inp = int.from_bytes(inp[0:16 if ksched is None else ksched // 8], 'little')

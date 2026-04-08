@@ -5,27 +5,26 @@
 1. Install Python dependencies:
    - py -m pip install -r requirements.txt
 2. Regenerate artifacts after relevant changes:
-   - py rsa.py
-   - py aes.py
-   - py ecdsab.py
+   - powershell -File scripts\regenerate.ps1
+   - (or individually: py python\rsa.py / py python\aes.py / py python\ecdsab.py)
 3. Run local checks:
    - py -m py_compile virt.py aes.py rsa.py ecdsab.py
 
 ## Building the C/C++ projects (Visual Studio)
 
 The `ecdsa` project (`ecdsa.vcxproj`) depends on GMP.
-GMP paths are resolved via `cpp\selfmodgraph\gmp.props` in this priority order:
+GMP paths are resolved via `native\gmp.props` in this priority order:
 
 ### Option A — Conan 2.x (recommended)
 
 ```powershell
 pip install "conan>=2.0"
-powershell -ExecutionPolicy Bypass -File cpp\selfmodgraph\conan_setup.ps1
+powershell -ExecutionPolicy Bypass -File native\conan_setup.ps1
 ```
 
 This runs `conan profile detect --force` (picks up the installed VS toolset
 automatically — VS2019 through VS2026 all work) then writes
-`cpp\selfmodgraph\build\conandeps.props` which `gmp.props` imports.
+`native\build\conandeps.props` which `gmp.props` imports.
 
 ### Option B — Environment variable
 
@@ -43,11 +42,11 @@ Restart Visual Studio after setting the variable. The expected layout is:
 
 ### Option C — Local deps folder (portable)
 
-Extract a GMP build under `cpp\selfmodgraph\deps\gmp\`:
+Extract a GMP build under `native\deps\gmp\`:
 ```
-cpp\selfmodgraph\deps\gmp\include\gmp.h
-cpp\selfmodgraph\deps\gmp\lib\x86\gmp.lib
-cpp\selfmodgraph\deps\gmp\lib\x64\gmp.lib
+native\deps\gmp\include\gmp.h
+native\deps\gmp\lib\x86\gmp.lib
+native\deps\gmp\lib\x64\gmp.lib
 ```
 
 No environment variables or Conan required.

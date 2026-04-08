@@ -18,16 +18,16 @@
     <ClCompile Include="rsa.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rsa32vm.c">
+    <ClCompile Include="../generated/rsa32vm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rsa64vm.c">
+    <ClCompile Include="../generated/rsa64vm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rsa128vm.c">
+    <ClCompile Include="../generated/rsa128vm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rsa256vm.c">
+    <ClCompile Include="../generated/rsa256vm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

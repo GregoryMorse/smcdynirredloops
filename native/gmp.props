@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!--
-    GMP dependency configuration for ecdsa.vcxproj.
+    GMP dependency configuration for the Visual Studio projects.
 
     Resolution order
     ─────────────────────────────────────────────────────────────────────────
@@ -10,22 +10,22 @@
          Run conan_setup.ps1 (in this folder) for one-command setup, or see
          CONTRIBUTING.md for the full manual command sequence with options.
 
-       The generated
-       present and injects include/lib paths via its own ItemDefinitionGroup.
+       The generated props file is imported and injects include/lib paths via
+       its own ItemDefinitionGroup.
 
     2. Environment variable  GMP_ROOT  pointing to an existing GMP install:
 
          set GMP_ROOT=C:\path\to\gmp          (current session)
          setx GMP_ROOT C:\path\to\gmp         (persistent — restart VS after)
 
-    3. Local deps folder  cpp\selfmodgraph\deps\gmp\  (portable, no env vars):
+    3. Local deps folder  native\deps\gmp\  (portable, no env vars):
 
          Download ShiftMediaProject prebuilt from
            https://github.com/ShiftMediaProject/gmp/releases
          and extract so that:
-           deps\gmp\include\gmp.h   exists
-           deps\gmp\lib\x86\gmp.lib exists
-           deps\gmp\lib\x64\gmp.lib exists
+           native\deps\gmp\include\gmp.h   exists
+           native\deps\gmp\lib\x86\gmp.lib exists
+           native\deps\gmp\lib\x64\gmp.lib exists
 
     Supported GMP directory layouts
     ─────────────────────────────────────────────────────────────────────────

@@ -1,5 +1,7 @@
 #https://contest2021.whibox.io/rules
 #https://github.com/whibox/whibox-contest-2021_supplementary-materials/blob/main/dECDSA.c
+import os as _os
+_OUTDIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', 'generated')
 import virt
 def is_point_on_curve(P, a, p, use_montgomery):
   b = 0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b
@@ -496,7 +498,7 @@ def ecdsa_sign_virtual(G_x, G_y, n, p, z, d, aeskey):
   zinp = virt.make_input(B, node, g, op)
   Qsoutp = virt.subg_virtual(do_ecdsa_sign_virtual_subg, zinp + virt.get_false()*B, (G, a, n, p, dm, B, R, Np, R2, aeskey), node, g, op, subg, True, repetition=-1, gated=True)
   Q, soutp = virt.get_bit_range(Qsoutp, 0, B), virt.get_bit_range(Qsoutp, B, None)
-  virt.virt_to_c("ecdsa" + str(256), "ECDSA_" + str(256), op, g, 10+1, zinp, Qsoutp, subg)  
+  virt.virt_to_c(_os.path.join(_OUTDIR, "ecdsa" + str(256)), "ECDSA_" + str(256), op, g, 10+1, zinp, Qsoutp, subg)  
   accepting = virt.run_virtual(op, g, 1, [zinp[i] for i, x in enumerate(virt.zero_extend_num(virt.constant_to_virtual(z), B)) if x], zinp, Qsoutp, subg)
   r, s = virt.virtual_to_constant([x in accepting for x in Q]), virt.virtual_to_constant([x in accepting for x in soutp])
   print(r, s); return r, s
@@ -506,7 +508,7 @@ def ecdsa_sign_virtual(G_x, G_y, n, p, z, d, aeskey):
   inp = zinp + kinp
   Q, soutp, iserr = do_ecdsa_sign_virtual(zinp, kinp, G, a, n, p, dm, B, R, Np, R2, aeskey, node, g, op, subg)
   outp = Q + soutp + iserr
-  virt.virt_to_c("ecdsa" + str(256), "ECDSA_" + str(256), op, g, 10+1, inp, outp, subg)  
+  virt.virt_to_c(_os.path.join(_OUTDIR, "ecdsa" + str(256)), "ECDSA_" + str(256), op, g, 10+1, inp, outp, subg)  
   while True:
     k += loop_counter
     
