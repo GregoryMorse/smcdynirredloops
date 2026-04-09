@@ -1,4 +1,4 @@
-# conan_setup.ps1
+﻿# conan_setup.ps1
 # Installs / configures Conan 2.x for this project and generates the
 # MSBuild props that ecdsa.vcxproj needs (build\conandeps.props etc.).
 #

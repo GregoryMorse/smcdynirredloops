@@ -75,4 +75,15 @@
 
   </PropertyGroup>
 
+  <!-- ── Suppress warnings from GMP headers (e.g. C4244 on x64 Windows) ─
+       Uses MSVC /external:I + /external:W0 so only GMP headers are affected.
+       The C4244 in mpz_get_ui is unfixable upstream: on Windows x64, unsigned
+       long is 32-bit (LLP64) while mp_limb_t is 64-bit. -->
+  <ItemDefinitionGroup Condition="'$(GmpIncDir)'!=''">
+    <ClCompile>
+      <AdditionalOptions>/external:I "$(GmpIncDir)" %(AdditionalOptions)</AdditionalOptions>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
 </Project>
