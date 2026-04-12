@@ -165,6 +165,7 @@
   <ItemGroup>
     <None Include="conan_setup.ps1" />
     <None Include="gmp.props" />
+    <None Include="README.md" />
     <None Include="selfmodmodel.asm" />
     <None Include="selfmodmodelgas.asm" />
   </ItemGroup>

@@ -1,16 +1,35 @@
-# smcdynirredloops
+﻿# smcdynirredloops
+
+[![DOI](https://img.shields.io/badge/DOI-10.5486%2FPMD.2022.suppl.5-blue)](https://doi.org/10.5486/PMD.2022.suppl.5)
+[![Journal](https://img.shields.io/badge/Journal-Publ.%20Math.%20Debrecen-green)](https://publi.math.unideb.hu/load_doi.php?pdoi=10_5486_PMD.2022.suppl.5)
+[![Conference](https://img.shields.io/badge/Conference-CECC'21-orange)](https://konferencia.unideb.hu/en/program-central-european-conference-cryptology-2021)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Reference implementation and research code for **control-flow obfuscation using irreducible loops and self-modifying code**, with cryptographic virtual-machine generation for AES, RSA, and ECDSA.
 
 ## Citation
 
-If you use this work, please cite the paper:
+If you use this work, please cite the journal paper:
 
 > Morse, G., Alqaradaghi, M., & Kozsik, T. (2022).
 > **Control flow obfuscation with irreducible loops and self-modifying code.**
 > *Publicationes Mathematicae Debrecen*, **100**(Supplementum), 617–637.
 > DOI: [10.5486/PMD.2022.suppl.5](https://doi.org/10.5486/PMD.2022.suppl.5)
 > PDF: <https://konferencia.unideb.hu/sites/default/files/upload_documents/10_5486_pmd.2022.suppl_.5.pdf>
+
+### Conference presentation
+
+> Morse, G., Alqaradaghi, M., & Kozsik, T. (2021).
+> **Control flow obfuscation with irreducible loops and self-modifying code.**
+> 21st Central European Conference on Cryptology (CECC'21), June 24, 2021, Debrecen, Hungary (virtual).
+> <https://konferencia.unideb.hu/en/program-central-european-conference-cryptology-2021>
+
+### Extended abstract
+
+> Morse, G., Alqaradaghi, M., & Kozsik, T. (2021).
+> **Control flow obfuscation with irreducible loops and self-modifying code.**
+> In *21st Central European Conference on Cryptology – Book of Abstracts*, pp. 40–41.
+> PDF: <https://konferencia.unideb.hu/sites/default/files/upload_documents/book_of_abstracts_v6.pdf>
 
 A machine-readable citation is available in [`CITATION.cff`](CITATION.cff).
 

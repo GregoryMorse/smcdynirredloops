@@ -31,5 +31,6 @@
     </None>
     <None Include="gmp.props" />
     <None Include="conan_setup.ps1" />
+    <None Include="README.md" />
   </ItemGroup>
 </Project>
