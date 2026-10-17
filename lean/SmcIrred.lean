@@ -2,6 +2,7 @@ module
 public import SmcIrred.Spec.Graph
 public import SmcIrred.Spec.DFS
 public import SmcIrred.Spec.LNF
+public import SmcIrred.Spec.Extremal
 public import SmcIrred.Graph.Decide
 public import SmcIrred.Graph.Classify
 public import SmcIrred.Graph.RunDFS
@@ -14,3 +15,9 @@ public import SmcIrred.LNF.Small
 public import SmcIrred.LNF.Fig4
 public import SmcIrred.LNF.NonUnique
 public import SmcIrred.LNF.Algo
+public import SmcIrred.Extremal.Count
+public import SmcIrred.Extremal.Chain
+public import SmcIrred.Extremal.Kn
+public import SmcIrred.Extremal.Mn
+public import SmcIrred.Extremal.MnCount
+public import SmcIrred.Extremal.IrrBound

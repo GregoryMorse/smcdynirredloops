@@ -25,3 +25,7 @@ Status: `open` (owner round named), `blocked` (needs the user/author), `closed` 
 | G13 | `palomar-full.yml` dispatch needs the user's go-ahead; submission/registration by the user | R0 | R24 | None | open |
 | G14 | C65: C++ encodings of Fig. 4 (`native/IrredLoop.cpp`) ↔ Lean `fig4` fidelity | R2 | R18 | Fig. 4 graph checked from the TeX only | open |
 | G15 | Lean `ErrataRefs.lean` check (`audit_errata.py --refs`) never run on the committed `lean_refs` (P03) | R2 | R22 | None | open |
+| G16 | `|MEE| ≤ C(n−1,2)` for every CFG and DFS (R4 item 4, "should"); proof idea found: no unordered pair is MEE in both directions, tree-adjacent pairs are never MEE | R4 | R4 (this session, second half) | Only the K_n/M_n equalities are claimed (paper claims maximality) | open |
+| G17 | K_n counts (headers chain, n−2 irreducible, C(n−1,2) MEE) for an **arbitrary** DFS labelling/root, not only the canonical numbering v_1…v_n (proved: canonical `chainJungle`, irreducible ≤ n−2 for every DFS) | R4 | R4 (second half) | Statements are for the paper's own convention (vertices named by DFS order) | open |
+| G18 | R4 item 6: `validation/planning/section5_bruteforce.py` cross-check against the Lean definitions via generated `#eval` file | R4 | R4 (second half) | Planning script stays unchecked evidence | open |
+| G19 | P15 second half: every CFG with C(n−1,2) MEE has ≥ 2n−3 non-MEE edges ("should") | R4 | R4 (second half) | Only the witness (`MnLite_others`) is claimed | open |
