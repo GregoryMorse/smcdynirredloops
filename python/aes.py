@@ -1259,8 +1259,8 @@ def map_to_vars(mapfile):
       kv = line.split(" ")
       d[kv[0]] = int(kv[1].strip())
   return d
-import sat
 def sat_unit_prop(cnf):
+  import sat  # sat.py is not part of this repository; imported on use only
   clauses = {frozenset(c) for c in cnf}
   map = sat.getsatmap(clauses)
   while True:

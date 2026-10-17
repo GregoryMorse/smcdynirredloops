@@ -68,6 +68,9 @@ jobs:
           python python/rsa.py
           python python/aes.py
           python python/ecdsab.py
+          # generated/aesgraph.c has no emitter any more (virt.graph_to_c is disabled, virt.py); the compile-only baseline
+          # links a stub with the same symbol (code fix L09, owner R21)
+          Set-Content -Path generated/aesgraph.c -Value 'void AES_128_obf_encrypt(unsigned char* out, unsigned char* in) {}'
       - name: GMP 6.2.1-4 (ShiftMediaProject prebuilt for VS2022, hash-pinned) into native/deps/gmp
         shell: pwsh
         run: |

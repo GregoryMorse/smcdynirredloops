@@ -158,9 +158,9 @@ def gen_n_phi_lbda(p, q):
   return n, phi, lbda
 def gen_d(e, lbda):
   #d = (e ** (totient(phi)-1)) % phi #factoring phi is not reasonable
-  #d = mul_inv(e, phi)
+  #d = virt.mul_inv(e, phi)
   #d = pow(e, totient(lbda)-1, lbda) #factoring lbda is not reasonable
-  d = mul_inv(e, lbda)
+  d = virt.mul_inv(e, lbda)
   return d
 def test_rsa_params():
   p, q, e = 61, 53, 17 #wikipedia
@@ -230,7 +230,7 @@ def rsa_sign_lib(c, pub, priv):
   from Crypto.Hash import SHA256
   from Crypto.PublicKey import RSA
   h = SHA256.new(); h.digest = lambda: c #h.update(c) #(virt.getBitSize(c) + 7) // 8
-  crtq = mul_inv(priv[0], priv[1]) #p^-1 mod q
+  crtq = virt.mul_inv(priv[0], priv[1]) #p^-1 mod q
   signature = pkcs1_15.new(RSA.construct(rsa_components=(pub[1], pub[0], priv[6], priv[0], priv[1], crtq))).sign(h)
   encsize = (virt.getBitSize(pub[1])+7)//8
   pkcs = pkcs1_15._EMSA_PKCS1_V1_5_ENCODE(h, encsize)
@@ -242,7 +242,7 @@ def rsa_verify_lib(c, sig, pub, priv):
   from Crypto.Hash import SHA256
   from Crypto.PublicKey import RSA
   h = SHA256.new(); h.digest = lambda: c #h.update(c)
-  crtq = mul_inv(priv[0], priv[1]) #p^-1 mod q
+  crtq = virt.mul_inv(priv[0], priv[1]) #p^-1 mod q
   res = True
   try:
     pkcs1_15.new(RSA.construct(rsa_components=(pub[1], pub[0], priv[6], priv[0], priv[1], crtq))).verify(h, sig)
@@ -261,7 +261,7 @@ def rsa_pkcs_1_15_pad(data, bits, randfunc):
 def rsa_encrypt_lib(c, pub, priv):
   from Crypto.PublicKey import RSA
   from Crypto.Cipher import PKCS1_v1_5
-  crtq = mul_inv(priv[0], priv[1]) #p^-1 mod q
+  crtq = virt.mul_inv(priv[0], priv[1]) #p^-1 mod q
   randfunc = lambda i: b'\x01'*i #Random.get_random_bytes
   cipher_rsa = PKCS1_v1_5.new(RSA.construct(rsa_components=(pub[1], pub[0], priv[6], priv[0], priv[1], crtq)), randfunc=randfunc)
   #c = c.to_bytes((virt.getBitSize(c) + 7) // 8, 'big')
@@ -286,7 +286,7 @@ def pkcs1_decode(pkcs, encsize, minpad=8):
 def rsa_decrypt_lib(c, pub, priv):
   from Crypto.PublicKey import RSA
   from Crypto.Cipher import PKCS1_v1_5
-  crtq = mul_inv(priv[0], priv[1]) #p^-1 mod q
+  crtq = virt.mul_inv(priv[0], priv[1]) #p^-1 mod q
   cipher_rsa = PKCS1_v1_5.new(RSA.construct(rsa_components=(pub[1], pub[0], priv[6], priv[0], priv[1], crtq)))
   #c = c.to_bytes((virt.getBitSize(c) + 7) // 8, 'big')
   dec = cipher_rsa.decrypt(c, None)
