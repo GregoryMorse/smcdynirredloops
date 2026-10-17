@@ -67,7 +67,7 @@
    "status": "confirmed",
    "confidence": "certain",
    "evidence": "Figure 4 (exit has no out-edge) contradicts the exhaustive-sounding 'otherwise'.",
-   "lean_refs": [],
+   "lean_refs": ["SmcIrred.fig4_kinds"],
    "source": "published PDF p. 619, p. 630 Fig. 4"
   },
   {

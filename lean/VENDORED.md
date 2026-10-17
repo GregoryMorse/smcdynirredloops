@@ -29,3 +29,4 @@ Hash = first 16 hex of SHA-256 of the source file / of the file as vendored. **P
 Written fresh (not vendored): `validation/fetch_reference.py`, `validation/native.py` (MSBuild per project, compile only), `validation/check_tables.py`.
 
 Templates not yet copied (copied and adapted by the round that needs them): `lean/errata/{POLICY.md,edits.json}` (R1), `lean/{formalization.yaml,comparator.json,PALOMAR_SEMANTICS.md,PALOMAR_SUBMISSION.md,LICENSE_AUDIT.md,PAPER_MAP.md,THREAT_MODEL.md}` (R1, R20a, R24).
+Added in R2: `validation/lean_scratch.py` (SelfModTamper `69a9d34`, verbatim; runs one scratch Lean file under the guard).

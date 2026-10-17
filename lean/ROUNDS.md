@@ -7,7 +7,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | --- | --- | --- | --- |
 | R0 | Bootstrap, references, baselines (authorization question) | must | DONE 2026-10-17 |
 | R1 | Claim inventory, errata verification, sources, author questions | must | DONE 2026-10-17 |
-| R2 | Graph foundations, DFS jungle, Figure 4(a)(b) | must | TODO |
+| R2 | Graph foundations, DFS jungle, Figure 4(a)(b) | must | DONE 2026-10-17 |
 | R3 | Havlak loop nesting forest, Figure 4(c), small CFGs, non-uniqueness | must | TODO |
 | R4 | Extremal results: K_n, M_n, n−2 bound (MEE bound should) | must | TODO |
 | R5 | 2-SAT: implication graph, APT theorem, unit clauses, Figure 1 | must | TODO |
@@ -67,6 +67,14 @@ handoff: done / next / open obligations / hazards / evidence file).
 
 - Done: `lean/errata/edits.json` (31 items: 26 confirmed, ask-author P06, P10, P11, P13, P28), `lean/errata/POLICY.md`, `lean/CODE_FIXES.md` (adds L07), `lean/PAPER_MAP.md` (C01-C83 + C84, C85 with classes, pages, R-class source checks), `validation/audit_errata.py` rewritten (31/31 quotes found on the published pages and once in the manuscript TeX). New errata from the read-through: P27 (Fig. 3 comments), P28 ("exponential growth of multiplication"), P29 (static-analysis overclaims); T01 completed (17 sub-items), B01 (5 sub-items; [21] vol. 137 and [26] swapped names are publisher typesetting, the manuscript bib is right). Sources checked: see `validation/rounds/R1.json`; unverified: Denuvo [17], the Banescu quotation (C82).
 - Author answers (one AskUserQuestion): P10 re-measure first (R16 step 4), minimal correction; P13: **the author implements the protected variant** (new round R19b, blocked on the author); wording minimal; T01, B01, P17b, P25, P26, P27 all appear; **new requirement:** every C/C++ project gets CMake, `build/` tree, CI Windows/Linux/macOS, VS 2022 and 2026 compatibility (new round R21a).
-- Next: R2 (graph foundations, DFS jungle, Figure 4(a)(b)).
+- Next: R2 (done, see below).
 - Open obligations: P11 provenance (R16); `make_errata.py` is still the SelfModTamper copy (adapt in R22); the TeX `before_tex` of the P18/P19 figure edits reference dot source, not prose.
 - Evidence: `validation/rounds/R1.json`.
+
+### R2 (Claude Sonnet 5.5, 2026-10-17)
+
+- Done: `Spec.Graph` (Digraph, IsCFG, vertex kinds), `Spec.DFS` (declarative `Jungle.Valid`, edge classes by timestamps), `Graph.Classify` (C27: tree/forward/back/cross iff-lemmas), `Graph.RunDFS` (computable fuel-bounded DFS in list order), `Graph.DfsValid.dfsRun_valid` (the algorithm's timestamps satisfy `Jungle.Valid` on any CFG, so the declarative notion covers real DFS runs), `Graph.Fig4` (published Fig. 4(a)(b): `fig4_dfs_eq` reproduces the published timestamps, jungle valid, classes; `fig4_kinds` = P03 evidence). Full build and axiom audit clean (0 violations, no sorry).
+- Next: R3 (Havlak loop nesting forest, Fig. 4(c), non-uniqueness).
+- Open obligations: Fig. 4 LNF part (R3); C65 C++ encodings (R18); P03 lean_ref is `SmcIrred.fig4_kinds` (checked via `audit_errata.py --refs` in R22).
+- Hazards: Lean core only (no Mathlib tactics: use omega/decide/simp, by_cases); definitions used by decide need `@[expose]`.
+- Evidence: validation/rounds/R2.json.

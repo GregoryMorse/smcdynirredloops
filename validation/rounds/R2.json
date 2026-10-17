@@ -1,0 +1,6 @@
+{
+ "round": "R2",
+ "commands": ["python validation/build_modules.py all (exit 0)", "python validation/axiom_audit.py (316 declarations, 0 violations)", "python validation/audit_errata.py"],
+ "theorems": ["dfsRun_valid", "visit_done", "Done.of_loop", "fig4_dfs_eq", "fig4Jungle_valid", "fig4_classes", "fig4_kinds", "cls_tree_or_forward_iff", "cls_back_iff", "cls_cross_iff"],
+ "sorry": 0
+}
