@@ -13,7 +13,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R4 | Extremal results: K_n, M_n, n−2 bound (MEE bound should) | must | DONE 2026-10-17 (G19 open) |
 | R4c | Close G19 (P15 second half: max-MEE CFGs have >= 2n-3 other edges), after R5 | should | TODO |
 | R5 | 2-SAT: implication graph, APT theorem, unit clauses, Figure 1 | must | DONE 2026-10-17 |
-| R6 | Tarjan's algorithm, cost, reference solver, `tarjan_scc` model | must | TODO |
+| R6 | Tarjan's algorithm, cost, reference solver (`tarjan_scc` model -> R6b, G22) | must | done 2026-10-18 |
+| R6b | `Tarjan/CodeModel` (G22) and DNF parity bound (G21) | must | TODO |
 | R7 | SMC 2-SAT solver Level 2 ⇒ Tarjan/APT; restamp lemma | must | TODO |
 | R8 | SMC solver VM level (should); native vectors and listing evidence (must) | must/should | TODO |
 | R9 | Planted 2-SAT generator (§3.1, P04) | must | TODO |
@@ -101,3 +102,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Done: `Spec/TwoSat` (literals, formula, Sat, implication graph with unit encoding ¬p→p, NoUnit/SelfLoop variants); `TwoSat/{Implication,Reach,APT,Unit,Fig1}`.
 - `twoSat_iff_scc`: satisfiable iff no variable shares an SCC with its negation (unconditional, labelling `sccLabel`); `apt_correct` for any reverse-topological labelling; `unitClash` counterexample for both unit variants (P02); Fig. 1: 24 edges, drawn labels valid, green assignment satisfies, exactly 3 of 256 assignments.
 - Open: G21 (DNF parity bound, C18) -> R6. Next: R6 (linear-time 2-SAT algorithm / Tarjan SCC), then R3b, R4c.
+
+## R6 handoff (2026-10-18)
+- Done: `Spec.Tarjan` (algorithm definitions live here, not in `Tarjan/Algo`), `Tarjan.{Inv,Finish,Mono,Correct}` (`tarjan_spec`: SCC partition, reverse topological order), `Spec.TwoSatSolve` + `Tarjan.Solver` (`twoSatSolveOf_spec`, `twoSatSolve_spec`), `Tarjan.Cost` (`tarjan_cost`: ticks <= 2n + m).
+- Open: G21, G22 -> R6b (before R23). Next: R6b, then R3b, R4c, R7.

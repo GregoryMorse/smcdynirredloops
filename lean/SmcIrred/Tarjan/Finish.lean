@@ -427,15 +427,22 @@ theorem TInv.keep {P : List Nat} {s : TState} {v p : Nat} {P0 : List Nat} (h : T
 theorem tstate_eq_of_low {s : TState} {L : Nat → Nat} (hL : L = s.low) : ({ s with low := L } : TState) = s := by
   subst hL; rfl
 
+/-- What the end of a visit of `v` needs about its parent: a root visit starts with an empty path and stack, a child
+visit has the parent at the head of the path and a path to `v`. -/
+abbrev FPar (g : Digraph) (P : List Nat) (v : Nat) (b : List Nat) : Option Nat → Prop
+  | none => P = [] ∧ b = []
+  | some p => (∃ P0, P = p :: P0) ∧ g.Reach p v
+
 /-- The end of `strongconnect`: pop the component if `v` is a root, otherwise return the lowlink to the parent. -/
 theorem tFinish_spec {P : List Nat} {s2 : TState} {v : Nat} {N b : List Nat} {par : Option Nat}
     (h : TInv g (v :: P) s2) (hstk : s2.stk = N ++ v :: b) (hN : ∀ u ∈ N, s2.num v < s2.num u)
     (hb : ∀ y ∈ b, s2.num y < s2.num v)
     (hex : ∀ y, g.edge v y → s2.Done y ∨ (y ∈ s2.stk ∧ s2.low v ≤ s2.num y))
-    (hpar : match par with | none => P = [] ∧ b = [] | some p => (∃ P0, P = p :: P0) ∧ g.Reach p v) :
+    (hpar : FPar g P v b par) :
     TInv g P (tFinish v par s2) ∧ (tFinish v par s2).num = s2.num ∧ (tFinish v par s2).cnt = s2.cnt ∧
     (∃ R, (tFinish v par s2).out = s2.out ++ R) ∧
     ((tFinish v par s2).stk = b ∨ (tFinish v par s2).stk = N ++ v :: b) ∧
+    (∀ w, par ≠ some w → (tFinish v par s2).low w = s2.low w) ∧
     (∀ p, par = some p → (tFinish v par s2).low p ≤ s2.low p ∧
       ((tFinish v par s2).Done v ∨
         (v ∈ (tFinish v par s2).stk ∧ (tFinish v par s2).low p ≤ (tFinish v par s2).num v))) := by
@@ -449,7 +456,7 @@ theorem tFinish_spec {P : List Nat} {s2 : TState} {v : Nat} {N b : List Nat} {pa
       have e : tFinish v none s2 = { s2 with stk := b, out := s2.out ++ [N ++ [v]], ticks := s2.ticks + (N ++ [v]).length } := by
         simp only [tFinish, hl, ↓reduceIte, hstk, popTo_split hvN]
       rw [e]
-      exact ⟨hpop _, rfl, rfl, ⟨_, rfl⟩, Or.inl rfl, fun p hp => absurd hp (by simp)⟩
+      exact ⟨hpop _, rfl, rfl, ⟨_, rfl⟩, Or.inl rfl, fun _ _ => rfl, fun p hp => absurd hp (by simp)⟩
     | some p0 =>
       obtain ⟨⟨P0, hP⟩, hpv⟩ := hpar
       have hp0 : p0 ∈ s2.stk := h.P_sub p0 (by rw [hP]; exact List.mem_cons_of_mem _ List.mem_cons_self)
@@ -462,7 +469,7 @@ theorem tFinish_spec {P : List Nat} {s2 : TState} {v : Nat} {N b : List Nat} {pa
       have e : tFinish v (some p0) s2 = { s2 with stk := b, out := s2.out ++ [N ++ [v]], ticks := s2.ticks + (N ++ [v]).length } := by
         simp only [tFinish, hl, ↓reduceIte, hstk, popTo_split hvN, hs]
       rw [e]
-      refine ⟨hpop _, rfl, rfl, ⟨_, rfl⟩, Or.inl rfl, ?_⟩
+      refine ⟨hpop _, rfl, rfl, ⟨_, rfl⟩, Or.inl rfl, fun _ _ => rfl, ?_⟩
       intro p hp
       exact ⟨Nat.le_refl _, Or.inl ⟨N ++ [v], List.mem_append_right _ (List.mem_singleton_self _),
         List.mem_append_right _ (List.mem_singleton_self _)⟩⟩
@@ -483,7 +490,10 @@ theorem tFinish_spec {P : List Nat} {s2 : TState} {v : Nat} {N b : List Nat} {pa
       have e : tFinish v (some p0) s2 = { s2 with low := tupd s2.low p0 (min (s2.low p0) (s2.low v)) } := by
         simp only [tFinish, hl, ↓reduceIte]
       rw [e]
-      refine ⟨hk, rfl, rfl, ⟨[], by simp⟩, Or.inr hstk, ?_⟩
+      refine ⟨hk, rfl, rfl, ⟨[], by simp⟩, Or.inr hstk, ?_, ?_⟩
+      · intro w hw
+        show tupd s2.low p0 (min (s2.low p0) (s2.low v)) w = s2.low w
+        exact tupd_ne _ _ (fun e => hw (by rw [e]))
       intro p hp
       have e : p = p0 := by injection hp with hp; exact hp.symm
       subst e

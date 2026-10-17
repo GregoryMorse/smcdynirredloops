@@ -26,9 +26,6 @@ theorem imps_var_lt (hw : f.Wf) {e : Lit × Lit} (he : e ∈ f.imps) : e.1.var <
     rcases h with rfl | rfl <;> exact ⟨by assumption, by assumption⟩
   | _ :: _ :: _ :: _, h => simp [clauseImps] at h
 
-/-- The Aspvall–Plass–Tarjan assignment: `x` is true iff `label(x) < label(¬x)`. -/
-@[expose] def aptAssign (lab : Nat → Nat) (x : Nat) : Bool :=
-  decide (lab (Lit.node ⟨x, true⟩) < lab (Lit.node ⟨x, false⟩))
 
 theorem apt_holds {n : Nat} {lab : Nat → Nat} (hd : ∀ x, x < n → lab (Lit.node ⟨x, true⟩) ≠ lab (Lit.node ⟨x, false⟩))
     {l : Lit} (hl : l.var < n) : l.Holds (aptAssign lab) ↔ lab l.node < lab l.neg.node := by

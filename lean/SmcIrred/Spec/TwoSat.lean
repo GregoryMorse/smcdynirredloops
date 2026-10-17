@@ -69,4 +69,8 @@ clause gives none. -/
   n := 2 * f.n
   succ u := ((f.clauses.flatMap clauseImpsSelfLoop).filter fun e => e.1.node == u).map fun e => e.2.node
 
+/-- The Aspvall–Plass–Tarjan assignment: `x` is true iff `label(x) < label(¬x)`. -/
+@[expose] def aptAssign (lab : Nat → Nat) (x : Nat) : Bool :=
+  decide (lab (Lit.node ⟨x, true⟩) < lab (Lit.node ⟨x, false⟩))
+
 end SmcIrred

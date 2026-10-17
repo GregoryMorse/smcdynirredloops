@@ -74,16 +74,16 @@ theorem TInv.stk_nil {s : TState} (h : TInv g [] s) : s.stk = [] := by
   exact key _ w hw rfl
 
 /-- The number of unvisited vertices among `0 … k-1`. -/
-@[expose] def tUn (s : TState) : Nat → Nat
+@[expose] def tUn (num : Nat → Nat) : Nat → Nat
   | 0 => 0
-  | k + 1 => tUn s k + (if s.num k = 0 then 1 else 0)
+  | k + 1 => tUn num k + (if num k = 0 then 1 else 0)
 
-theorem tUn_mono {s t : TState} (hm : ∀ w, s.num w ≠ 0 → t.num w ≠ 0) : ∀ k, tUn t k ≤ tUn s k := by
+theorem tUn_mono {s t : TState} (hm : ∀ w, s.num w ≠ 0 → t.num w ≠ 0) : ∀ k, tUn t.num k ≤ tUn s.num k := by
   intro k
   induction k with
   | zero => exact Nat.le_refl _
   | succ k ih =>
-    show tUn t k + (if t.num k = 0 then 1 else 0) ≤ tUn s k + (if s.num k = 0 then 1 else 0)
+    show tUn t.num k + (if t.num k = 0 then 1 else 0) ≤ tUn s.num k + (if s.num k = 0 then 1 else 0)
     by_cases h1 : t.num k = 0
     · have h2 : s.num k = 0 := by
         by_cases h2 : s.num k = 0
@@ -93,13 +93,13 @@ theorem tUn_mono {s t : TState} (hm : ∀ w, s.num w ≠ 0 → t.num w ≠ 0) : 
     · by_cases h2 : s.num k = 0 <;> simp [h1, h2] <;> omega
 
 theorem tUn_lt {s t : TState} (hm : ∀ w, s.num w ≠ 0 → t.num w ≠ 0) {v : Nat} (hs : s.num v = 0) (ht : t.num v ≠ 0) :
-    ∀ k, v < k → tUn t k < tUn s k := by
+    ∀ k, v < k → tUn t.num k < tUn s.num k := by
   intro k
   induction k with
   | zero => intro h; omega
   | succ k ih =>
     intro hk
-    show tUn t k + (if t.num k = 0 then 1 else 0) < tUn s k + (if s.num k = 0 then 1 else 0)
+    show tUn t.num k + (if t.num k = 0 then 1 else 0) < tUn s.num k + (if s.num k = 0 then 1 else 0)
     by_cases e : v = k
     · subst e
       have := tUn_mono hm v
@@ -113,21 +113,21 @@ theorem tUn_lt {s t : TState} (hm : ∀ w, s.num w ≠ 0 → t.num w ≠ 0) {v :
         simp [h1, h2]; omega
       · by_cases h2 : s.num k = 0 <;> simp [h1, h2] <;> omega
 
-theorem tUn_pos {s : TState} {v k : Nat} (hv : v < k) (hs : s.num v = 0) : 0 < tUn s k := by
+theorem tUn_pos {s : TState} {v k : Nat} (hv : v < k) (hs : s.num v = 0) : 0 < tUn s.num k := by
   induction k with
   | zero => omega
   | succ k ih =>
-    show 0 < tUn s k + (if s.num k = 0 then 1 else 0)
+    show 0 < tUn s.num k + (if s.num k = 0 then 1 else 0)
     by_cases e : v = k
     · subst e; simp [hs]
     · have := ih (by omega); omega
 
-theorem tUn_le (s : TState) : ∀ k, tUn s k ≤ k := by
+theorem tUn_le (s : TState) : ∀ k, tUn s.num k ≤ k := by
   intro k
   induction k with
   | zero => exact Nat.le_refl _
   | succ k ih =>
-    show tUn s k + (if s.num k = 0 then 1 else 0) ≤ k + 1
+    show tUn s.num k + (if s.num k = 0 then 1 else 0) ≤ k + 1
     by_cases h : s.num k = 0 <;> simp [h] <;> omega
 
 end SmcIrred

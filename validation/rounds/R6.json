@@ -1,0 +1,7 @@
+{
+ "round": "R6",
+ "commands": ["python validation/build_modules.py all", "python validation/axiom_audit.py"],
+ "theorems": ["tarjan_spec", "twoSatSolveOf_spec", "twoSatSolve_spec", "tarjan_cost", "tFinish_spec", "visit_spec", "tRun_spec"],
+ "open": ["G21", "G22"],
+ "sorry": 0
+}

@@ -30,3 +30,11 @@ public import SmcIrred.TwoSat.Reach
 public import SmcIrred.TwoSat.APT
 public import SmcIrred.TwoSat.Unit
 public import SmcIrred.TwoSat.Fig1
+public import SmcIrred.Spec.Tarjan
+public import SmcIrred.Spec.TwoSatSolve
+public import SmcIrred.Tarjan.Inv
+public import SmcIrred.Tarjan.Finish
+public import SmcIrred.Tarjan.Mono
+public import SmcIrred.Tarjan.Correct
+public import SmcIrred.Tarjan.Solver
+public import SmcIrred.Tarjan.Cost

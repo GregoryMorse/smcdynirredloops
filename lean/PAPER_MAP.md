@@ -11,7 +11,7 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C05 | §1 ¶1 | 617–619 | VMProtect and Denuvo defeated [16, 17] | R | R1 | R1 checked | source-partial: VMAttack (Kalysch, Götzfried, Müller, ARES 2017, doi 10.1145/3098954.3098995) deobfuscates VMProtect (checked); Denuvo reference [17] (Karthik, Amritha, Sethumadhavan, ICCCNT 2020) not found online: UNVERIFIED |
 | C06 | §1 ¶3 | 617–619 | DFS-based SCC + topological sort implemented by an SMC CFG of the queried graph | F + M | R7, R8 | open |  |
 | C07 | §1 ¶3 | 617–619 | stack simplification; generalizable to largely any graph algorithm | X | R1 | listed (X) |  |
-| C08 | §1 ¶3 | 617–619 | SCC + topological sort make an efficient linear 2-SAT solver [2] | F | R5, R6 | open |  |
+| C08 | §1 ¶3 | 617–619 | SCC + topological sort make an efficient linear 2-SAT solver [2] | F | R5, R6 | done (Tarjan.Solver `twoSatSolve_spec`, Tarjan.Correct `tarjan_spec`) |  |
 | C09 | §1 ¶4 | 617–619 | an IL is a loop with multiple entries; hardest structure for static tools | F (def) + X | R3 | open |  |
 | C10 | §1 ¶4 | 617–619 | nested ILs can cause quadratic LNF construction [22] | R | R1 | R1 checked | source-checked: Ramalingam, Identifying loops in almost linear time, TOPLAS 21(2) 1999, 175-188: abstract states Havlak's algorithm is quadratic in the worst case (IBM Research page) |
 | C11 | §1 ¶4 | 617–619 | "the only resolution" for structuring is variables + conditions (P12) | F + R | R18 | open |  |
@@ -24,7 +24,7 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C18 | §2 ¶1 | 619–622 | DNF trivially solvable but potentially O(2^n) clauses | F (should) | R5 | open: G21 (R6) |  |
 | C19 | §2 ¶1 | 619–622 | k-SAT reduces to 3-SAT; 3-SAT NP-complete | R (+F could) | R1 | R1 checked | standard: Cook-Levin; Karp 1972 (not opened this round) |
 | C20 | §2 ¶2 | 619–622 | 2-SAT NL-complete; NL ⊆ P | R | R1 | R1 checked | standard: Papadimitriou, Computational Complexity, 1994, Ch. 16 (2-SAT NL-complete); Jones, Lien, Laaser 1976 (not opened this round) |
-| C21 | §2 ¶2 | 619–622 | linear time via implication graph + SCC; solution in reverse topological order | F | R5, R6 | done (TwoSat.APT `twoSat_iff_scc`, `apt_correct`) |  |
+| C21 | §2 ¶2 | 619–622 | linear time via implication graph + SCC; solution in reverse topological order | F | R5, R6 | done (TwoSat.APT `twoSat_iff_scc`, `apt_correct`; Tarjan.Cost `tarjan_cost`) |  |
 | C22 | §2 ¶2 | 619–622 | an empty clause means unsatisfiable | F | R5 | done (TwoSat.APT `unsat_of_empty`) |  |
 | C23 | §2 ¶2 | 619–622 | unit-clause handling (P02) | F | R5 | done (TwoSat.Unit `noUnit_sccCriterion_fails`) |  |
 | C24 | §2 ¶2 | 619–622 | (p ∨ q) ≡ (¬p ⇒ q) ∧ (¬q ⇒ p) | F | R5 | done (TwoSat.Implication `or_iff_implications`) |  |
