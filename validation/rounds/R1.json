@@ -1,0 +1,43 @@
+{
+ "round": "R1",
+ "items": 31,
+ "confirmed": 26,
+ "ask_author": [
+  "P06",
+  "P10",
+  "P11",
+  "P13",
+  "P28"
+ ],
+ "commands": [
+  "python validation/audit_errata.py (31/31 ok)",
+  "python validation/check_tables.py (OK)"
+ ],
+ "new_items": [
+  "P27",
+  "P28",
+  "P29"
+ ],
+ "sources_checked": [
+  "Ramalingam 1999 (abstract)",
+  "CFT POPL 2003 (PDF)",
+  "Bos et al. CHES 2016 (ePrint 2015/753)",
+  "VMAttack ARES 2017",
+  "Stanier-Watson 2012 (abstract)",
+  "Unger-Mueller TOPLAS 2002",
+  "ePrint 2015/412",
+  "Ilango-Loff-Oliveira CCC 2020"
+ ],
+ "unverified": [
+  "Denuvo reference [17]",
+  "Banescu et al. SPRO 2015 quotation (C82)",
+  "Papadimitriou/Karp/PKCS standard facts not opened"
+ ],
+ "author_answers_2026-10-17": {
+  "P10": "re-measure first (R16), minimal correction, regeneration allowed",
+  "P13": "author implements the protected variant (new round R19b)",
+  "wording": "minimal",
+  "include": "T01, B01, P17b, P25, P26, P27",
+  "native": "CMake for all C projects, build/ tree, CI Windows/Linux/macOS, VS2022/2026 compatible (new round R21a)"
+ }
+}

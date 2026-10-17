@@ -1,4 +1,4 @@
-"""Errata audit for lean/errata/edits.json (paper-only errata against arXiv v1).
+"""Errata audit for lean/errata/edits.json (paper-only errata against the published PMD version).
 
   --inventory (default): every `before` occurs verbatim (line endings normalised) in the v1 TeX, and every fragment of
       `before_pdf` occurs, after whitespace/hyphenation/ligature normalisation, on one page of the v1 PDF text;
@@ -11,8 +11,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 EDITS = ROOT / "lean/errata/edits.json"
-TEX = ROOT / "paper/arxiv-v1/SelfModifyingCodeTamperProofingManuscriptUpdated.tex"
-PDF_TXT = ROOT / "validation/reference/2604.12407v1.txt"
+TEX = ROOT / "validation/reference/SelfModifyingControlFlowObfuscationPaper.tex"
+PDF_TXT = ROOT / "validation/reference/pmd_raw.txt"
+FIRST_PAGE = 617  # journal page of the first PDF page
 
 
 def norm(s: str) -> str:
@@ -32,32 +33,29 @@ def refs() -> int:
 
 
 def pdf() -> int:
-    p = ROOT / "output/pdf/smctamper-2026-errata.pdf"
+    p = ROOT / "output/pdf/smcirred-2022-errata.pdf"
     n = len(re.findall(rb"/Type\s*/Page[^s]", p.read_bytes()))
     print("errata pdf pages", n)
     return 0 if 1 <= n <= 3 else 1
 
 
 def inventory(fill: bool) -> int:
+    """Each `before_pdf` entry {page, text} occurs (normalised) on that journal page of the published PDF text;
+    each `before_tex` (when not null) occurs exactly once in the manuscript TeX (line endings normalised)."""
     data = json.loads(EDITS.read_text(encoding="utf-8"))
-    tex = TEX.read_bytes().decode("utf-8").replace("\r\n", "\n")
-    pages = [norm(p) for p in PDF_TXT.read_text(encoding="utf-8").split("\f")]
+    tex = TEX.read_bytes().decode("utf-8").replace(chr(13) + chr(10), chr(10))
+    pages = {FIRST_PAGE + i: norm(p) for i, p in enumerate(PDF_TXT.read_text(encoding="utf-8").split(chr(12)))}
     bad = 0
     for e in data["edits"]:
-        in_tex = tex.count(e["before"]) == 1
-        found = []
-        frags = e.get("before_pdf") or []
-        if frags:
-            for i, p in enumerate(pages, 1):
-                if all(norm(f) in p for f in frags):
-                    found.append(i)
-        ok = in_tex and (found or not frags)
+        tex_ok = True
+        for frag in ([e["before_tex"]] if isinstance(e.get("before_tex"), str) else e.get("before_tex") or []):
+            tex_ok &= tex.count(frag) == 1
+        pdf_ok = True
+        for f in e.get("before_pdf") or []:
+            pdf_ok &= norm(f["text"]) in pages.get(f["page"], "")
+        ok = tex_ok and pdf_ok
         bad += not ok
-        if fill and found:
-            e["page"] = found[0]
-        print("ok  " if ok else "FAIL", e["id"], "tex-once=%s" % in_tex, "pdf-pages=%s" % found, e["status"])
-    if fill:
-        EDITS.write_text(json.dumps(data, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+        print("ok  " if ok else "FAIL", e["id"], "tex=%s pdf=%s" % (tex_ok, pdf_ok), e["status"])
     return 1 if bad else 0
 
 

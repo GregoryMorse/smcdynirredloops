@@ -6,7 +6,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | Round | Deliverable | Priority | State |
 | --- | --- | --- | --- |
 | R0 | Bootstrap, references, baselines (authorization question) | must | DONE 2026-10-17 |
-| R1 | Claim inventory, errata verification, sources, author questions | must | TODO |
+| R1 | Claim inventory, errata verification, sources, author questions | must | DONE 2026-10-17 |
 | R2 | Graph foundations, DFS jungle, Figure 4(a)(b) | must | TODO |
 | R3 | Havlak loop nesting forest, Figure 4(c), small CFGs, non-uniqueness | must | TODO |
 | R4 | Extremal results: K_n, M_n, n−2 bound (MEE bound should) | must | TODO |
@@ -27,6 +27,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R19 | Dynamic scheme, faults, static scheme end-to-end | must | TODO |
 | R20a | Security model I: definitions, T1–T3 (crux) | must | TODO |
 | R20b | Security model II: T4–T7, necessity, §5.1 texts | must | TODO |
+| R19b | Protected AES/RSA variant: the author implements it, this round integrates (P13, D03) | must | BLOCKED on the author |
+| R21a | Portable native build system: CMake, build/ tree, VS 2022/2026, CI Windows/Linux/macOS | must | TODO |
 | R21 | Code fixes (not errata) and native acceptance | must | TODO |
 | R22 | Errata list (paper only) | must | TODO |
 | R23 | Coverage and fidelity audit | must | TODO |
@@ -60,3 +62,11 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Open obligations: `aes` and `ecdsa` native projects exceed the 1.5 GB local cap when compiled (generated/aesvm.cpp 10.8 MB; ecdsa256vm.c C1060): CI-only. Win32 and g++ baselines are CI-only. Round-close `limited_run.py` must be invoked with `python` (not `py -I`: it imports a sibling module).
 - Hazards: `limited_run.py`/`build_modules.py` break under `py -I` for direct calls; `latexmk` exits 12 on the first-pass graphviz message (accepted by `build_tex.py`); Table 3, Fig. 1 and Fig. 4 page sign-off rests on the planning-time inspection (Tables 1-2 re-checked).
 - Evidence: `validation/rounds/R0.json`.
+
+### R1 (Claude Sonnet 5.5, 2026-10-17)
+
+- Done: `lean/errata/edits.json` (31 items: 26 confirmed, ask-author P06, P10, P11, P13, P28), `lean/errata/POLICY.md`, `lean/CODE_FIXES.md` (adds L07), `lean/PAPER_MAP.md` (C01-C83 + C84, C85 with classes, pages, R-class source checks), `validation/audit_errata.py` rewritten (31/31 quotes found on the published pages and once in the manuscript TeX). New errata from the read-through: P27 (Fig. 3 comments), P28 ("exponential growth of multiplication"), P29 (static-analysis overclaims); T01 completed (17 sub-items), B01 (5 sub-items; [21] vol. 137 and [26] swapped names are publisher typesetting, the manuscript bib is right). Sources checked: see `validation/rounds/R1.json`; unverified: Denuvo [17], the Banescu quotation (C82).
+- Author answers (one AskUserQuestion): P10 re-measure first (R16 step 4), minimal correction; P13: **the author implements the protected variant** (new round R19b, blocked on the author); wording minimal; T01, B01, P17b, P25, P26, P27 all appear; **new requirement:** every C/C++ project gets CMake, `build/` tree, CI Windows/Linux/macOS, VS 2022 and 2026 compatibility (new round R21a).
+- Next: R2 (graph foundations, DFS jungle, Figure 4(a)(b)).
+- Open obligations: P11 provenance (R16); `make_errata.py` is still the SelfModTamper copy (adapt in R22); the TeX `before_tex` of the P18/P19 figure edits reference dot source, not prose.
+- Evidence: `validation/rounds/R1.json`.

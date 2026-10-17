@@ -918,7 +918,13 @@ odd N); compiled-graph correctness by R11; `graph_stats.py --lean-compare` for R
    machine (evidence only; never compared as numbers with the paper).
 3. `Spec/Data.lean` + `Data/Ratios` (C61, FD): per-executed-node times (4.3–7.3 ns), growth ratios
    (exponent between 2 and 3 in time), the P10 anomalies (equal 128/256 cells; non-monotone 32/64).
-4. Update P10/P11 with the evidence; questions to `QUESTIONS.md` (provenance: which key; which counts).
+4. **P10 (author decision 2026-10-17):** re-measure the `C gmp` column (modular exponentiation with GMP,
+   1000 operations in succession, RSA-32/64/128/256 with the fixed repository keys, x86 and x64) on this
+   machine, with the same method as the paper's Table 2; first decide whether the printed 256-bit cells are
+   really the 128-bit values (and whether the 32-bit row is a unit slip). If the printed cells are wrong,
+   apply the minimal correction (re-measured values, labelled as such); regeneration of the column is
+   allowed. Record method, machine and numbers in `validation/data/gmp_remeasure.json`.
+5. Update P10/P11 with the evidence; questions to `QUESTIONS.md` (provenance: which key; which counts).
 
 **Gate:** every Table 1–2 count is either reproduced or recorded as a mismatch in P11 with evidence.
 
@@ -1017,6 +1023,49 @@ repeat); a vertex execution reads the current values of its predecessors; "final
    (D10) of every sentence.
 
 **Gate:** T4–T7 and necessity witnesses proved; P21–P25 texts in `edits.json` with `lean_refs`.
+
+### R19b — Protected AES/RSA variant (must; **the author implements it**; decision 2026-10-17)
+
+The author will implement the irreducible-loop + planted-2-SAT protected variant of AES/RSA announced in §1
+(P13) and the §3.1 generator (D03). This round **integrates** it and cannot start before the author says the
+implementation is in the repository.
+
+1. Review the code the author adds (generator of planted 2-SAT formulas, the Figure 5/6 transformations,
+   the protected AES/RSA drivers); add it to `CODE_FIXES.md` as new code, not as a fix; native vectors on
+   this machine.
+2. Lean: connect it to R9 (generator), R17 (transformations) and R19 (static scheme end-to-end) as literal
+   transcriptions with M evidence (D12).
+3. Decide P13 with the author: if the case study now exists and is measured, the erratum becomes a
+   statement of what Table 1-3 report versus the new measurements; otherwise state the scope.
+4. `validation/rounds/R19b.json`.
+
+**Gate:** protected variant builds and runs on the CI platforms (R21a); Lean models and M evidence in place;
+P13 settled.
+
+### R21a — Portable native build system (must; author decision 2026-10-17)
+
+Every C/C++ project of the repository (`selfmodgraph`, `IrredLoop`, `aes`, `rsa`, `ecdsa`, `ecdsawhibox`, the
+protected variant of R19b) gets the usual portable clean semantics:
+
+1. A root `CMakeLists.txt` (CMake >= 3.20, C11/C++17) building every target; all build artifacts go to a
+   `build/` tree outside the sources (no `x64/`, `Debug/`, `.obj` next to sources); `build/` is gitignored; the
+   generated sources (`generated/*vm.c*`) are built as separate object libraries so the compiler memory stays
+   bounded (R0 finding: the 10.8 MB `generated/aesvm.cpp` needs more than 1.5 GB with MSVC); GMP is found via
+   `find_package`/Conan/vcpkg/`GMP_ROOT`.
+2. The x86 SMC blueprint (`selfmodmodel.asm` MASM, `selfmodmodelgas.asm` GNU as) is selected per platform;
+   non-x86 hosts (macOS arm64, Linux arm64) build and test everything except executing the x86 blueprint
+   (CMake option `SMC_X86_EXECUTE`); macOS x86-64 (runner `macos-15-intel`) executes it.
+3. Visual Studio projects keep working with VS 2022 (v143) and VS 2026 (v145): no hard-coded
+   `PlatformToolset` (use `$(DefaultPlatformToolset)`), outputs under `build/` (`$(SolutionDir)build\...`), the
+   CMake VS generators checked on both.
+4. CI (`.github/workflows/`): Windows (2022, 2025), Linux (x86-64) and macOS (Intel and arm64) matrix; both
+   the MSBuild solution and the CMake build, compile-only plus the native vectors that exist (R8); nothing
+   outside `build/` may be written (`git status --porcelain` check).
+5. `CONTRIBUTING.md` and `README.md` updated (commands, GMP, Conan); `validation/native.py` calls the new
+   targets. Native acceptance in R21 uses these builds.
+
+**Gate:** clean checkout builds on Windows (VS 2022 and 2026), Linux and macOS in CI; no artifact outside
+`build/`; vectors pass where the platform can execute them.
 
 ### R21 — Code corrections and native acceptance (must)
 
