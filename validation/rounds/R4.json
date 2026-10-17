@@ -1,0 +1,7 @@
+{
+ "round": "R4",
+ "commands": ["python validation/build_modules.py all (exit 0)", "python validation/axiom_audit.py (819 declarations, 0 violations)", "Evidence.lean #eval assertion n = 2..4"],
+ "theorems": ["Kn_edgeCount", "Kn_irrCount", "Kn_meeCount", "Kn_irrCount_any", "Kn_meeCount_any", "Kn_headerCount_any", "Mn_edgeCount", "Mn_meeCount_eq", "MnLite_others", "irrCount_le", "meeCount_le"],
+ "open": ["G19", "G20"],
+ "sorry": 0
+}

@@ -10,7 +10,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R2 | Graph foundations, DFS jungle, Figure 4(a)(b) | must | DONE 2026-10-17 |
 | R3 | Havlak loop nesting forest, Figure 4(c), small CFGs, non-uniqueness | must | DONE 2026-10-17 (algorithm equivalence: open obligation) |
 | R3b | Close G01/G02: Havlak algorithm = declarative LNF; reducible-CFG body uniqueness (scheduled after R5, before R6 if time; mandatory before R23) | must | TODO |
-| R4 | Extremal results: K_n, M_n, n−2 bound (MEE bound should) | must | TODO |
+| R4 | Extremal results: K_n, M_n, n−2 bound (MEE bound should) | must | DONE 2026-10-17 (G19 open) |
+| R4c | Close G19 (P15 second half: max-MEE CFGs have >= 2n-3 other edges), after R5 | should | TODO |
 | R5 | 2-SAT: implication graph, APT theorem, unit clauses, Figure 1 | must | TODO |
 | R6 | Tarjan's algorithm, cost, reference solver, `tarjan_scc` model | must | TODO |
 | R7 | SMC 2-SAT solver Level 2 ⇒ Tarjan/APT; restamp lemma | must | TODO |
@@ -87,3 +88,11 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Open obligations: (1) general proof that `havlak` equals the declarative LNF (plan risk fallback taken: M evidence only on Fig. 4); (2) C28 second half: loop bodies DFS-independent for reducible CFGs (marked "should").
 - Hazards: core has no `push_neg`, `set`, `interval_cases`; `decide` on `Body` needs `set_option synthInstance.maxSize 2048`; Body is defined only through `IsHeader` (non-headers have empty bodies).
 - Evidence: validation/rounds/R3.json.
+
+### R4 (Claude Sonnet 5.5, 2026-10-17)
+
+- Done: `Spec.Extremal` (Kn, Mn, MnLite, chainJungle, edgeCount/irrCount/meeCount); `Extremal.Chain` (generic chain-graph theory: headers, bodies, irreducible, MEE, counts); `Kn`/`Mn`/`MnCount` (canonical numbering: |E(K_n)| = n²−n, n−2 irreducible, C(n−1,2) MEE, |E(M_n)| = (n−1)(n+2)/2, |MEE(M_n)| = |MEE(K_n)|, disjoint edge classes, P14 formal, P15 witness with 2n−3 other edges); `KnAny` (same counts for any root and any DFS of K_n, Hamiltonian-path property); `IrrBound` (every CFG, n >= 2: <= n−2 irreducible loops); `MEEBound` (every CFG, every DFS: <= C(n−1,2) MEE; `K_n` attains it); `Evidence` (brute-force cross-check n <= 4, class M). Build + audit clean (819 declarations, 0 violations, no sorry).
+- Next: R5 (2-SAT, APT, Figure 1). Round R4c (G19) is scheduled after R5; R3b (G01/G02) before R23.
+- Open obligations: G19, G20 (see `lean/GAPS.md`).
+- Hazards: `Evidence.lean` is a non-`module` file (module files cannot `#eval` imported code) and is not imported by `SmcIrred.lean`; classical `decide` inside Spec counts clashes with the `Decidable` instances: use `filter_congr` + `decide_eq_decide`.
+- Evidence: validation/rounds/R4.json.

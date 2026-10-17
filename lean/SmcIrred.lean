@@ -21,3 +21,6 @@ public import SmcIrred.Extremal.Kn
 public import SmcIrred.Extremal.Mn
 public import SmcIrred.Extremal.MnCount
 public import SmcIrred.Extremal.IrrBound
+public import SmcIrred.Extremal.Count2
+public import SmcIrred.Extremal.MEEBound
+public import SmcIrred.Extremal.KnAny

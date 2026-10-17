@@ -90,4 +90,20 @@ theorem sum_last (n c : Nat) (hn : 1 ≤ n) : ((List.range n).map fun a => if a 
   rw [e, sum_map_const]
   simp
 
+theorem count_ne (n : Nat) : ∀ a, a < n → ((List.range n).filter fun b => decide (b ≠ a)).length = n - 1 := by
+  induction n with
+  | zero => intro a h; omega
+  | succ n ih =>
+    intro a ha
+    rw [List.range_succ, List.filter_append, List.length_append]
+    by_cases e : a = n
+    · subst e
+      have : (List.range a).filter (fun b => decide (b ≠ a)) = List.range a :=
+        List.filter_eq_self.2 (fun b hb => by simp only [List.mem_range] at hb; simp; omega)
+      rw [this]; simp
+    · have := ih a (by omega)
+      rw [this]
+      have : n ≠ a := fun h => e h.symm
+      simp [this]; omega
+
 end SmcIrred
