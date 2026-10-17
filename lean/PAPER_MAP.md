@@ -97,4 +97,4 @@ New claims found in R1 (no seed existed):
 
 ## Open obligations
 
-(none yet)
+See `lean/GAPS.md` (single register; every `partial`/`open` row here has a G-row there).

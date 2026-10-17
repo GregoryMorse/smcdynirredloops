@@ -38,6 +38,8 @@ deviating. Do not browse sibling repositories beyond the paths the plan names.
 - Evidence (native runs, regenerated counts, listings, data checks) is never described as proof. Prose
   (docstrings, YAML, Markdown, the corrected manuscript's statement) must claim no more than the Lean
   hypotheses give.
+- Gaps: never drop one. Every open obligation, narrowed claim or deferred item goes into `lean/GAPS.md` with an owner round and a
+  fallback claim; round closes update it (new rows, closed rows). R23/R24 fail while a row has no owner.
 - Economy: one round per session; build only touched modules until round close; three focused attempts
   per obstacle, then narrow the statement and record an open obligation in `lean/PAPER_MAP.md`; at most
   one batched question to the user per round.

@@ -9,6 +9,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R1 | Claim inventory, errata verification, sources, author questions | must | DONE 2026-10-17 |
 | R2 | Graph foundations, DFS jungle, Figure 4(a)(b) | must | DONE 2026-10-17 |
 | R3 | Havlak loop nesting forest, Figure 4(c), small CFGs, non-uniqueness | must | DONE 2026-10-17 (algorithm equivalence: open obligation) |
+| R3b | Close G01/G02: Havlak algorithm = declarative LNF; reducible-CFG body uniqueness (scheduled after R5, before R6 if time; mandatory before R23) | must | TODO |
 | R4 | Extremal results: K_n, M_n, n−2 bound (MEE bound should) | must | TODO |
 | R5 | 2-SAT: implication graph, APT theorem, unit clauses, Figure 1 | must | TODO |
 | R6 | Tarjan's algorithm, cost, reference solver, `tarjan_scc` model | must | TODO |
