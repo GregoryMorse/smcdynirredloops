@@ -1,0 +1,7 @@
+{
+ "round": "R3",
+ "commands": ["python validation/build_modules.py all (exit 0)", "python validation/axiom_audit.py (479 declarations, 0 violations)"],
+ "theorems": ["pathSet_iff", "Jungle.Valid.root_not_irreducible", "Jungle.Valid.body_nested_or_disjoint", "Jungle.mee_forward_or_cross", "no_irreducible_of_small", "threeNode_irreducible", "fig4_headers", "fig4_bodies", "fig4_irreducible", "fig4_lnf", "fig4_mee", "lnf_not_unique", "irreducible_not_unique", "havlak_fig4", "havlak_fig4Swap"],
+ "open": ["havlak = declarative LNF in general (M evidence on Fig. 4 only)", "reducible-CFG body uniqueness (should)"],
+ "sorry": 0
+}

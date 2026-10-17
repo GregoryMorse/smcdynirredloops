@@ -8,7 +8,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R0 | Bootstrap, references, baselines (authorization question) | must | DONE 2026-10-17 |
 | R1 | Claim inventory, errata verification, sources, author questions | must | DONE 2026-10-17 |
 | R2 | Graph foundations, DFS jungle, Figure 4(a)(b) | must | DONE 2026-10-17 |
-| R3 | Havlak loop nesting forest, Figure 4(c), small CFGs, non-uniqueness | must | TODO |
+| R3 | Havlak loop nesting forest, Figure 4(c), small CFGs, non-uniqueness | must | DONE 2026-10-17 (algorithm equivalence: open obligation) |
 | R4 | Extremal results: K_n, M_n, n−2 bound (MEE bound should) | must | TODO |
 | R5 | 2-SAT: implication graph, APT theorem, unit clauses, Figure 1 | must | TODO |
 | R6 | Tarjan's algorithm, cost, reference solver, `tarjan_scc` model | must | TODO |
@@ -78,3 +78,11 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Open obligations: Fig. 4 LNF part (R3); C65 C++ encodings (R18); P03 lean_ref is `SmcIrred.fig4_kinds` (checked via `audit_errata.py --refs` in R22).
 - Hazards: Lean core only (no Mathlib tactics: use omega/decide/simp, by_cases); definitions used by decide need `@[expose]`.
 - Evidence: validation/rounds/R2.json.
+
+### R3 (Claude Sonnet 5.5, 2026-10-17)
+
+- Done: `Spec.LNF` (PathIn, BackEdge, IsHeader, Body, Irreducible, LnfParent, IsMEE; all relative to a jungle, declarative); `LNF.Path` (decision procedure for paths inside a set, proved correct, gives `Decidable`); `LNF.Decide` (instances); `LNF.Facts` (root loop never irreducible; loop bodies nested or disjoint for every valid jungle; every MEE is forward or cross); `LNF.Small` (C71: no irreducible loop with <= 2 vertices for any jungle; the 3-vertex graph has one in every valid jungle); `LNF.Fig4` (Fig. 4(c): headers u,w,x; bodies; all irreducible; forest u>w>x>v; only MEE entry->v); `LNF.NonUnique` (C28: second DFS of Fig. 4 is valid and has different headers; also irreducible-set differs); `LNF.Algo` (Havlak's algorithm with union-find, executable; equals the declarative LNF on the two Fig. 4 DFS orders by `decide`). Full build + audit clean (479 declarations, 0 violations, no sorry).
+- Next: R4 (extremal results K_n, M_n; may take two sessions). Use `Digraph.IsMEE`, `Irreducible`, `Body` from `Spec.LNF`; the decidable instances and `PathIn.trans/mono`, `Jungle.Valid.tree_path` help.
+- Open obligations: (1) general proof that `havlak` equals the declarative LNF (plan risk fallback taken: M evidence only on Fig. 4); (2) C28 second half: loop bodies DFS-independent for reducible CFGs (marked "should").
+- Hazards: core has no `push_neg`, `set`, `interval_cases`; `decide` on `Body` needs `set_option synthInstance.maxSize 2048`; Body is defined only through `IsHeader` (non-headers have empty bodies).
+- Evidence: validation/rounds/R3.json.

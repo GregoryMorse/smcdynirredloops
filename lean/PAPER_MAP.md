@@ -31,8 +31,8 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C25 | Fig. 1 | 620 | formula, 24 implications, graph, SCC labels, highlighted solution | F + M | R5 | open |  |
 | C26 | §2 ¶3 | 619–622 | CFG definition; vertex kinds by out-degree (P03) | F | R2 | done | Spec.Graph IsCFG/kind; Graph.Fig4.fig4_kinds |
 | C27 | §2 ¶3 | 619–622 | DFS edge classification by pre/post timestamps | F | R2 | done | Graph.Classify (cls_*_iff); Graph.DfsValid.dfsRun_valid |
-| C28 | §2 ¶4 | 619–622 | loops; LNF; unique for reducible CFGs, not for irreducible ones | F | R3 | open |  |
-| C29 | §2 ¶4 | 619–622 | Havlak LNF: one header per loop; near-linear [26] | F (def) + R | R3 | open | source-partial: Havlak TOPLAS 19(4) 1997 557-567 (definition); near-linear claim cites Wei, Mao, Zou, Chen, SAS 2007 (not opened); Ramalingam 1999 shows Havlak's worst case is quadratic |
+| C28 | §2 ¶4 | 619–622 | loops; LNF; unique for reducible CFGs, not for irreducible ones | F | R3 | partial | R3: LNF.NonUnique.lnf_not_unique, irreducible_not_unique (non-uniqueness for irreducible CFGs); open (should): bodies DFS-independent for reducible CFGs |
+| C29 | §2 ¶4 | 619–622 | Havlak LNF: one header per loop; near-linear [26] | F (def) + R | R3 | partial | Spec.LNF (declarative Havlak loops); LNF.Algo.havlak with LNF.Algo.havlak_fig4/havlak_fig4Swap (M evidence on two DFS orders of Fig. 4; general algorithm = declarative equivalence is an OPEN OBLIGATION, plan risk fallback); source-partial: Havlak TOPLAS 19(4) 1997 557-567 (definition); near-linear claim cites Wei, Mao, Zou, Chen, SAS 2007 (not opened); Ramalingam 1999 shows Havlak's worst case is quadratic |
 | C30 | §2 ¶4 | 619–622 | ILs not directly representable in Java/Python | F (should) | R18 | open |  |
 | C31 | §2 ¶5 | 619–622 | state-machine model represents any CFG with one variable and an n-way conditional | F | R18 | open |  |
 | C32 | §2 ¶6 | 619–622 | structuring ILs needs goto (absent new variables/duplication); tools named | F + R | R18 | open |  |
@@ -68,13 +68,13 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C62 | §4.3 | 627–629 | machine-word reductions gain "2^32 or 2^64" (P09) | F | R14 | open |  |
 | C63 | Fig. 3 | 628 | the listed Python equals the generator code | M | R11 | open |  |
 | C64 | §5 ¶1 | 629–633 | ILs rare in C [25]; undecidability [18]; read-only code segments | R + X | R1 | R1 checked | source-checked: Stanier and Watson, Softw. Pract. Exper. 42(1) 2012, 117-130, abstract: irreducibility is extremely rare in open-source C |
-| C65 | Fig. 4 | 630 | CFG, jungle with timestamps, Havlak LNF; C++ encodings | F + M | R3, R18 | partial | R2: Graph.Fig4 (CFG, jungle: fig4_dfs_eq, fig4Jungle_valid, fig4_classes); LNF in R3 |
+| C65 | Fig. 4 | 630 | CFG, jungle with timestamps, Havlak LNF; C++ encodings | F + M | R3, R18 | partial | R2 Graph.Fig4 (CFG, jungle); R3 LNF.Fig4 (fig4_headers, fig4_bodies, fig4_irreducible, fig4_lnf, fig4_mee); C++ encodings R18 |
 | C66 | Table 3 | 630 | decompiler counts | X | R1 | listed (X) |  |
-| C67 | §5, Def. 3 | 629–633 | K_n: / E / = n²−n; any root gives a CFG; n−1 headers in a chain; entry loop reducible; ≤ n−2 irreducible loops; / MEE(K_n) / = (n−1)(n−2)/2 | F | R4 | open |  |
+| C67 | §5, Def. 3 | 629–633 | K_n: / E / = n²−n; any root gives a CFG; n−1 headers in a chain; entry loop reducible; ≤ n−2 irreducible loops; / MEE(K_n) / = (n−1)(n−2)/2 | F | R4 | partial | R3: LNF.Facts Jungle.Valid.root_not_irreducible (entry loop reducible), mee_forward_or_cross, body_nested_or_disjoint; counts in R4 |
 | C68 | §5, Def. 4 | 629–633 | M_n construction (P14), / E(M_n) / , / MEE(M_n) / = / MEE(K_n) / , MEE maximal, others minimal (P15, P16) | F | R4 | open |  |
 | C69 | §5 | 629–633 | DCC/REC assumptions on Boolean latches | X + R | R1 | open | source-partial: Cifuentes, Latin American Informatics Conf. 1993 (not opened); REC Studio page cited without access date |
 | C70 | §5 | 629–633 | node splitting needs a quadratic amount of duplication (P17) | R + F (should) | R18 | open | source-checked: Carter, Ferrante, Thomborson, POPL 2003, pp. 106-114 (PDF read): exponential, not quadratic; see P17 |
-| C71 | §5 | 629–633 | 1- and 2-node CFGs never contain an IL | F | R3 | open |  |
+| C71 | §5 | 629–633 | 1- and 2-node CFGs never contain an IL | F | R3 | done | LNF.Small no_irreducible_of_small, threeNode_irreducible (every valid jungle), threeNode_dfs_valid |
 | C72 | §5 | 629–633 | DREAM: n−2 integer variables; conditions by MEE; n−2 compound conditions | X + F (could) | R18 | open |  |
 | C73 | §5 | 629–633 | minimal 2 edges for a sequence; simulated loop = one node + three edges + SMC/state variable | F | R17 | open |  |
 | C74 | Figs. 5–6 | 632–633 | transformed programs equivalent; ILs induced; graphs match code (P18, P19) | F | R17 | open |  |
