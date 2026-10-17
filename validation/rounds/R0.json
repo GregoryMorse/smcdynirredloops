@@ -1,0 +1,21 @@
+{
+ "round": "R0",
+ "base_commit": "a42274f96a5d433b226dd5be241452129a4227fa",
+ "authorization": "user 2026-10-17: commits and pushes allowed; errata list committed; manuscript TeX/bib/cls and published PDF NOT committed; no corrected paper now (errata list only); tag name not yet asked (R25)",
+ "gates": {
+  "reference_hashes": "pass (validation/fetch_reference.py: PDF e89a803c..., TeX 309bc5d1..., bib 28968b3a..., cls 2dbdc5da...; 21 pages)",
+  "manuscript_build": "pass: validation/build_tex.py -> 21 pages (published PDF 21 pages); latexmk exit 12 is the first-pass graphviz 'can't open X.dot' message, second pass clean, 0 undefined references; output/pdf/manuscript-2022.pdf is gitignored",
+  "lean_stub": "pass: build_modules.py all + axiom_audit.py: 22 declarations, 0 violations; peak group commit 612151296 B under the 1.5 GB guard",
+  "tables_checker": "pass: validation/check_tables.py OK (Tables 1-3, Fig. 1 clauses/edges/SCCs/APT assignment, Fig. 4 edges/jungle/LNF)",
+  "rendered_page_signoff": "Tables 1-2 compared with the rendered page 629 on 2026-10-17 (matches the JSON); Table 3, Fig. 1 and Fig. 4 pages (630, 620) were inspected during planning",
+  "native_compile_debug_x64": {
+   "selfmodgraph": "ok",
+   "rsa": "ok",
+   "aes": "CAPPED: generated/aesvm.cpp (10.8 MB) exceeds the 1.5 GB guard (cl.exe > 2.4 GB unguarded, exit 137 guarded); CI-only",
+   "ecdsa": "CAPPED: C1060 out of heap space on generated/ecdsa256vm.c under the guard; CI-only (ECDSA is outside the paper's tables)"
+  },
+  "native_win32": "not attempted locally (same generated sources); CI",
+  "linux_gxx": "not available locally; CI"
+ },
+ "note": "One unguarded msbuild of aes/ecdsa was started by mistake before the guard check; stopped and its partial aesgraph.obj deleted; every later build ran under limited_run.py."
+}

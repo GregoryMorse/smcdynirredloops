@@ -74,3 +74,13 @@ results/
 *.cnf
 *_map.txt
 /native/.vs
+
+# Lean / validation scratch (R0)
+lean/.lake/
+validation/.build/
+validation/.cache/
+validation/reference/
+output/pdf/*.aux
+output/pdf/*.log
+/.private/
+output/pdf/manuscript-2022.pdf

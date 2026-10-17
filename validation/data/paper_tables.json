@@ -1,0 +1,52 @@
+{
+ "_comment": "Transcribed by hand from the author manuscript TeX (SHA-256 309bc5d1...) with TeX line numbers; page = journal page of the published version. validation/check_tables.py re-reads the TeX and compares.",
+ "tex_sha256": "309bc5d1d0970a74a62e6f221697bb601a864fb3dc081af8bc879523fd635968",
+ "table1_aes": {
+  "tex_lines": [251, 262], "page": 629,
+  "header": ["AES", "Arch.", "C. Ref.", "Intrin.", "CFG", "Nodes", "Edges", "Exec. N", "Exec. E"],
+  "rows": [
+   {"bits": 128, "nodes": 51127, "edges": 222683, "exec_n": 134455, "exec_e": 386203, "arch": [
+     {"arch": "x86", "cref": "61us", "intrin": "5us", "cfg": "0.58s"},
+     {"arch": "x86-64", "cref": "49us", "intrin": "3us", "cfg": "0.65s"}]},
+   {"bits": 192, "nodes": 61364, "edges": 267320, "exec_n": 161489, "exec_e": 463381, "arch": [
+     {"arch": "x86", "cref": "72us", "intrin": "5us", "cfg": "0.74s"},
+     {"arch": "x86-64", "cref": "58us", "intrin": "4us", "cfg": "0.82s"}]},
+   {"bits": 256, "nodes": 71568, "edges": 311924, "exec_n": 188438, "exec_e": 541018, "arch": [
+     {"arch": "x86", "cref": "83us", "intrin": "6us", "cfg": "0.91s"},
+     {"arch": "x86-64", "cref": "67us", "intrin": "4us", "cfg": "0.89s"}]}]},
+ "table2_rsa": {
+  "tex_lines": [264, 277], "page": 629,
+  "header": ["RSA", "Arch.", "C gmp", "CFG", "Nodes", "Edges", "Exec. N", "Exec. E"],
+  "rows": [
+   {"bits": 32, "nodes": 8882, "edges": 16591, "exec_n": 686447, "exec_e": 1321378, "arch": [
+     {"arch": "x86", "cgmp": "851ms", "cfg": "4.90s"},
+     {"arch": "x86-64", "cgmp": "707ms", "cfg": "5.03s"}]},
+   {"bits": 64, "nodes": 15743, "edges": 29925, "exec_n": 4538657, "exec_e": 8706840, "arch": [
+     {"arch": "x86", "cgmp": "2.207ms", "cfg": "32.12s"},
+     {"arch": "x86-64", "cgmp": "1.015ms", "cfg": "33.06s"}]},
+   {"bits": 128, "nodes": 34604, "edges": 67583, "exec_n": 27372136, "exec_e": 52186545, "arch": [
+     {"arch": "x86", "cgmp": "9.141ms", "cfg": "196.69s"},
+     {"arch": "x86-64", "cgmp": "7.640ms", "cfg": "201.02s"}]},
+   {"bits": 256, "nodes": 88121, "edges": 180473, "exec_n": 167967539, "exec_e": 320612875, "arch": [
+     {"arch": "x86", "cgmp": "9.141ms", "cfg": "1171.36s"},
+     {"arch": "x86-64", "cgmp": "7.640ms", "cfg": "1228.89s"}]}]},
+ "table3_decompilers": {
+  "tex_lines": [321, 330], "page": 630,
+  "header": ["Tool", "Style", "gotos", "Loops", "B. Conds.", "S. Conds.", "S. gotos"],
+  "rows": [["IDA Free", "Unstructured C", 6, 2, 11, 6, 3], ["IDA Free", "Structured C", 7, 1, 10, 5, 4],
+           ["Ghidra", "Unstructured C", 8, 2, 11, 6, 5], ["Ghidra", "Structured C", 7, 2, 13, 6, 3]]},
+ "fig1": {
+  "tex_lines": [56, 132], "page": 620,
+  "clauses": [[1, 4], [-2, 5], [3, 7], [2, -5], [-8, -2], [3, -1], [4, -3], [5, -4], [-3, -7], [6, 7], [1, 7], [-7, -1]],
+  "edges": [[2, 5], [5, 2], [-1, 7], [-3, -1], [-3, 7], [7, -3], [7, -1], [1, -7], [1, 3], [3, -7], [-7, 1], [-7, 3], [-2, -5], [-5, -2],
+            [-1, 4], [-4, 1], [-4, -3], [4, 5], [2, -8], [-5, -4], [3, 4], [-7, 6], [8, -2], [-6, 7]],
+  "sccs": {"1": [-8], "2": [2, 5], "3": [4], "4": [-1, 7, -3], "5": [6], "6": [1, -7, 3], "7": [-4], "8": [-2, -5], "9": [8], "10": [-6]},
+  "green": [2, 4, 5, 6, 7, -8, -3, -1]},
+ "fig4": {
+  "tex_lines": [286, 319], "page": 630,
+  "cfg_edges": [["entry", "u"], ["entry", "v"], ["u", "w"], ["v", "x"], ["w", "u"], ["w", "x"], ["w", "exit"], ["x", "v"], ["x", "w"], ["x", "exit"]],
+  "jungle_intervals": {"1": [2, 13], "2": [3, 12], "3": [6, 7], "4": [4, 11], "5": [5, 10], "6": [8, 9]},
+  "jungle_tree_edges": [[1, 2], [2, 4], [4, 5], [5, 3], [5, 6]],
+  "jungle_other_edges": [[1, 3], [3, 5], [4, 2], [4, 6], [5, 4]],
+  "lnf_tree_edges": [[2, 4], [4, 5], [5, 3]]}
+}

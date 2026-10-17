@@ -1,0 +1,11 @@
+name = "smcdynirredloops"
+version = "0.1.0"
+defaultTargets = ["SmcIrred"]
+buildDir = ".lake/proof-build"
+weakLeanArgs = ["-M", "768", "-j", "1"]
+
+[leanOptions]
+autoImplicit = false
+
+[[lean_lib]]
+name = "SmcIrred"

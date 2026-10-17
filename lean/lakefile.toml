@@ -1,0 +1,10 @@
+name = "smcdynirredloops"
+version = "0.1.0"
+defaultTargets = ["SmcIrred"]
+weakLeanArgs = ["-M", "768", "-j", "1"]
+
+[leanOptions]
+autoImplicit = false
+
+[[lean_lib]]
+name = "SmcIrred"
