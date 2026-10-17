@@ -24,3 +24,9 @@ public import SmcIrred.Extremal.IrrBound
 public import SmcIrred.Extremal.Count2
 public import SmcIrred.Extremal.MEEBound
 public import SmcIrred.Extremal.KnAny
+public import SmcIrred.Spec.TwoSat
+public import SmcIrred.TwoSat.Implication
+public import SmcIrred.TwoSat.Reach
+public import SmcIrred.TwoSat.APT
+public import SmcIrred.TwoSat.Unit
+public import SmcIrred.TwoSat.Fig1

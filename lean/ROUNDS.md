@@ -12,7 +12,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R3b | Close G01/G02: Havlak algorithm = declarative LNF; reducible-CFG body uniqueness (scheduled after R5, before R6 if time; mandatory before R23) | must | TODO |
 | R4 | Extremal results: K_n, M_n, n−2 bound (MEE bound should) | must | DONE 2026-10-17 (G19 open) |
 | R4c | Close G19 (P15 second half: max-MEE CFGs have >= 2n-3 other edges), after R5 | should | TODO |
-| R5 | 2-SAT: implication graph, APT theorem, unit clauses, Figure 1 | must | TODO |
+| R5 | 2-SAT: implication graph, APT theorem, unit clauses, Figure 1 | must | DONE 2026-10-17 |
 | R6 | Tarjan's algorithm, cost, reference solver, `tarjan_scc` model | must | TODO |
 | R7 | SMC 2-SAT solver Level 2 ⇒ Tarjan/APT; restamp lemma | must | TODO |
 | R8 | SMC solver VM level (should); native vectors and listing evidence (must) | must/should | TODO |
@@ -96,3 +96,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Open obligations: G19, G20 (see `lean/GAPS.md`).
 - Hazards: `Evidence.lean` is a non-`module` file (module files cannot `#eval` imported code) and is not imported by `SmcIrred.lean`; classical `decide` inside Spec counts clashes with the `Decidable` instances: use `filter_congr` + `decide_eq_decide`.
 - Evidence: validation/rounds/R4.json.
+
+## R5 handoff (2-SAT)
+- Done: `Spec/TwoSat` (literals, formula, Sat, implication graph with unit encoding ¬p→p, NoUnit/SelfLoop variants); `TwoSat/{Implication,Reach,APT,Unit,Fig1}`.
+- `twoSat_iff_scc`: satisfiable iff no variable shares an SCC with its negation (unconditional, labelling `sccLabel`); `apt_correct` for any reverse-topological labelling; `unitClash` counterexample for both unit variants (P02); Fig. 1: 24 edges, drawn labels valid, green assignment satisfies, exactly 3 of 256 assignments.
+- Open: G21 (DNF parity bound, C18) -> R6. Next: R6 (linear-time 2-SAT algorithm / Tarjan SCC), then R3b, R4c.

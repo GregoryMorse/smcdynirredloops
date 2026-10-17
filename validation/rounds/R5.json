@@ -1,0 +1,7 @@
+{
+ "round": "R5",
+ "commands": ["python validation/build_modules.py all", "python validation/axiom_audit.py"],
+ "theorems": ["or_iff_implications", "sat_iff_closed", "apt_sat", "twoSat_iff_scc", "apt_correct", "unsat_of_empty", "unsat_of_sameSCC", "noUnit_sccCriterion_fails", "selfLoop_sccCriterion_fails", "unitEncoding_sccCriterion_correct", "fig1_edges", "fig1_label_ok", "fig1_apt", "fig1_count"],
+ "open": ["G21"],
+ "sorry": 0
+}
