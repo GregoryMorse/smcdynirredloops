@@ -84,3 +84,6 @@ output/pdf/*.aux
 output/pdf/*.log
 /.private/
 output/pdf/manuscript-2022.pdf
+
+# Local GMP prebuilt (see native/gmp.props)
+native/deps/

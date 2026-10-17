@@ -310,7 +310,9 @@ def rsa_sec():
   #  print_rsa_params(secbits // 2, *gen_rsa_params(secbits // 2))
   #minimum RSA encryption per PKCS is 2+8+1 + 1 encrypted byte = 12 bytes or 96 bits
   #minimum RSA signature depends on hash scheme for SHA256, it is 2+8+1 + 19 bytes DER encoding + 32 bytes = 62 bytes or 496 bits (RSA-150)
-  for secbits, f in ((32, rsa32_params), (64, rsa64_params), (128, rsa128_params), (256, rsa256_params), (512, rsa512_params), (1024, rsa1024_params)):
+  # SMCIRRED_RSA_MAX_BITS limits the sizes emitted (CI builds the sizes native/rsa.vcxproj uses: 32..256)
+  max_bits = int(_os.environ.get('SMCIRRED_RSA_MAX_BITS', '1024'))
+  for secbits, f in [sf for sf in ((32, rsa32_params), (64, rsa64_params), (128, rsa128_params), (256, rsa256_params), (512, rsa512_params), (1024, rsa1024_params)) if sf[0] <= max_bits]:
     #print_rsa_params(secbits // 2, *f())
     m = b'\x01' * (secbits // 8 - 3)
     pub, priv = f()

@@ -51,7 +51,7 @@ theorem Kn_irreducible_iff (hv : J.Valid (Kn n) r) (hr : r < n) (w : Nat) :
     have hxr : r ≠ x := fun e => hnr (e ▸ hanc)
     exact ⟨hh, x, r, (Kn_body_iff w x).2 ⟨hh, hanc, hx⟩, hne, (Kn_edge_iff n r x).2 ⟨hr, hx, fun e => hxr e.symm⟩, hnr⟩
 
-theorem root_pre_le (hv : J.Valid g r) {a : Nat} (ha : a < g.n) : J.pre r ≤ J.pre a := (hv.root a ha).1
+theorem root_pre_le {g : Digraph} (hv : J.Valid g r) {a : Nat} (ha : a < g.n) : J.pre r ≤ J.pre a := (hv.root a ha).1
 
 /-- `K_n` has exactly `n − 2` irreducible loops for **every** DFS and every root (C67). -/
 theorem Kn_irrCount_any (hv : J.Valid (Kn n) r) (hr : r < n) (hn : 2 ≤ n) : (Kn n).irrCount J = n - 2 := by

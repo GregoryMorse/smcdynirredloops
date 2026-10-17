@@ -38,7 +38,7 @@ def main():
         target = OUT / (m.replace(".", "/") + ".olean"); target.parent.mkdir(parents=True, exist_ok=True)
         print("BUILD", m, flush=True)
         r = subprocess.run([sys.executable, str(ROOT / "validation/limited_run.py"), "--cwd", str(LEAN), "--timeout", "3000", "--",
-            str(BIN / "lean.exe"), str(path(m).relative_to(LEAN)), "-o", str(target), "-i", str(target.with_suffix(".ilean"))],
+            str(BIN / "lean.exe"), "-DautoImplicit=false", str(path(m).relative_to(LEAN)), "-o", str(target), "-i", str(target.with_suffix(".ilean"))],
             capture_output=True, text=True, encoding="utf-8", errors="replace")
         out = r.stdout
         print(out if len(out) <= 10000 else out[:7000] + "\n...\n" + out[-3000:], r.stderr[-2000:], flush=True)

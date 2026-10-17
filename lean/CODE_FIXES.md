@@ -13,6 +13,7 @@ code once more before editing.
 | L05 | `python/virt.py`, `aes.py`, `rsa.py` | optional `--seed` for reproducible graph regeneration (`subg_virtual` and `multi_bit_selection_to_table_virtual` call an unseeded `random.shuffle`); default behaviour unchanged | `graph_stats.py` twice gives identical counts | open |
 | L06 | `python/aes.py` `gen_aes` | document that the key is `0x12...` per byte (the paper says "fixed randomly generated key", see P11); key choice per the author's answer | regenerate | open |
 | L07 | `native/*.vcxproj`, `generated/` | native `aes` and `ecdsa` projects need more than the 1.5 GB local compile cap for the 10.8 MB `generated/aesvm.cpp` and for `ecdsa256vm.c` (C1060 out of heap space); document CI-only or split the generated sources (R0 finding) | CI compile | open |
+| L08 | `python/rsa.py`, `.github/workflows/proof.yml`, `validation/build_modules.py` | `SMCIRRED_RSA_MAX_BITS` limits the emitted RSA sizes (default 1024, unchanged); CI generates the C sources and unpacks a hash-pinned GMP prebuilt before the MSBuild baseline; local Lean builds pass `-DautoImplicit=false` as the lakefile does | CI run | open |
 | D01 | `README.md` | Lean section (R24); Palomar ID and tag after registration (R25) | | open |
 | D02 | `CITATION.cff` | add the formalization reference after registration | | open |
 | D03 | `README.md` / `CHANGELOG.md` | state that the irreducible-loop-protected AES/RSA variant and the planted 2-SAT generator of Section 3.1 are not implemented in the repository (per the P13 answer) | | open |
