@@ -66,6 +66,7 @@ public import SmcIrred.Smc.Visit
 public import SmcIrred.Smc.Final
 public import SmcIrred.Smc.Solve
 public import SmcIrred.Smc.Restamp
+public import SmcIrred.Smc.Cost
 public import SmcIrred.Gen.Planted
 public import SmcIrred.Spec.Circuit
 public import SmcIrred.Circuit.CodeModel

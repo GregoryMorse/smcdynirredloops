@@ -1,0 +1,18 @@
+{
+ "round": "R8b",
+ "commands": [
+  "python validation/build_modules.py all",
+  "python validation/axiom_audit.py"
+ ],
+ "theorems": [
+  "cntRun_state",
+  "cCall_bound",
+  "cntRun_bound",
+  "chain_le",
+  "smcSteps_le"
+ ],
+ "open": [
+  "G28"
+ ],
+ "sorry": 0
+}

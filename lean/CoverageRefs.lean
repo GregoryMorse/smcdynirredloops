@@ -67,6 +67,7 @@ import SmcIrred.Smc.Visit
 import SmcIrred.Smc.Final
 import SmcIrred.Smc.Solve
 import SmcIrred.Smc.Restamp
+import SmcIrred.Smc.Cost
 import SmcIrred.Gen.Planted
 import SmcIrred.Spec.Circuit
 import SmcIrred.Circuit.CodeModel
@@ -148,6 +149,7 @@ set_option maxErrors 100000
 #check @SmcIrred.CostWitness.gate_data_dependent
 #check @SmcIrred.smcSolve_spec
 #check @SmcIrred.sRun_sim
+#check @SmcIrred.smcSteps_le
 #check @SmcIrred.twoSatSolve_spec
 #check @SmcIrred.tarjan_spec
 #check @SmcIrred.Digraph.Irreducible
