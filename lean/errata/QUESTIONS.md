@@ -8,3 +8,5 @@ Open:
 - P11: key provenance and regeneration counts (R16).
 - C05 / C82: the Denuvo reference [17] content and the Banescu et al. quotation (opaque predicates defeated only in simple contrived scenarios) could not be located online; can the author supply the passages?
 - P06, P28: wording is proposed in `edits.json`; confirm in R22.
+- P25 / R20b: replace Section 5.1 by the proposed formal subsection (appendix of the errata PDF), or apply only P21-P24 and drop P25?
+- Review of the errata PDF `output/pdf/smcirred-2022-errata.pdf` (R22 gate).

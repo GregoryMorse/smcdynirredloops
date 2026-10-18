@@ -39,7 +39,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R19b | Protected AES/RSA variant: the author implements it, this round integrates (P13, D03) | must | BLOCKED on the author |
 | R21a | Portable native build system: CMake, build/ tree, VS 2022/2026, CI Windows/Linux/macOS | must | TODO |
 | R21 | Code fixes (not errata) and native acceptance | must | TODO |
-| R22 | Errata list (paper only) | must | TODO |
+| R22 | Errata list (paper only) | must | DONE 2026-10-18 (author review requested) |
 | R23 | Coverage and fidelity audit | must | TODO |
 | R24 | Palomar package, CI, handoff (user submits and registers) | must | TODO |
 | R25 | Tag (after registration); corrected manuscript deferred by the user (errata list only for now) | must | TODO |
@@ -204,3 +204,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Open question to the user (one, batched): replace Section 5.1 by the P25 text, or apply only P21–P24 (P25 stays in the list as optional until answered). Fidelity pass (D10) of the P21–P25 sentences is R23.
 - Not done (G36 -> R23, G35 -> R20b/R23): `extra_wf` witness, literature checks, node-splitting bound (G33).
 - Next: R21a (portable native build), R21, R22 (errata list review), R23, R24, R25.
+
+## R22 handoff (2026-10-18)
+- Done: `validation/make_errata.py` adapted (published-version header, 31 items, P25 text as the appendix); `lean/errata/ERRATA.md`, `smcirred-2022-errata.tex`, `output/pdf/smcirred-2022-errata.pdf` (4 pages incl. the P25 appendix); `audit_errata.py` (inventory, evidence check, `--refs` 57 declarations all resolve, `--pdf` at most 5 pages).
+- Open for the author (`lean/errata/QUESTIONS.md`): P25 yes/no, P06/P28 wording, P10/P11/P13 (measurements and the protected variant), review of the PDF.
+- Next: R21a/R21 (native build and code corrections need CI and native toolchains; not done), R23 coverage and fidelity audit, R24 Palomar package, R25 tag.

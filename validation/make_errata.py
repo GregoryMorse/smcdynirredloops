@@ -1,5 +1,6 @@
-r"""Generate lean/errata/ERRATA.md and lean/errata/smctamper-2026-errata.tex from lean/errata/edits.json (paper-only errata
-against arXiv:2604.12407v1; code fixes are not errata and are not listed).  Usage: python validation/make_errata.py"""
+r"""Generate lean/errata/ERRATA.md and lean/errata/smcirred-2022-errata.tex from lean/errata/edits.json (paper-only errata
+against the published Publ. Math. Debrecen version; code fixes are not errata and are not listed).
+Usage: python validation/make_errata.py"""
 import json, textwrap
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,7 +26,8 @@ def tt(s):
     return BS + "texttt{" + t + "}"
 
 
-CLS = {"formal": "Lean", "mechanical": "listing", "editorial": "editorial"}
+CLS = {"formal": "Lean", "mechanical": "listing", "editorial": "editorial", "typographical": "typographical",
+       "bibliographic": "bibliographic"}
 HEAD = r"""\documentclass[9pt,twocolumn]{article}
 \usepackage[a4paper,margin=1.5cm]{geometry}
 \usepackage[T1]{fontenc}
@@ -34,30 +36,30 @@ HEAD = r"""\documentclass[9pt,twocolumn]{article}
 \setlist{nosep,leftmargin=0pt,labelsep=0pt,itemsep=2pt}
 \setlength{\columnsep}{0.6cm}\setlength{\parindent}{0pt}\setlength{\parskip}{1pt}
 \sloppy\emergencystretch=3em
-\title{\vspace{-1.2cm}Errata and model clarifications --- \emph{Tamper-Proofing with Self-Modifying Code}}
-\author{Errata to G.~Morse and T.~Kozsik, arXiv:2604.12407v1}
+\title{\vspace{-1.2cm}Errata and clarifications --- \emph{Control flow obfuscation with irreducible loops and self-modifying code}}
+\author{Errata to G.~Morse, A.~Alqaradaghi and T.~Kozsik, \emph{Publ. Math. Debrecen} 100 (Suppl.) (2022) 617--637,\\ DOI 10.5486/PMD.2022.Suppl.5}
 \date{}
 \begin{document}
 \maketitle
 \small
-\noindent Each item quotes the TeX source of arXiv:2604.12407v1 exactly (\emph{before}), gives the replacement (\emph{after}), a one-sentence
-reason and its basis.  \emph{Lean}: proved in the accompanying Lean development (declaration names given); \emph{listing}: checked against
-assembled objects or native runs (evidence, not proof); \emph{editorial}: an unambiguous internal inconsistency or a primary source.
-Page numbers refer to the arXiv v1 PDF.  Items marked \emph{open} await the authors' confirmation and are not applied.
+\noindent Each item quotes the published text exactly (\emph{before}), gives the replacement (\emph{after}) and a reason.
+\emph{Lean}: proved in the accompanying Lean 4 development (declaration names given); \emph{listing}: checked against native runs
+(evidence, not proof); \emph{editorial}: an internal inconsistency or a primary source. Page numbers are those of the journal.
+Items marked \emph{open} await the authors' confirmation and are not applied.
 \section*{Corrections}
 \begin{enumerate}[label=]"""
 
 
 def main():
     d = json.loads((ROOT / "lean/errata/edits.json").read_text(encoding="utf-8"))
-    out, md = [HEAD], ["# Errata and model clarifications — Tamper-Proofing with Self-Modifying Code", "",
-                       "Against arXiv:2604.12407v1. Generated from `edits.json` by `validation/make_errata.py`.", ""]
+    out, md = [HEAD], ["# Errata and clarifications — Control flow obfuscation with irreducible loops and self-modifying code", "",
+                       "Against Publ. Math. Debrecen 100 (Suppl.) (2022) 617–637. Generated from `edits.json` by `validation/make_errata.py`.", ""]
     appendix = []
     for e in d["edits"]:
         cls = CLS[e["class"]]
         open_ = e["status"] != "confirmed"
         tag = cls + (", open" if open_ else "")
-        long_after = len(e["after"]) > 900
+        long_after = len(e["after"]) > 1100
         refs = ""
         if e.get("lean_refs"):
             refs = " " + BS + "emph{Lean:} " + ", ".join(BS + "texttt{%s}" % esc(r.replace("SmcIrred.", "")) for r in e["lean_refs"]) + "."
@@ -66,7 +68,7 @@ def main():
             appendix.append((e["id"], e["after"]))
         out.append(BS + "item " + BS + "textbf{%s} (p.~%s, %s; %s). Before: %s After: %s %s%s %s" % (
             e["id"], e["page"], esc(e["location"]), tag, tt(e["before"]) + ".", after_tex, esc(e["reason"]), refs,
-            (BS + "emph{Basis:} " + esc(e["evidence"]) + ".") if False else ""))
+            ""))
         md += ["## %s — %s (p. %s; %s; %s)" % (e["id"], e["location"], e["page"], tag, e["confidence"]), "",
                "**Before:**", "", "```tex", e["before"].strip(), "```", "", "**After:**", "", "```tex", e["after"].strip(), "```", "",
                "**Reason:** " + e["reason"], "", "**Evidence:** " + e["evidence"], "", "**Source:** " + e["source"], ""]
@@ -77,7 +79,7 @@ def main():
         out.append(BS + "onecolumn" + BS + "section*{Appendix: replacement text for %s}" % i)
         out.append(BS + "begin{small}" + BS + "begin{verbatim}" + "\n" + "\n".join(textwrap.fill(l, 100, subsequent_indent="  ", break_long_words=False) if l.strip() else "" for l in a.strip().splitlines()) + "\n" + BS + "end{verbatim}" + BS + "end{small}")
     out.append(BS + "end{document}")
-    (ROOT / "lean/errata/smctamper-2026-errata.tex").write_text("\n".join(out) + "\n", encoding="utf-8")
+    (ROOT / "lean/errata/smcirred-2022-errata.tex").write_text("\n".join(out) + "\n", encoding="utf-8")
     (ROOT / "lean/errata/ERRATA.md").write_text("\n".join(md) + "\n", encoding="utf-8")
     print("items", len(d["edits"]), "appendix", [i for i, _ in appendix])
 

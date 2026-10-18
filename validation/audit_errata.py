@@ -4,7 +4,7 @@
       `before_pdf` occurs, after whitespace/hyphenation/ligature normalisation, on one page of the v1 PDF text;
       the page found is reported (`--fill-pages` writes it into `page`).
   --refs: write lean/ErrataRefs.lean (a #check for every declaration named in `lean_refs`).
-  --pdf: the errata PDF exists and has at most 3 pages.
+  --pdf: the errata PDF exists and has at most 5 pages (4 + one appendix page).
 """
 import json, re, sys, unicodedata
 from pathlib import Path
@@ -36,7 +36,7 @@ def pdf() -> int:
     p = ROOT / "output/pdf/smcirred-2022-errata.pdf"
     n = len(re.findall(rb"/Type\s*/Page[^s]", p.read_bytes()))
     print("errata pdf pages", n)
-    return 0 if 1 <= n <= 3 else 1
+    return 0 if 1 <= n <= 5 else 1
 
 
 def inventory(fill: bool) -> int:

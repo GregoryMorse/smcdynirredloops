@@ -1,0 +1,25 @@
+{
+ "round": "R22",
+ "commands": [
+  "python validation/make_errata.py",
+  "python validation/audit_errata.py",
+  "python validation/audit_errata.py --refs",
+  "python validation/audit_errata.py --pdf"
+ ],
+ "items": 31,
+ "pdf_pages": 4,
+ "open": [
+  "G25",
+  "G27",
+  "G28",
+  "G29",
+  "G30",
+  "G31",
+  "G32",
+  "G33",
+  "G34",
+  "G35",
+  "G36"
+ ],
+ "sorry": 0
+}
