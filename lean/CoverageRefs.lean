@@ -135,6 +135,8 @@ import SmcIrred.Threat.Structuring
 import SmcIrred.Threat.NotIO
 import SmcIrred.Threat.DCA
 import SmcIrred.Threat.Necessity
+import SmcIrred.Spec.DynBridge
+import SmcIrred.Dynamic.Bridge
 
 set_option maxErrors 100000
 

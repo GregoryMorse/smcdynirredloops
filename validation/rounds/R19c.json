@@ -1,0 +1,16 @@
+{
+ "round": "R19c",
+ "commands": [
+  "python validation/build_modules.py all",
+  "python validation/axiom_audit.py"
+ ],
+ "theorems": [
+  "valAt_eq_valOf",
+  "dynamic_eq_evaluator",
+  "range_schedule_eq_evaluator"
+ ],
+ "open": [
+  "G34"
+ ],
+ "sorry": 0
+}

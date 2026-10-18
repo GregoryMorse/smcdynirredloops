@@ -33,7 +33,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R18 | Figure 4 C++ code, flattening; structured ⇒ reducible, CFT (should) | must/should | DONE 2026-10-18 (items 1-2; items 3-4 -> R18b) |
 | R18b | Structured programs reducible, CFT leftist trees (G33) | should | TODO |
 | R19 | Dynamic scheme, faults, static scheme end-to-end | must | DONE 2026-10-18 (abstract model; bridge -> R19c) |
-| R19c | Bridge of the dynamic scheme to the CFG evaluator and schedule construction (G34) | should | TODO |
+| R19c | Bridge of the dynamic scheme to the CFG evaluator and schedule construction (G34) | should | DONE 2026-10-19 (call-free circuits; rest G34) |
 | R20a | Security model I: definitions, T1–T3 (crux) | must | DONE 2026-10-18 |
 | R20b | Security model II: T4–T7, necessity, §5.1 texts | must | DONE 2026-10-18 |
 | R19b | Protected AES/RSA variant: the author implements it, this round integrates (P13, D03) | must | BLOCKED on the author |
@@ -213,3 +213,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 ## R23 handoff (2026-10-18, partial)
 - Done: `validation/coverage_audit.py` adapted to the 8-column map (declaration index with namespace tracking, FT class, closed rows must name declarations, open rows must be explained, every P/T/B item mentioned): 85 rows, 180 declarations, 0 problems, `--build` compiles `CoverageRefs.lean`; PAPER_MAP rows C06, C09, C13, C17, C26, C27, C35, C37, C39–C41, C51, C60, C61, C67, C68, C71, C72, C84, C85 normalised; GAPS: G04 and G35 -> R23/author, G09, G10, G15 closed; fidelity pass of `Spec/Threat`, `Threat/*`, `THREAT_MODEL.md` and the P25 text: the T3 sentence claimed work for the analyzer; it now states only the cost of the Tarjan run in the clean model.
 - Not done (R23 closes after the pending rounds): the D1 wording row by row for rows still `open` (C13, C51, C60, C61, C72, C84 and the rows of R8b/R13/R14b/R15/R16/R17b/R18b/R19c); G03, G05, G25, G29, G35, G36 owned by R23; fidelity pass of the planned README section.
+
+## R19c handoff (2026-10-19)
+- Done: `Spec/DynBridge` (`Circ.Flat`, `Circ.TopoR`, `lookupAcc`, `Circ.toD`); `Dynamic/Bridge`: `valAt_eq_valOf`, `dynamic_eq_evaluator` (every final-ordered schedule over `toD c inp` leaves the evaluator's `Circ.val` at every nesting depth), `range_schedule_eq_evaluator` (the hypotheses are satisfiable).
+- Not done (G34 narrowed): circuits with calls (subgraph runs), schedule construction from the solver's conditions, multiple faults, DCA/DPA beyond T6, the SMC realization of the toggle.

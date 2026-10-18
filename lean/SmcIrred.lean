@@ -134,3 +134,5 @@ public import SmcIrred.Threat.Structuring
 public import SmcIrred.Threat.NotIO
 public import SmcIrred.Threat.DCA
 public import SmcIrred.Threat.Necessity
+public import SmcIrred.Spec.DynBridge
+public import SmcIrred.Dynamic.Bridge
