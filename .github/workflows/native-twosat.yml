@@ -1,0 +1,27 @@
+name: native-twosat
+
+# Plan R8 item 2 (Linux x64): the product 2-SAT solvers against the Lean-generated vectors. Mechanical evidence only.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "native/selfmodgraph.cpp"
+      - "validation/native/twosat_harness.cpp"
+      - "validation/data/twosat_vectors.txt"
+      - ".github/workflows/native-twosat.yml"
+
+jobs:
+  twosat-linux-x64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build harness
+        run: |
+          g++ -O2 -std=c++17 -w validation/native/twosat_harness.cpp -o harness
+          g++ -O2 -std=c++17 -w -DUSE_VM validation/native/twosat_harness.cpp -o harness_vm
+      - name: Run vectors
+        run: |
+          ./harness validation/data/twosat_vectors.txt | tee run.txt
+          ./harness_vm validation/data/twosat_vectors.txt | tee run_vm.txt
+          grep -q "failures=0" run.txt
+          grep -q "failures=0" run_vm.txt

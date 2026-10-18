@@ -1,0 +1,36 @@
+{
+ "parsed_arrays": {
+  "blueprint": 509,
+  "callblueprint": 21,
+  "jumptopo": 12
+ },
+ "source_arrays": {
+  "blueprint": 509,
+  "callblueprint": 21,
+  "jumptopo": 12
+ },
+ "arrays_equal": {
+  "blueprint": true,
+  "callblueprint": true,
+  "jumptopo": true
+ },
+ "consts_equal": {
+  "indexoffs": true,
+  "counteroffs": true,
+  "getsuccnodeaddroffs": true,
+  "getsuccnodeaddroppoffs": true,
+  "starttopooffs": true,
+  "succsizeoffs": true,
+  "checksamesccoffs": true,
+  "unsatoffs": true,
+  "unsatoppoffs": true,
+  "addsolutionoffs": true,
+  "addsolutionoppoffs": true,
+  "satoffs": true,
+  "satoppoffs": true,
+  "callblueprintoffs": true,
+  "jumptopooffs": true
+ },
+ "const_diffs": {},
+ "ok": true
+}
