@@ -1,0 +1,14 @@
+{
+ "round": "R16",
+ "commands": [
+  "SMCIRRED_SEED=1 python aes.py",
+  "SMCIRRED_SEED=1 SMCIRRED_RSA_MAX_BITS=256 python rsa.py (scratchpad copy, under limited_run.py)"
+ ],
+ "theorems": [],
+ "open": [
+  "G06",
+  "G07",
+  "G38"
+ ],
+ "sorry": 0
+}

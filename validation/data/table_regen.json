@@ -1,0 +1,52 @@
+{
+ "round": "R16",
+ "class": "M (regeneration, evidence not proof)",
+ "seed": "SMCIRRED_SEED=1",
+ "aes_static": {
+  "128": {
+   "nodes": 51127,
+   "edges": 222683
+  },
+  "192": {
+   "nodes": 61364,
+   "edges": 267320
+  },
+  "256": {
+   "nodes": 71568,
+   "edges": 311924
+  }
+ },
+ "aes_exec_nodes": {
+  "128": 134455,
+  "192": 161489,
+  "256": 188438
+ },
+ "aes_exec_edges_note": "vary with the random dependency order (e.g. AES-256 541018..541694, paper 541694 is within the observed range for another seed); not reproduced exactly",
+ "rsa": {
+  "32": {
+   "nodes": 8882,
+   "edges": 16591,
+   "exec_nodes": 686447,
+   "exec_edges": 1321687
+  },
+  "64": {
+   "nodes": 15743,
+   "edges": 29925,
+   "exec_nodes": 4538657,
+   "exec_edges": 8686995
+  },
+  "128": {
+   "nodes": 34604,
+   "edges": 67583,
+   "exec_nodes": 27372136,
+   "exec_edges": 52269807
+  },
+  "256": {
+   "nodes": 88121,
+   "edges": 180473,
+   "exec_nodes": 167967539,
+   "exec_edges": 320530894
+  }
+ },
+ "paper_match": "AES static nodes/edges, AES exec nodes, RSA-32..256 static and exec nodes/edges equal Table 1/2 as recorded in paper_tables.json"
+}

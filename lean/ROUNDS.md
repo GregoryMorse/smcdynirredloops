@@ -27,7 +27,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R14 | Arithmetic for RSA (Montgomery, windows, Karatsuba/Toom P08, word size P09) | must | DONE 2026-10-18 (items 1-6; items 7-8 partly -> R14b) |
 | R14b | RBSD carry-free addition, NAF/MOF, Wallace counts (G31) | should | TODO |
 | R15 | RSA compiler correctness | should | TODO |
-| R16 | Tables 1–2: regeneration (M) and data checks (FD) | must | TODO |
+| R16 | Tables 1–2: regeneration (M) and data checks (FD) | must | PARTIAL 2026-10-19 (regeneration done; Lean data checks, GMP re-measure -> R16b) |
 | R17 | Transformation language, Figures 5–6 (P18, P19), minimal edges | must | DONE 2026-10-18 (figure instances; general n -> R17b) |
 | R17b | General-n minimal edges, arbitrary-program transformation (G32) | should | TODO |
 | R18 | Figure 4 C++ code, flattening; structured ⇒ reducible, CFT (should) | must/should | DONE 2026-10-18 (items 1-2; items 3-4 -> R18b) |
@@ -225,3 +225,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 ## R21a handoff (2026-10-19, partial)
 - Done: root `CMakeLists.txt` (targets `selfmodgraph`, `twosat_harness`, optional drivers with per-generated-source object libraries and GMP discovery, `ctest` of the native 2-SAT vectors; outputs under `build/`), checked locally with the Visual Studio 2022 and 2026 generators (build and `ctest` pass); `native/*.vcxproj` use `$(DefaultPlatformToolset)` and write to `build\msbuild` (checked: MSBuild with v143 and the default toolset); `.github/workflows/cmake.yml` (Windows 2022/2025, Ubuntu, macOS Intel and arm64, no stray files check); CONTRIBUTING/README commands.
 - Not done (G37 -> R24): running the workflow (it needs a push and a look at the result), the driver builds on other platforms, L07-L09.
+
+## R16 handoff (2026-10-19, partial)
+- Done: regenerated the AES and RSA graphs after the code fixes (`SMCIRRED_SEED=1`, scratchpad copy so tracked `generated/` is untouched, `limited_run.py`, peak < 250 MB). Static nodes/edges for AES-128/192/256 and RSA-32/64/128/256 and the executed node counts equal Tables 1-2 (`validation/data/table_regen.json`); AES executed-edge counts vary with the random dependency order (541018-541694 for AES-256). Evidence class M, not proof.
+- Not done (R16b: G06, G07, G38): Lean `Spec/Data` and ratio checks (C60, C61), the GMP re-measure for P10, P11 provenance, RSA-512/1024.
