@@ -1,0 +1,35 @@
+name: cmake
+
+# Portable CMake build of the native code (plan R21a): selfmodgraph, the native 2-SAT harness and its vectors, on Windows,
+# Linux and macOS (Intel and arm64). The x86-64 self-modifying blueprint is executed only where the host is x86-64.
+# The AES/RSA/ECDSA drivers (SMC_BUILD_DRIVERS) are built by the MSBuild baseline of proof.yml.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  cmake:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-2025, ubuntu-24.04, macos-15-intel, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - name: Preserve exact source bytes
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Configure
+        run: cmake -S . -B build/cmake -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build/cmake --config Release
+      - name: Test (native 2-SAT vectors)
+        run: ctest --test-dir build/cmake -C Release --output-on-failure
+      - name: Nothing outside build/ may have been written
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain)" || { git status --porcelain; exit 1; }

@@ -37,7 +37,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R20a | Security model I: definitions, T1–T3 (crux) | must | DONE 2026-10-18 |
 | R20b | Security model II: T4–T7, necessity, §5.1 texts | must | DONE 2026-10-18 |
 | R19b | Protected AES/RSA variant: the author implements it, this round integrates (P13, D03) | must | BLOCKED on the author |
-| R21a | Portable native build system: CMake, build/ tree, VS 2022/2026, CI Windows/Linux/macOS | must | TODO |
+| R21a | Portable native build system: CMake, build/ tree, VS 2022/2026, CI Windows/Linux/macOS | must | PARTIAL 2026-10-19 (local Windows verified; CI matrix pending, G37) |
 | R21 | Code fixes (not errata) and native acceptance | must | PARTIAL 2026-10-19 (L01-L06, L11, D03 done; Linux/R16 reruns and L07-L09 open) |
 | R22 | Errata list (paper only) | must | DONE 2026-10-18 (author review requested) |
 | R23 | Coverage and fidelity audit | must | PARTIAL 2026-10-18 (audit passes; closes after the pending rounds) |
@@ -221,3 +221,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 ## R21 handoff (2026-10-19, partial)
 - Done: L01 (verified natively on this machine: the new `tarjan_scc` partition check fails without the fix and passes with it; MSVC x64 and x86 6012 runs, `--vm` x64 8016 runs, 0 failures), L02, L03, L04, L05 (`SMCIRRED_SEED`), L06 (comment), L11, D03; `validation/python_fixes_test.py`; `R8_native.json` regenerated after the fixes.
 - Not done: Linux x64 vectors and R16 regeneration after the fixes (CI / R16); L07, L08, L09 (R21a and the author's decision, `QUESTIONS.md`); D01, D02 (after registration); the `aes`/`rsa`/`ecdsa` native builds are CI-only (L07).
+
+## R21a handoff (2026-10-19, partial)
+- Done: root `CMakeLists.txt` (targets `selfmodgraph`, `twosat_harness`, optional drivers with per-generated-source object libraries and GMP discovery, `ctest` of the native 2-SAT vectors; outputs under `build/`), checked locally with the Visual Studio 2022 and 2026 generators (build and `ctest` pass); `native/*.vcxproj` use `$(DefaultPlatformToolset)` and write to `build\msbuild` (checked: MSBuild with v143 and the default toolset); `.github/workflows/cmake.yml` (Windows 2022/2025, Ubuntu, macOS Intel and arm64, no stray files check); CONTRIBUTING/README commands.
+- Not done (G37 -> R24): running the workflow (it needs a push and a look at the result), the driver builds on other platforms, L07-L09.

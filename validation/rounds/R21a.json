@@ -1,0 +1,14 @@
+{
+ "round": "R21a",
+ "status": "partial",
+ "commands": [
+  "cmake -S . -B build/cmake",
+  "cmake --build build/cmake --config Release",
+  "ctest --test-dir build/cmake -C Release",
+  "python validation/native.py --toolset v143 --projects selfmodgraph"
+ ],
+ "open": [
+  "G37"
+ ],
+ "sorry": 0
+}

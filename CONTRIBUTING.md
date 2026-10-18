@@ -10,6 +10,18 @@
 3. Run local checks:
    - py -m py_compile virt.py aes.py rsa.py ecdsab.py
 
+## Building with CMake (all platforms)
+
+CMake 3.20 or newer builds `native/selfmodgraph`, the native 2-SAT harness and its test (`ctest`) on Windows, Linux and macOS; all outputs go to `build/` (ignored by git):
+
+```
+cmake -S . -B build/cmake
+cmake --build build/cmake --config Release
+ctest --test-dir build/cmake -C Release
+```
+
+`-DSMC_BUILD_DRIVERS=ON` also builds the AES/RSA/ECDSA drivers (Windows and x86-64 only; GMP via `-DGMP_ROOT=...`); the generated sources are separate object libraries so that the compiler memory stays bounded. The Visual Studio projects keep working with VS 2022 and VS 2026 (no hard-coded toolset); their outputs go to `build\msbuild`. Non-x86 hosts build everything except the execution of the x86-64 self-modifying blueprint.
+
 ## Building the C/C++ projects (Visual Studio)
 
 The `ecdsa` project (`ecdsa.vcxproj`) depends on GMP.
