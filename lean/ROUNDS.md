@@ -16,7 +16,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R6 | Tarjan's algorithm, cost, reference solver (`tarjan_scc` model -> R6b, G22) | must | done 2026-10-18 |
 | R6b | `Tarjan/CodeModel` (G22) and DNF parity bound (G21) | must | done 2026-10-18 |
 | R6c | G23 (re-emitted duplicates are exactly the roots; needs a done-vertex root invariant) | must | TODO |
-| R7 | SMC 2-SAT solver Level 2 ⇒ Tarjan/APT; restamp lemma | must | TODO |
+| R7 | SMC 2-SAT solver Level 2 ⇒ Tarjan/APT; restamp lemma | must | done 2026-10-18 |
 | R8 | SMC solver VM level (should); native vectors and listing evidence (must) | must/should | TODO |
 | R9 | Planted 2-SAT generator (§3.1, P04) | must | TODO |
 | R10 | Boolean-CFG VM: order independence, data-independent counts, subgraphs | must | TODO |
@@ -113,3 +113,10 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Model note: the Lean model counts indices from 1 (`0` = key absent); the parent's lowlink update is done at the end of the child call, which is the same state change as the C++ lambda after the call.
 - Also done in R6b (G24): `Tarjan.TwoSatLink` (`tsFold_link`) and `Tarjan.TwoSatLegacy` (`twosat_legacy_correct`: the legacy `twosat` over the legacy SCC vector is correct and its `sol` is the APT assignment).
 - Open: G23 -> R6c. Next: R6c (small), R3b, R4c, R7.
+
+## R7 handoff (2026-10-18)
+- Done: `Spec.SmcMachine` (abstract self-modifying machine, D3 Level 2: per-node cell `ent/low/pk/dep/chk/set`, stack of return cells, topological chain, `restamp`, `smcSolve`), `Smc.Rel` (`SRel` simulation relation, entry), `Smc.Finish` (component extraction), `Smc.Sim`/`Smc.Visit` (`ssim_scan`, `ssim_visit`, `ssim_top`, `sRun_sim`: the machine simulates Tarjan on the graph with every successor list reversed), `Smc.Final` (`smc_link`), `Smc.Solve` (`smcSolve_spec`: `none` iff unsatisfiable; the returned literal nodes satisfy the formula; needs `Wf`, non-empty clauses), `Smc.Restamp` (`sRun_stk_nil`, `smcRound_restamp`, `smcRounds_replicate`).
+- Modelling choices are in the `Spec.SmcMachine` docstring. A scratch `#eval` comparison of `smcSolve` with `twoSatSolve` on 3000 random formulas found one machine bug (fuel consumed by visited stubs) before the proof; it is evidence only and not committed.
+- Open: G25, G26, G27 -> R8 (offsets, listing match, step bound). Next: R6c (small), R3b, R4c, R8.
+- Hazard: names in `Smc/*` use the `ssim_` prefix because `Tarjan.CodeSim` owns `sim_*`.
+- Evidence file: `validation/rounds/R7.json`.

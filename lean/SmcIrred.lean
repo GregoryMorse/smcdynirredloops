@@ -46,3 +46,11 @@ public import SmcIrred.Tarjan.CodeModel
 public import SmcIrred.Tarjan.TwoSatLink
 public import SmcIrred.Tarjan.TwoSatLegacy
 public import SmcIrred.TwoSat.DNF
+public import SmcIrred.Spec.SmcMachine
+public import SmcIrred.Smc.Rel
+public import SmcIrred.Smc.Finish
+public import SmcIrred.Smc.Sim
+public import SmcIrred.Smc.Visit
+public import SmcIrred.Smc.Final
+public import SmcIrred.Smc.Solve
+public import SmcIrred.Smc.Restamp
