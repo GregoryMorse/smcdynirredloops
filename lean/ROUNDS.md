@@ -40,7 +40,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R21a | Portable native build system: CMake, build/ tree, VS 2022/2026, CI Windows/Linux/macOS | must | TODO |
 | R21 | Code fixes (not errata) and native acceptance | must | TODO |
 | R22 | Errata list (paper only) | must | DONE 2026-10-18 (author review requested) |
-| R23 | Coverage and fidelity audit | must | TODO |
+| R23 | Coverage and fidelity audit | must | PARTIAL 2026-10-18 (audit passes; closes after the pending rounds) |
 | R24 | Palomar package, CI, handoff (user submits and registers) | must | TODO |
 | R25 | Tag (after registration); corrected manuscript deferred by the user (errata list only for now) | must | TODO |
 
@@ -209,3 +209,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Done: `validation/make_errata.py` adapted (published-version header, 31 items, P25 text as the appendix); `lean/errata/ERRATA.md`, `smcirred-2022-errata.tex`, `output/pdf/smcirred-2022-errata.pdf` (4 pages incl. the P25 appendix); `audit_errata.py` (inventory, evidence check, `--refs` 57 declarations all resolve, `--pdf` at most 5 pages).
 - Open for the author (`lean/errata/QUESTIONS.md`): P25 yes/no, P06/P28 wording, P10/P11/P13 (measurements and the protected variant), review of the PDF.
 - Next: R21a/R21 (native build and code corrections need CI and native toolchains; not done), R23 coverage and fidelity audit, R24 Palomar package, R25 tag.
+
+## R23 handoff (2026-10-18, partial)
+- Done: `validation/coverage_audit.py` adapted to the 8-column map (declaration index with namespace tracking, FT class, closed rows must name declarations, open rows must be explained, every P/T/B item mentioned): 85 rows, 180 declarations, 0 problems, `--build` compiles `CoverageRefs.lean`; PAPER_MAP rows C06, C09, C13, C17, C26, C27, C35, C37, C39–C41, C51, C60, C61, C67, C68, C71, C72, C84, C85 normalised; GAPS: G04 and G35 -> R23/author, G09, G10, G15 closed; fidelity pass of `Spec/Threat`, `Threat/*`, `THREAT_MODEL.md` and the P25 text: the T3 sentence claimed work for the analyzer; it now states only the cost of the Tarjan run in the clean model.
+- Not done (R23 closes after the pending rounds): the D1 wording row by row for rows still `open` (C13, C51, C60, C61, C72, C84 and the rows of R8b/R13/R14b/R15/R16/R17b/R18b/R19c); G03, G05, G25, G29, G35, G36 owned by R23; fidelity pass of the planned README section.

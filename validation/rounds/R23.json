@@ -1,0 +1,21 @@
+{
+ "round": "R23",
+ "status": "partial",
+ "commands": [
+  "python validation/coverage_audit.py --build",
+  "python validation/audit_errata.py",
+  "python validation/threat_audit.py"
+ ],
+ "rows": 85,
+ "declarations": 180,
+ "problems": 0,
+ "open": [
+  "G03",
+  "G05",
+  "G25",
+  "G29",
+  "G35",
+  "G36"
+ ],
+ "sorry": 0
+}

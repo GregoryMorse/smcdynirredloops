@@ -8,13 +8,14 @@ one Lean declaration; every `open`/`partial` row is explained; every declaration
 (`#check`); every P item of lean/errata/edits.json is mentioned in PAPER_MAP.md or a round note.
 """
 import json, re, subprocess, sys
+sys.stdout.reconfigure(encoding="utf-8")
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MAP = ROOT / "lean/PAPER_MAP.md"
 OUT = ROOT / "lean/CoverageRefs.lean"
 EDITS = ROOT / "lean/errata/edits.json"
-CLASSES = {"F", "FC", "FD", "M", "R", "X"}
+CLASSES = {"F", "FC", "FD", "FT", "M", "R", "X"}
 
 
 def rows():
@@ -37,6 +38,27 @@ def decl_tokens(cell):
     return toks
 
 
+def decl_index():
+    """Fully qualified names of the declarations of lean/SmcIrred (namespace stack tracked textually)."""
+    names = set()
+    for f in (ROOT / "lean/SmcIrred").rglob("*.lean"):
+        stack = []
+        for ln in f.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"namespace\s+([\w.]+)", ln)
+            if m:
+                stack.append(m.group(1))
+                continue
+            m = re.match(r"end\s+([\w.]+)", ln)
+            if m and stack and stack[-1] == m.group(1):
+                stack.pop()
+                continue
+            m = re.match(r"(?:@\[[^\]]*\]\s*)?(?:(?:private|protected|noncomputable|public)\s+)*(?:theorem|lemma|def|abbrev|structure|inductive|class)\s+([\w.']+)", ln)
+            if m:
+                full = ".".join(stack + [m.group(1)])
+                names.add(full)
+    return names
+
+
 def main():
     bad = []
     rs = rows()
@@ -45,23 +67,25 @@ def main():
         bad.append("duplicate claim IDs")
     names = []
     for r in rs:
-        if len(r) < 7:
-            bad.append(f"{r[0]}: expected 7 columns, got {len(r)}")
+        if len(r) < 8:
+            bad.append(f"{r[0]}: expected 8 columns, got {len(r)}")
             continue
-        cid, _loc, _claim, cls, _rnd, status, ev = r[:7]
-        base = set(re.findall(r"\b(FC|FD|F|M|R|X)\b", cls))
+        cid, _loc, _page, _claim, cls, _rnd, status, ev = r[:8]
+        ev = (status + " " + ev).strip()  # declarations and notes may sit in either of the last two cells
+        base = set(re.findall(r"\b(FC|FD|FT|F|M|R|X)\b", cls))
         if not base:
             bad.append(f"{cid}: no class in '{cls}'")
         if status.lower().startswith("todo") or status == "":
             bad.append(f"{cid}: status '{status}'")
         toks = decl_tokens(ev)
-        if base & {"F", "FC", "FD"} and not toks:
+        closed = status.lower().startswith(("done", "proved", "checked"))
+        if base & {"F", "FC", "FT"} and not toks and closed:
             bad.append(f"{cid}: class {cls} names no Lean declaration")
-        if base & {"F", "FC", "FD"}:
+        if base & {"F", "FC", "FD", "FT"}:
             names += [(cid, t) for t in toks]
         if base == {"X"} and not ev:
             bad.append(f"{cid}: class X without a note")
-        if (status.lower().startswith("open") or status.lower().startswith("partial")) and not ev:
+        if (status.lower().startswith("open") or status.lower().startswith("partial")) and len(ev) < 12:
             bad.append(f"{cid}: {status} without explanation")
     text = MAP.read_text(encoding="utf-8")
     for e in json.loads(EDITS.read_text(encoding="utf-8"))["edits"]:
@@ -74,8 +98,18 @@ def main():
     for cid, n in names:
         if n not in seen:
             seen.append(n)
-    lines = ["module", ""] + ["import " + m for m in mods] + [""]
-    lines += ["#check @%s" % (n if n.startswith("SmcIrred.") else "SmcIrred." + n) for n in seen]
+    index = decl_index()
+    resolved, missing = [], []
+    for n in seen:
+        cands = sorted((f for f in index if f == n or f.endswith("." + n)), key=lambda f: (len(f), f))
+        if cands:
+            resolved.append(cands[0])
+        else:
+            missing.append(n)
+    for n in missing:
+        bad.append(f"declaration `{n}` is not defined in lean/SmcIrred")
+    lines = ["module", ""] + ["import " + m for m in mods] + [""] + ["set_option maxErrors 100000", ""]
+    lines += ["#check @%s" % n for n in resolved]
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"rows={len(rs)} declarations={len(seen)} problems={len(bad)}")
     for b in bad:

@@ -68,20 +68,21 @@ Replace Section 5.1 by the following subsection (every statement is a Lean theor
   in dependency order; S4 only the capabilities above are considered. Results: T1 the image executes
   the blocks of the original program and the schedule yields the circuit's values [Threat.correct];
   T2 an Imm analyzer is wrong on some image satisfying S1-S3 [Threat.imm_unsound]; T3 an SmcSem
-  analyzer reports every predicate cell, with work bounded by 2|V|+|E| in the clean Tarjan cost
-  model [Threat.recover], so opacity is relative to analyzers without the machine semantics and is
-  not computational hardness; T4 one state variable always suffices to flatten a control-flow graph,
-  and the quadratic quantity of Section 2 is the multi-entry-edge count of K_n, not a cost of
-  restructuring [Threat.one_variable_suffices, Threat.quadratic_is_edge_count] (an exponential lower
-  bound for node splitting is due to Carter, Ferrante and Thomborson and is not proved here); T5 a
-  fault in a non-final execution does not change the output, a fault in a final execution does
-  [Threat.fault_class, Dyn.fault_final_changes]; T6 on address-aligned traces every dependency-
-  respecting schedule gives the same (vertex, final value) pairs, and repeated executions of a
-  vertex are visible [Threat.dca_last, Threat.dca_final_obs, Threat.dca_repeats_visible]; T7 the
-  scheme is not an indistinguishability obfuscator for the number of vertices
-  [Threat.not_size_indist]. Each assumption is necessary for the theorem it supports
-  [Threat.nec_forcing, nec_stamped, nec_false_cells, nec_extra_respects, nec_schedule, nec_topo].
-  Not claimed: hardness of the predicates against an analyzer with SmcSem, resistance to any
-  existing tool, any indistinguishability or virtual-black-box property.
+  analyzer reports every predicate cell, and the Tarjan run on the stamped formula costs at most
+  2|V|+|E| steps in the clean cost model [Threat.recover], so opacity is relative to analyzers
+  without the machine semantics and is not computational hardness; T4 one state variable always
+  suffices to flatten a control-flow graph, and the quadratic quantity of Section 2 is the multi-
+  entry-edge count of K_n, not a cost of restructuring [Threat.one_variable_suffices,
+  Threat.quadratic_is_edge_count] (an exponential lower bound for node splitting is due to Carter,
+  Ferrante and Thomborson and is not proved here); T5 a fault in a non-final execution does not
+  change the output, a fault in a final execution does [Threat.fault_class,
+  Dyn.fault_final_changes]; T6 on address-aligned traces every dependency-respecting schedule gives
+  the same (vertex, final value) pairs, and repeated executions of a vertex are visible
+  [Threat.dca_last, Threat.dca_final_obs, Threat.dca_repeats_visible]; T7 the scheme is not an
+  indistinguishability obfuscator for the number of vertices [Threat.not_size_indist]. Each
+  assumption is necessary for the theorem it supports [Threat.nec_forcing, nec_stamped,
+  nec_false_cells, nec_extra_respects, nec_schedule, nec_topo]. Not claimed: hardness of the
+  predicates against an analyzer with SmcSem, resistance to any existing tool, any
+  indistinguishability or virtual-black-box property.
 \end{verbatim}\end{small}
 \end{document}

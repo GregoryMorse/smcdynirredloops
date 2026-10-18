@@ -30,8 +30,9 @@ bounds) is the capability structures themselves. Necessity witnesses: below.
   final values of the dynamic schedule are the circuit's values.
 * T2 `imm_fails`, `imm_determines_iff`, `imm_unsound` (witness design satisfying S1–S3, blueprint true, run-time false),
   `static_reading_wrong` (behavioural difference for the four programs).
-* T3 `recover`, `smcsem_determines`: an `SmcSem` analyzer reports the intended values; the work bound `2|V|+|E|` is in the clean
-  Tarjan cost model of the implication graph (`tarjan_cost`), not a bound on the machine (G27/R8b).
+* T3 `recover`, `smcsem_determines`: an `SmcSem` analyzer reports the intended values; the Tarjan run on the implication graph
+  costs at most `2|V|+|E|` steps in the clean cost model (`tarjan_cost`); this bounds that run, not the work of an arbitrary
+  analyzer nor the machine (G27/R8b).
   Opacity is therefore relative to analyzers lacking the machine semantics; it is not computational hardness.
 
 ## 3b. Theorems proved in R20b
