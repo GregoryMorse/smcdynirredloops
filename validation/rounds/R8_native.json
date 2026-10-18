@@ -4,7 +4,7 @@
   "build_seconds": 4,
   "run_ok": true,
   "run_seconds": 1,
-  "run_tail": "SUMMARY runs=6012 failures=0 countchecks=798\n\nMemory cap: 1499996160 bytes; peak group commit: 37793792 bytes; sampled peak resident: 64094208 bytes; exit 0\n"
+  "run_tail": "SUMMARY runs=6012 failures=0 countchecks=798\n\nMemory cap: 1499996160 bytes; peak group commit: 37990400 bytes; sampled peak resident: 64249856 bytes; exit 0\n"
  },
  "msvc-x86": {
   "build_ok": true,

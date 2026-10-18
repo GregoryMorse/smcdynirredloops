@@ -34,7 +34,10 @@ int main(int argc, char** argv)
     std::string line;
     long total = 0, bad = 0, countsChecked = 0;
     std::vector<std::pair<std::string, std::function<std::vector<int>(std::vector<std::pair<int, int>>)>>> solvers = {
-        {"twosat", twosat}, {"selfmodtwosatasm", selfmodtwosatasm},
+        {"twosat", twosat},
+#if defined(_M_X64) || defined(__amd64__)
+        {"selfmodtwosatasm", selfmodtwosatasm}, // executes the x86-64 self-modifying blueprint
+#endif
 #ifdef USE_VM
         {"selfmodvmtwosat", selfmodvmtwosat},
 #endif
