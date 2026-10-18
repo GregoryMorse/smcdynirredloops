@@ -1,0 +1,41 @@
+{
+ "round": "R20b",
+ "commands": [
+  "python validation/build_modules.py all",
+  "python validation/axiom_audit.py",
+  "python validation/threat_audit.py",
+  "python validation/audit_errata.py"
+ ],
+ "theorems": [
+  "one_variable_suffices",
+  "quadratic_is_edge_count",
+  "fault_class",
+  "dca_last",
+  "dca_final_obs",
+  "dca_repeats_visible",
+  "dca_witness",
+  "not_size_indist",
+  "scheme_overhead",
+  "solver_succeeds",
+  "nec_forcing",
+  "nec_stamped",
+  "nec_false_cells",
+  "nec_extra_respects",
+  "nec_schedule",
+  "nec_topo"
+ ],
+ "open": [
+  "G25",
+  "G27",
+  "G28",
+  "G29",
+  "G30",
+  "G31",
+  "G32",
+  "G33",
+  "G34",
+  "G35",
+  "G36"
+ ],
+ "sorry": 0
+}

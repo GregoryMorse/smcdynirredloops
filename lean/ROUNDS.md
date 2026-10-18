@@ -35,7 +35,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R19 | Dynamic scheme, faults, static scheme end-to-end | must | DONE 2026-10-18 (abstract model; bridge -> R19c) |
 | R19c | Bridge of the dynamic scheme to the CFG evaluator and schedule construction (G34) | should | TODO |
 | R20a | Security model I: definitions, T1–T3 (crux) | must | DONE 2026-10-18 |
-| R20b | Security model II: T4–T7, necessity, §5.1 texts | must | TODO |
+| R20b | Security model II: T4–T7, necessity, §5.1 texts | must | DONE 2026-10-18 |
 | R19b | Protected AES/RSA variant: the author implements it, this round integrates (P13, D03) | must | BLOCKED on the author |
 | R21a | Portable native build system: CMake, build/ tree, VS 2022/2026, CI Windows/Linux/macOS | must | TODO |
 | R21 | Code fixes (not errata) and native acceptance | must | TODO |
@@ -198,3 +198,9 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Done: `Spec/Threat` (Image, rtVal, Obfuscates, Design, Assumptions S1-S3, ImmCap, SmcSemCap, Determines); `Threat/Correct` (T1 `correct`, `rtVal_planted`); `Threat/Immutable` (T2 `imm_fails`, `imm_determines_iff`, `imm_unsound`, `static_reading_wrong`, `witness`); `Threat/Recover` (T3 `recover`, `smcsem_determines`); `Lang/Congr.traceS_of_reads_false`; `validation/threat_audit.py` adapted (passes); `lean/THREAT_MODEL.md` §1-§4.
 - Not done (G35 -> R20b): remaining literature checks; the `Struct`, `Trace`, `Fault`, `Dca` classes; necessity witnesses for S1-S3; T4-T7; errata `after` texts P21-P24 (P25 optional).
 - Next: R20b; one question to the user: replace §5.1 (P25) or correct only P21-P24.
+
+## R20b handoff (2026-10-18)
+- Done: `Spec/Threat` extended (`obs`, `finalObs`, `vcount`, `Equiv`, `SizeIndist`); `Threat/Structuring` (T4), `Threat/DCA` (T5 wrapper, T6), `Threat/NotIO` (T7), `Threat/Necessity` (witnesses for S1–S3), `Threat.solver_succeeds`, `Lang.traceS_congr`; errata: `lean_refs` for P17, P22–P25 and the P25 replacement text of Section 5.1 in `edits.json`; `THREAT_MODEL.md` §3b.
+- Open question to the user (one, batched): replace Section 5.1 by the P25 text, or apply only P21–P24 (P25 stays in the list as optional until answered). Fidelity pass (D10) of the P21–P25 sentences is R23.
+- Not done (G36 -> R23, G35 -> R20b/R23): `extra_wf` witness, literature checks, node-splitting bound (G33).
+- Next: R21a (portable native build), R21, R22 (errata list review), R23, R24, R25.

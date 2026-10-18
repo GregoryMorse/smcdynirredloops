@@ -15,13 +15,15 @@ Nothing here claims that a real tool fails or succeeds; classes of analyzers are
 |---|---|---|
 | `Imm` | `ImmCap`: predicts every cell as its static code byte | R20a |
 | `SmcSem` | `SmcSemCap`: predicts every cell as its run-time value (implements stamping and machine semantics) | R20a |
-| `Struct`, `Trace`, `Fault`, `Dca` | added with T4–T6 | R20b |
+| `Struct` | restructures the CFG; state variables (`one_variable_suffices`) | R20b |
+| `Trace`, `Dca` | see `obs`, `finalObs` (address, value) pairs | R20b |
+| `Fault` | one replaced write `(v, some d)` | R20b |
 
 Goal `Determines A img`: the analyzer reports every cell the program reads with its run-time value.
 Assumptions (`structure Assumptions`; no field mentions a goal, checked by `validation/threat_audit.py`):
 S1 planted formula (`planted`, `extra_respects`, `extra_wf`, `stamped`); S2 the cells read are planted, required, false-valued
 (`cells_planted`); S3 the dynamic schedule respects dependencies (`schedule_topo`, `schedule_ordered`). S4 (class capability
-bounds) is the capability structures themselves. Necessity witnesses for S1–S3: R20b.
+bounds) is the capability structures themselves. Necessity witnesses: below.
 
 ## 3. Theorems proved in R20a
 * T1 `Threat.correct`: under S1–S3 the image executes exactly the blocks of the original (both condition values), and the
@@ -31,6 +33,17 @@ bounds) is the capability structures themselves. Necessity witnesses for S1–S3
 * T3 `recover`, `smcsem_determines`: an `SmcSem` analyzer reports the intended values; the work bound `2|V|+|E|` is in the clean
   Tarjan cost model of the implication graph (`tarjan_cost`), not a bound on the machine (G27/R8b).
   Opacity is therefore relative to analyzers lacking the machine semantics; it is not computational hardness.
+
+## 3b. Theorems proved in R20b
+* T4 `one_variable_suffices` (flattening, no duplication), `quadratic_is_edge_count` (`2·MEE = (n−1)(n−2)` for K_n). The
+  exponential node-splitting bound of Carter–Ferrante–Thomborson is cited, not proved (G33).
+* T5 `fault_class` (non-final fault harmless), with `Dyn.fault_final_overwrites`, `fault_final_changes`, `fault_input_dependent`.
+* T6 `dca_last`, `dca_final_obs`, `dca_repeats_visible`, `dca_witness`: on address-aligned traces any two dependency-respecting
+  schedules give the same (vertex, final value) pairs; repeated executions are visible by address.
+* T7 `not_size_indist`, `scheme_overhead`: not an indistinguishability obfuscator for the vertex count; no VBB claim.
+* Necessity: `nec_forcing`, `nec_stamped`, `nec_false_cells` (run misbehaves), `nec_extra_respects` (solver returns nothing),
+  `nec_schedule`, `nec_topo` (no ordered schedule exists in a cyclic circuit). No witness for `extra_wf` (G36).
+* `Threat.solver_succeeds`: under S1 the solver returns a solution.
 
 ## 4. Literature pass (D11 list)
 Verified online this round: Barak et al., J. ACM 59(2), 2012, doi 10.1145/2160158.2160159 (impossibility of black-box

@@ -67,7 +67,9 @@
    "status": "confirmed",
    "confidence": "certain",
    "evidence": "Figure 4 (exit has no out-edge) contradicts the exhaustive-sounding 'otherwise'.",
-   "lean_refs": ["SmcIrred.fig4_kinds"],
+   "lean_refs": [
+    "SmcIrred.fig4_kinds"
+   ],
    "source": "published PDF p. 619, p. 630 Fig. 4"
   },
   {
@@ -90,7 +92,14 @@
    "status": "confirmed",
    "confidence": "inferred",
    "evidence": "Counterexamples are elementary (x true, y false; add x -> y: acyclic but violated). The replacement condition is the one Lean proves in R9 (planted generator); the wording of the replacement is inferred from the published construction.",
-   "lean_refs": ["SmcIrred.forcing_agree", "SmcIrred.planted_solve", "SmcIrred.counter_violates", "SmcIrred.counter_unsat", "SmcIrred.loop_keeps", "SmcIrred.no_loop_through_negation"],
+   "lean_refs": [
+    "SmcIrred.forcing_agree",
+    "SmcIrred.planted_solve",
+    "SmcIrred.counter_violates",
+    "SmcIrred.counter_unsat",
+    "SmcIrred.loop_keeps",
+    "SmcIrred.no_loop_through_negation"
+   ],
    "source": "published PDF p. 623"
   },
   {
@@ -113,7 +122,11 @@
    "status": "confirmed",
    "confidence": "certain",
    "evidence": "The next equation in the same sentence defines c_{i+1} from a_i, b_i, c_i; the repository addition_bit_to_virtual computes S = A ^ B ^ carry_in.",
-   "lean_refs": ["SmcIrred.published_add_fails", "SmcIrred.addBit_post", "SmcIrred.ripple_add"],
+   "lean_refs": [
+    "SmcIrred.published_add_fails",
+    "SmcIrred.addBit_post",
+    "SmcIrred.ripple_add"
+   ],
    "source": "published PDF p. 625; python/virt.py addition_bit_to_virtual"
   },
   {
@@ -166,7 +179,14 @@
    "status": "confirmed",
    "confidence": "certain",
    "evidence": "FIPS 197 section 5.1.1 (S-box = multiplicative inverse in GF(2^8), then affine transformation); Lean in R12.",
-   "lean_refs": ["SmcIrred.AES.sbox_table", "SmcIrred.AES.ginv_mul", "SmcIrred.AES.invAffine_affine", "SmcIrred.AES.affine_is_affine", "SmcIrred.AES.sbox_not_affine", "SmcIrred.AES.invSbox_sbox"],
+   "lean_refs": [
+    "SmcIrred.AES.sbox_table",
+    "SmcIrred.AES.ginv_mul",
+    "SmcIrred.AES.invAffine_affine",
+    "SmcIrred.AES.affine_is_affine",
+    "SmcIrred.AES.sbox_not_affine",
+    "SmcIrred.AES.invSbox_sbox"
+   ],
    "source": "published PDF p. 625; FIPS 197"
   },
   {
@@ -189,7 +209,12 @@
    "status": "confirmed",
    "confidence": "certain",
    "evidence": "Toom-k performs (2k-1) multiplications on operands of size n/k (standard; Bernstein, Multidigit multiplication for mathematicians); Lean in R14.",
-   "lean_refs": ["SmcIrred.Arith.toomProds_eq", "SmcIrred.Arith.toom_between", "SmcIrred.Arith.toom_published_too_small", "SmcIrred.Arith.toom_witness"],
+   "lean_refs": [
+    "SmcIrred.Arith.toomProds_eq",
+    "SmcIrred.Arith.toom_between",
+    "SmcIrred.Arith.toom_published_too_small",
+    "SmcIrred.Arith.toom_witness"
+   ],
    "source": "published PDF p. 626"
   },
   {
@@ -212,7 +237,12 @@
    "status": "confirmed",
    "confidence": "inferred",
    "evidence": "Gate-count argument; exact counts for the repository generators in R14. The intended meaning is the author's: confirm in R1 question if kept.",
-   "lean_refs": ["SmcIrred.Arith.words_exact", "SmcIrred.Arith.word_products", "SmcIrred.Arith.words_cover", "SmcIrred.Arith.word_gain_not_exponential"],
+   "lean_refs": [
+    "SmcIrred.Arith.words_exact",
+    "SmcIrred.Arith.word_products",
+    "SmcIrred.Arith.words_cover",
+    "SmcIrred.Arith.word_gain_not_exponential"
+   ],
    "source": "published PDF p. 627"
   },
   {
@@ -414,7 +444,10 @@
    "status": "confirmed",
    "confidence": "certain",
    "evidence": "Carter, Ferrante, Thomborson, Folklore confirmed: reducible flow graphs are exponentially larger, POPL 2003, pp. 106-114 (Theorems 4 and 5), copy read at https://www.cs.tufts.edu/~nr/cs257/archive/larry-carter/exponential-node-splitting.pdf; Lean proof planned in R18.",
-   "lean_refs": [],
+   "lean_refs": [
+    "SmcIrred.Threat.one_variable_suffices",
+    "SmcIrred.Threat.quadratic_is_edge_count"
+   ],
    "source": "published PDF p. 631"
   },
   {
@@ -455,7 +488,13 @@
    "status": "confirmed",
    "confidence": "inferred",
    "evidence": "Path analysis of the drawn graph against the code while (trueThenFalse) { A; labelB: B; }; Lean R17 proves the equivalence of the repaired graph.",
-   "lean_refs": ["SmcIrred.Lang.fig5_traces", "SmcIrred.Lang.fig5c_cfg", "SmcIrred.Lang.drawn5c_no_AB", "SmcIrred.Lang.fig5c_cfg_AB", "SmcIrred.Lang.fig5c_irreducible"],
+   "lean_refs": [
+    "SmcIrred.Lang.fig5_traces",
+    "SmcIrred.Lang.fig5c_cfg",
+    "SmcIrred.Lang.drawn5c_no_AB",
+    "SmcIrred.Lang.fig5c_cfg_AB",
+    "SmcIrred.Lang.fig5c_irreducible"
+   ],
    "source": "published PDF p. 632; manuscript TeX figure source"
   },
   {
@@ -473,7 +512,13 @@
    "status": "confirmed",
    "confidence": "inferred",
    "evidence": "Reading of the code in (c); Lean R17 checks the repaired graph against the code semantics.",
-   "lean_refs": ["SmcIrred.Lang.fig6_traces", "SmcIrred.Lang.fig6c_cfg", "SmcIrred.Lang.fig6c_drawn_extra", "SmcIrred.Lang.fig6c_no_AB_edge", "SmcIrred.Lang.fig6c_irreducible"],
+   "lean_refs": [
+    "SmcIrred.Lang.fig6_traces",
+    "SmcIrred.Lang.fig6c_cfg",
+    "SmcIrred.Lang.fig6c_drawn_extra",
+    "SmcIrred.Lang.fig6c_no_AB_edge",
+    "SmcIrred.Lang.fig6c_irreducible"
+   ],
    "source": "published PDF p. 633; manuscript TeX figure source"
   },
   {
@@ -518,8 +563,12 @@
    "class": "formal",
    "status": "confirmed",
    "confidence": "inferred",
-   "evidence": "Lean statement T6 (multiset of (vertex, final value) pairs equal) planned for R20b; the replacement is made certain by that theorem, and is otherwise a wording choice.",
-   "lean_refs": [],
+   "evidence": "Lean statement T6 `Threat.dca_last` (multiset of (vertex, final value) pairs equal) planned for R20b; the replacement is made certain by that theorem, and is otherwise a wording choice.",
+   "lean_refs": [
+    "SmcIrred.Threat.dca_last",
+    "SmcIrred.Threat.dca_final_obs",
+    "SmcIrred.Threat.dca_witness"
+   ],
    "source": "published PDF p. 634"
   },
   {
@@ -542,7 +591,11 @@
    "status": "confirmed",
    "confidence": "certain",
    "evidence": "Lean T1 (functional equivalence) and T7 (witness that obfuscations of equivalent programs differ in a public size measure) in R20; wording is the author's choice. Wording style (author, 2026-10-17): minimal.",
-   "lean_refs": [],
+   "lean_refs": [
+    "SmcIrred.Threat.correct",
+    "SmcIrred.Threat.scheme_overhead",
+    "SmcIrred.Threat.not_size_indist"
+   ],
    "source": "published PDF p. 634"
   },
   {
@@ -565,7 +618,10 @@
    "status": "confirmed",
    "confidence": "inferred",
    "evidence": "Lean T6 (R20b) for the trace statement; wording is the author's choice. Wording style (author, 2026-10-17): minimal.",
-   "lean_refs": [],
+   "lean_refs": [
+    "SmcIrred.Threat.dca_repeats_visible",
+    "SmcIrred.Threat.dca_witness"
+   ],
    "source": "published PDF p. 635"
   },
   {
@@ -576,14 +632,28 @@
    "before": "Section 5.1 as a whole",
    "before_pdf": [],
    "before_tex": null,
-   "after": "Replace Section 5.1 by a short formal security subsection stating the adversary classes, the structural assumptions and the theorems proved in the Lean development (text written in R20b).",
+   "after": "Replace Section 5.1 by the following subsection (every statement is a Lean theorem; names in brackets).\n\n5.1 Security. System: the original program is a structured program with goto over abstract blocks; the obfuscator is the static scheme of Figures 5 and 6 whose opaque conditions are outputs of the self-modifying 2-SAT solver on a planted formula; an image consists of the transformed program, the stamped formula and the placeholder bytes of the predicate cells. Adversary classes describe capabilities, not tools: Imm reads the predicate cells from the static code bytes; SmcSem implements stamping and the machine semantics; Struct restructures the control-flow graph; Trace and Dca see (address, value) pairs of a run; Fault replaces one written value. Assumptions: S1 the stamped formula is a planted formula whose extra implications respect the intended assignment; S2 the predicate cells the program reads are required variables whose intended value is false; S3 the circuit of the dynamic scheme is numbered topologically and its schedule has the final executions in dependency order; S4 only the capabilities above are considered. Results: T1 the image executes the blocks of the original program and the schedule yields the circuit's values [Threat.correct]; T2 an Imm analyzer is wrong on some image satisfying S1-S3 [Threat.imm_unsound]; T3 an SmcSem analyzer reports every predicate cell, with work bounded by 2|V|+|E| in the clean Tarjan cost model [Threat.recover], so opacity is relative to analyzers without the machine semantics and is not computational hardness; T4 one state variable always suffices to flatten a control-flow graph, and the quadratic quantity of Section 2 is the multi-entry-edge count of K_n, not a cost of restructuring [Threat.one_variable_suffices, Threat.quadratic_is_edge_count] (an exponential lower bound for node splitting is due to Carter, Ferrante and Thomborson and is not proved here); T5 a fault in a non-final execution does not change the output, a fault in a final execution does [Threat.fault_class, Dyn.fault_final_changes]; T6 on address-aligned traces every dependency-respecting schedule gives the same (vertex, final value) pairs, and repeated executions of a vertex are visible [Threat.dca_last, Threat.dca_final_obs, Threat.dca_repeats_visible]; T7 the scheme is not an indistinguishability obfuscator for the number of vertices [Threat.not_size_indist]. Each assumption is necessary for the theorem it supports [Threat.nec_forcing, nec_stamped, nec_false_cells, nec_extra_respects, nec_schedule, nec_topo]. Not claimed: hardness of the predicates against an analyzer with SmcSem, resistance to any existing tool, any indistinguishability or virtual-black-box property.",
    "after_tex": null,
    "reason": "Section 5.1 states security goals without an adversary model, assumption list or statement.",
    "class": "formal",
    "status": "confirmed",
    "confidence": "certain",
-   "evidence": "Lean development, rounds R20a-R20b. Included in the errata list by the author (2026-10-17).",
-   "lean_refs": [],
+   "evidence": "Lean development, rounds R20a-R20b (Threat/*). Included in the errata list by the author (2026-10-17); whether it replaces Section 5.1 or P21-P24 only are applied is the author's choice.",
+   "lean_refs": [
+    "SmcIrred.Threat.correct",
+    "SmcIrred.Threat.imm_unsound",
+    "SmcIrred.Threat.recover",
+    "SmcIrred.Threat.one_variable_suffices",
+    "SmcIrred.Threat.fault_class",
+    "SmcIrred.Threat.dca_last",
+    "SmcIrred.Threat.not_size_indist",
+    "SmcIrred.Threat.nec_forcing",
+    "SmcIrred.Threat.nec_stamped",
+    "SmcIrred.Threat.nec_false_cells",
+    "SmcIrred.Threat.nec_extra_respects",
+    "SmcIrred.Threat.nec_schedule",
+    "SmcIrred.Threat.nec_topo"
+   ],
    "source": "published PDF pp. 634-635"
   },
   {

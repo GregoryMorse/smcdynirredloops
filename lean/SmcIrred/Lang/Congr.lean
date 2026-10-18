@@ -66,4 +66,10 @@ theorem traceS_of_reads_false {sol : Nat → Bool} (p : Stmt) (h : ∀ i ∈ cod
   intro i hi
   exact h i hi
 
+/-- Two generator-output functions that agree on the outputs a program reads give the same run. -/
+theorem traceS_congr {sol sol' : Nat → Bool} (p : Stmt) (h : ∀ i ∈ codeReads (compile p), sol i = sol' i) (c v : Bool) :
+    traceS sol p c v = traceS sol' p c v := by
+  unfold traceS
+  exact exec_congr h c _ _ _ _
+
 end SmcIrred.Lang

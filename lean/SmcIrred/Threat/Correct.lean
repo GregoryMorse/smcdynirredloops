@@ -18,6 +18,11 @@ theorem rtVal_planted {d : Design} (hA : Assumptions d) {k : Nat} (hk : k < d.n)
   rw [hA.stamped, hsol]
   exact hout k hk hr
 
+/-- Under S1 the solver succeeds on the stamped formula (S1 is what makes the formula satisfiable). -/
+theorem solver_succeeds {d : Design} (hA : Assumptions d) : smcSolve d.img.formula ≠ none := by
+  obtain ⟨sol, hsol, _⟩ := planted_smc (extra := d.extra) hA.planted hA.extra_respects hA.extra_wf
+  rw [hA.stamped, hsol]; simp
+
 theorem trace_obfuscated {orig prog : Stmt} (h : Obfuscates orig prog) (c : Bool) :
     trace prog c true = trace orig c true := by
   cases h <;> cases c <;> decide

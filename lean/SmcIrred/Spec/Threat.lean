@@ -104,4 +104,26 @@ structure SmcSemCap (A : Analyzer) : Prop where
 vertex entry, examined edge and popped vertex of the implication graph). -/
 @[expose] def recoverWork (img : Image) : Nat := (tarjan img.formula.graph).ticks
 
+/-! ### Observations (the `Trace`, `Dca` and `Fault` classes and the size observable) -/
+
+/-- The trace of a schedule as a dynamic tracer sees it: for each action, the address (vertex) and the value it left in that
+vertex. An action `(v, none)` is an execution of `v`; `(v, some d)` a faulty one (the fault class replaces the written value). -/
+@[expose] def obs {α : Type} (c : DCirc α) : (Nat → α) → List (Act α) → List (Nat × α)
+  | _, [] => []
+  | σ, a :: t => (a.1, stepA c σ a a.1) :: obs c (stepA c σ a) t
+
+/-- The pairs (vertex, final value) of a schedule: the data a correlation attack aligned by address has for every vertex. -/
+@[expose] def finalObs {α : Type} (c : DCirc α) (σ : Nat → α) (acts : List (Act α)) : List (Nat × α) :=
+  (List.range c.n).map fun v => (v, runA c σ acts v)
+
+/-- The observable size of a program: the number of vertices of its control-flow graph. -/
+@[expose] def vcount (s : Stmt) : Nat := (cfgOf (compile s)).n
+
+/-- Functional equivalence of programs: the same block trace for both values of the condition and of the toggled variable. -/
+@[expose] def Equiv (p q : Stmt) : Prop := ∀ c v, trace p c v = trace q c v
+
+/-- The property of an obfuscator that a notion of indistinguishability must have for the size observable: equivalent programs
+get obfuscations with the same number of vertices. -/
+@[expose] def SizeIndist (O : Stmt → Stmt) : Prop := ∀ p q, Equiv p q → vcount (O p) = vcount (O q)
+
 end SmcIrred.Threat

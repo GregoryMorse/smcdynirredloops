@@ -130,3 +130,7 @@ public import SmcIrred.Spec.Threat
 public import SmcIrred.Threat.Correct
 public import SmcIrred.Threat.Recover
 public import SmcIrred.Threat.Immutable
+public import SmcIrred.Threat.Structuring
+public import SmcIrred.Threat.NotIO
+public import SmcIrred.Threat.DCA
+public import SmcIrred.Threat.Necessity
