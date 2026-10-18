@@ -1,0 +1,7 @@
+{
+ "round": "R10",
+ "commands": ["python validation/build_modules.py all", "python validation/axiom_audit.py"],
+ "theorems": ["order_independent", "runPass_eq_circ_val", "callRuns_ungated", "callCost_ungated", "costAt_flat", "costAt_uniform", "CostWitness.gate_data_dependent", "CostWitness.activated"],
+ "open": ["G25", "G27", "G28", "G29"],
+ "sorry": 0
+}

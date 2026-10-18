@@ -20,7 +20,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R8 | SMC solver VM level (should); native vectors and listing evidence (must) | must/should | DONE 2026-10-18 (items 2–3; item 1 and G27 -> R8b) |
 | R8b | G27 step bound for the Level 2 machine; G28 VM instruction-list refinement (R8 item 1) | should | TODO |
 | R9 | Planted 2-SAT generator (§3.1, P04) | must | DONE 2026-10-18 |
-| R10 | Boolean-CFG VM: order independence, data-independent counts, subgraphs | must | TODO |
+| R10 | Boolean-CFG VM: order independence, data-independent counts, subgraphs | must | DONE |
 | R11 | Gate primitives, decoders, adders (P05), DSL compiler correctness | must | TODO |
 | R12 | AES specification facts (S-box P07, xtime, key expansion, vectors) | must | TODO |
 | R13 | AES compiler correctness | should | TODO |
@@ -145,3 +145,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Done: `Spec.Generator` (`ImpPath`, `impFormula`, `Respecting`, `Planted`: forest of implications respecting the desired assignment `σ`, forcing path `¬ℓ ⇒* ℓ` for each required variable; further implications arbitrary but `σ`-respecting), `Gen.Planted`: `planted_sat` (σ solves the generated formula), `forcing_agree` (every solution agrees with σ on required variables), `planted_solve`/`planted_smc` (the reference solver and the Level 2 machine return a solution, hence agree with σ there), P04: `counter_violates`, `counter_unsat` (acyclic true→false implication destroys σ; with required ends the formula is unsatisfiable), `loop_keeps` (loops among σ-true literals are harmless), `no_loop_through_negation`. The probabilistic choices of the generator are universally quantified (every choice satisfying the conditions).
 - P04 `after` text in `errata/edits.json` is backed (lean_refs set).
 - Open: G25 -> R23; G27, G28 -> R8b. Next: R10 (or R8b).
+
+## R10 handoff (2026-10-18)
+- Done: `Spec.Circuit` (Kind/Circ/Sub/Lib, `valAt`, `callOf`, `writtenBy`, `costAt`, nesting-depth `level`, `Circ.val`, `Circ.cost`); `Circuit.CodeModel` (`stepCode`/`runPass`/`PassWF`, a literal elif-chain pass in any admissible vertex order); `Circuit.Order`: `order_independent` (every admissible order gives the same values), `runPass_eq_circ_val` (the code pass equals the specification value); `Circuit.Counts`: `callRuns_ungated` (an ungated call runs `reps + 1` times and its final accepting set is the `reps`-fold feedback iteration), `callCost_ungated`, `costAt_flat` (call-free circuits cost `(n, Σ edges)` for every input), `costAt_uniform` (cost independent of the input when every call is activated and ungated and subgraph costs are input independent), and the necessity witness `CostWitness` (a gated subgraph makes the cost data dependent: `gate_data_dependent`; the same circuit ungated costs the same for both inputs; the activation hypothesis is satisfiable).
+- Modelling notes: start token = vertex `c.n`; `edgesOf` counts predecessor edges only (the Python `edgecount` also counts the token edge of each active input, a data-dependent term); the FLOW "pass" branch is needed for call outputs; calls enter the code model through the black-box evaluator `V`.
+- Open: G25 -> R23; G27, G28 -> R8b; G29 (below). Next: R11 (or R8b).

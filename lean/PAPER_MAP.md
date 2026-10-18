@@ -6,7 +6,7 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 |---|---|---|---|---|---|---|---|
 | C01 | Abstract; §5 ¶1 | 617 | static analysis of SMC has decidability limits "as per Rice's theorem" (P26) | R | R1 | R1 checked | source-partial: Landi, ACM LOPLAS 1(4) 1992 is alias-analysis undecidability, not Rice; see P26 |
 | C02 | Abstract; §2 ¶7; §5 | 617 | IL → reducible by node splitting or variables: quadratic increase (P17) | F + R | R4, R18 | open |  |
-| C03 | Abstract; §4 | 617 | algorithms lowered to multi-input gates; applicable to any CFG | F | R10 | open |  |
+| C03 | Abstract; §4 | 617 | algorithms lowered to multi-input gates; applicable to any CFG | F | R10 | done: `order_independent`, `runPass_eq_circ_val`, `costAt_uniform`, `CostWitness.gate_data_dependent` |  |
 | C04 | Abstract; §6 | 617 | the ideas can be applied separately | X | R1 | listed (X) |  |
 | C05 | §1 ¶1 | 617–619 | VMProtect and Denuvo defeated [16, 17] | R | R1 | R1 checked | source-partial: VMAttack (Kalysch, Götzfried, Müller, ARES 2017, doi 10.1145/3098954.3098995) deobfuscates VMProtect (checked); Denuvo reference [17] (Karthik, Amritha, Sethumadhavan, ICCCNT 2020) not found online: UNVERIFIED |
 | C06 | §1 ¶3 | 617–619 | DFS-based SCC + topological sort implemented by an SMC CFG of the queried graph | F + M | R7, R8 | F part done (Smc.Solve `smcSolve_spec`, Smc.Visit `sRun_sim`); M part: native vectors agree (evidence, R8_native.json); step bound open (G27, R8b) |
@@ -52,7 +52,7 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C46 | §4; §4.1 ¶3 | 623–629 | optimal circuit synthesis "NP-hard based on circuit SAT" (P06) | R | R1 | R1 checked | source-checked: see P06 (Ilango, Loff, Oliveira, CCC 2020, https://drops.dagstuhl.de/opus/volltexte/2020/12574/) |
 | C47 | §4; Fig. 3 | 623–629 | two table-lookup representations; nodes-vs-edges trade-off; Fig. 3 count comments | F | R11 | open |  |
 | C48 | §4 | 623–629 | ripple addition (P05), subtraction with borrow, combined add/sub selector | F | R11 | open |  |
-| C49 | §4 | 623–629 | constant time maintained; reusable subgraphs with activation edge and repetition; conditional execution loses constant time | F | R10 | open |  |
+| C49 | §4 | 623–629 | constant time maintained; reusable subgraphs with activation edge and repetition; conditional execution loses constant time | F | R10 | done: `order_independent`, `runPass_eq_circ_val`, `costAt_uniform`, `CostWitness.gate_data_dependent` |  |
 | C50 | §4.1 ¶1–2 | 625–626 | AES structure; key expansion by XOR + lookups; xtime as selection; S-box (P07); inverse | F + R | R12 | open |  |
 | C51 | §4.1 ¶2 | 625–626 | S-box subgraph reuse; identification needs recognizing decoder circuits | M + X | R13, R16 | open |  |
 | C52 | §4.1 ¶3 | 625–626 | spurious inputs/deeper circuits remove table uniformity | X | R1 | listed (X) |  |

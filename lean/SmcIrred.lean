@@ -67,3 +67,7 @@ public import SmcIrred.Smc.Final
 public import SmcIrred.Smc.Solve
 public import SmcIrred.Smc.Restamp
 public import SmcIrred.Gen.Planted
+public import SmcIrred.Spec.Circuit
+public import SmcIrred.Circuit.CodeModel
+public import SmcIrred.Circuit.Order
+public import SmcIrred.Circuit.Counts
