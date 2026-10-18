@@ -43,4 +43,6 @@ public import SmcIrred.Spec.Dnf
 public import SmcIrred.Tarjan.TwoSatCode
 public import SmcIrred.Tarjan.CodeSim
 public import SmcIrred.Tarjan.CodeModel
+public import SmcIrred.Tarjan.TwoSatLink
+public import SmcIrred.Tarjan.TwoSatLegacy
 public import SmcIrred.TwoSat.DNF

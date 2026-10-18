@@ -15,7 +15,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R5 | 2-SAT: implication graph, APT theorem, unit clauses, Figure 1 | must | DONE 2026-10-17 |
 | R6 | Tarjan's algorithm, cost, reference solver (`tarjan_scc` model -> R6b, G22) | must | done 2026-10-18 |
 | R6b | `Tarjan/CodeModel` (G22) and DNF parity bound (G21) | must | done 2026-10-18 |
-| R6c | G23 (duplicates are exactly the roots), G24 (`tsFold` = APT assignment) | must | TODO |
+| R6c | G23 (re-emitted duplicates are exactly the roots; needs a done-vertex root invariant) | must | TODO |
 | R7 | SMC 2-SAT solver Level 2 ⇒ Tarjan/APT; restamp lemma | must | TODO |
 | R8 | SMC solver VM level (should); native vectors and listing evidence (must) | must/should | TODO |
 | R9 | Planted 2-SAT generator (§3.1, P04) | must | TODO |
@@ -111,4 +111,5 @@ handoff: done / next / open obligations / hazards / evidence file).
 ## R6b handoff (2026-10-18)
 - Done: `Spec.TarjanCode` (literal C++ model: separate `onstack` flags and stack, re-entering outer loop; `tsComp`/`tsFold` model of `twosat`; `DupOf`), `Tarjan.CodeSim` (simulation by the clean model), `Tarjan.CodeModel` (`ctarjan_spec`), `Tarjan.TwoSatCode` (`tsFold_dup`), `Spec.Dnf` + `TwoSat.DNF` (`dnf_parity_terms`, G21 closed).
 - Model note: the Lean model counts indices from 1 (`0` = key absent); the parent's lowlink update is done at the end of the child call, which is the same state change as the C++ lambda after the call.
-- Open: G23, G24 -> R6c. Next: R6c, R3b, R4c, R7.
+- Also done in R6b (G24): `Tarjan.TwoSatLink` (`tsFold_link`) and `Tarjan.TwoSatLegacy` (`twosat_legacy_correct`: the legacy `twosat` over the legacy SCC vector is correct and its `sol` is the APT assignment).
+- Open: G23 -> R6c. Next: R6c (small), R3b, R4c, R7.
