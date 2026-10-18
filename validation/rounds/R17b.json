@@ -1,0 +1,17 @@
+{
+ "round": "R17b",
+ "commands": [
+  "python validation/build_modules.py all",
+  "python validation/axiom_audit.py"
+ ],
+ "theorems": [
+  "reducible_no_irreducible",
+  "path_one_edge_reducible_all",
+  "nway_irreducible_every_jungle",
+  "nway_one_edge_all"
+ ],
+ "open": [
+  "G32"
+ ],
+ "sorry": 0
+}

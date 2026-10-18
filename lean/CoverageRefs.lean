@@ -117,6 +117,7 @@ import SmcIrred.Lang.Fig6
 import SmcIrred.Lang.MinEdges
 import SmcIrred.Lang.Induce
 import SmcIrred.Lang.NWay
+import SmcIrred.Lang.General
 import SmcIrred.Spec.IrredLoop
 import SmcIrred.Spec.Flatten
 import SmcIrred.Struct.Machine
@@ -287,7 +288,9 @@ set_option maxErrors 100000
 #check @SmcIrred.Lang.two_edges_irreducible
 #check @SmcIrred.Lang.cond_one_edge
 #check @SmcIrred.Lang.simulated_loop_counts
-#check @SmcIrred.Lang.path_one_edge_reducible
+#check @SmcIrred.Lang.path_one_edge_reducible_all
+#check @SmcIrred.Lang.reducible_no_irreducible
+#check @SmcIrred.Lang.pathAdd_reducible
 #check @SmcIrred.Lang.fig5b_cfg
 #check @SmcIrred.Lang.fig5c_cfg
 #check @SmcIrred.Lang.fig6b_cfg
@@ -301,7 +304,8 @@ set_option maxErrors 100000
 #check @SmcIrred.Lang.induce_on_loop
 #check @SmcIrred.Lang.induce_instance
 #check @SmcIrred.Lang.induce_needs_unreached
-#check @SmcIrred.Lang.nway_one_edge
+#check @SmcIrred.Lang.nway_one_edge_all
+#check @SmcIrred.Lang.nway_irreducible_every_jungle
 #check @SmcIrred.Lang.oneway_no_irreducible
 #check @SmcIrred.Dyn.final_isVal
 #check @SmcIrred.Dyn.final_exec_eq_val

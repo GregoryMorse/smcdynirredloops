@@ -29,7 +29,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R15 | RSA compiler correctness | should | TODO |
 | R16 | Tables 1–2: regeneration (M) and data checks (FD) | must | PARTIAL 2026-10-19 (regeneration done; Lean data checks, GMP re-measure -> R16b) |
 | R17 | Transformation language, Figures 5–6 (P18, P19), minimal edges | must | DONE 2026-10-18 (figure instances; general n -> R17b) |
-| R17b | General-n minimal edges, arbitrary-program transformation (G32) | should | TODO |
+| R17b | General-n minimal edges, arbitrary-program transformation (G32) | should | PARTIAL 2026-10-19 (G32 b done; a, c, d, e open) |
 | R18 | Figure 4 C++ code, flattening; structured ⇒ reducible, CFT (should) | must/should | DONE 2026-10-18 (items 1-2; items 3-4 -> R18b) |
 | R18b | Structured programs reducible, CFT leftist trees (G33) | should | TODO |
 | R19 | Dynamic scheme, faults, static scheme end-to-end | must | DONE 2026-10-18 (abstract model; bridge -> R19c) |
@@ -238,3 +238,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 ## R14b handoff (2026-10-19, partial)
 - Done: `Spec.RBSD` (literal models of `add_rbsd` (table, lookup chain `x1`, `(None, y1)`, `(x1, y1)`), `to_rbsd` (`enc1`-`enc3`, `recoding`), `montgomeryBound(issub=True)`), `Arith.RBSD`: `rCell_good` (every table entry on a window allowed by the recoded form exists and equals `x + y - 2 T(x,y) + T(x1,y1)`), `rAddGo_val`/`rAdd_spec` (carry-free addition of recoded operands of any length never fails and returns the sum or difference), `rToRbsd_spec` (recoding preserves the value and gives `Rec1 0`: no digit repeats the nonzero digit below it), `boundSub_spec`. Findings: the transfer is unique (`T(-1,-1) = -1`, `T(1,1) = 1`); the table is wrong on windows the recoded form excludes (`rCell_spec` needs the adjacency condition), so `add_rbsd` is correct only on recoded operands. `validation/rbsd_vectors.py`: 660 `decide` comparisons of the Lean model with `python/virt.py` (M evidence).
 - Not done (G31 stays open): NAF/MOF, carry-save/Wallace counts, Karatsuba thresholds and the extra carry bit, `to_bsd`/`from_bsd`.
+
+## R17b handoff (2026-10-19, partial)
+- Done: `Lang.General`: `reducible_no_irreducible` (in a reducible flow graph no loop is irreducible, for every valid jungle: from `body_dom`, `dom_anc`), `reducible_of_lt`, `path_one_edge_reducible_all` (a path of any size plus one edge, via `edge_pathAdd`, `pathAdd_stay`, `pathAdd_reducible`), `nway_reducible`, `nway_irreducible_every_jungle` (for every `k >= 2` and every valid jungle of the n-way conditional with the join-to-first-branch edge: either the loop headed by branch 1 or the one headed by the join is irreducible; needs `Jungle.Valid.laminar`, `no_rightward`, `tree_path`), `nway_one_edge_all`. The jungle of `dfsRun` is covered through `dfsRun_valid`.
+- Not done (G32 stays open): (a) arbitrary programs for C14, (c) figure CFG irreducibility independent of the jungle, (d), (e).
