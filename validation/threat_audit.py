@@ -1,21 +1,23 @@
-"""Threat-model audit: no field of `structure Assumptions` (Spec/Threat.lean) may mention the conclusion
-(alarm, wins, detect, ExecViolation) in its statement. Docstrings are checked for 'detected' wording as well.
+"""Threat-model audit: no field of `structure Assumptions` (Spec/Threat.lean) may mention a goal
+(Determines, Recovers, wins, Breaks, Defeats, detection...) in its statement. Docstrings are stripped first.
 Usage: python validation/threat_audit.py"""
 import re, sys
 from pathlib import Path
 src = (Path(__file__).parent.parent / "lean/SmcIrred/Spec/Threat.lean").read_text(encoding="utf8")
-start = src.index("def A1 ")
-body = src[start:src.index("end SmcIrred", start)]
-bad = re.compile(r"\b(Alarm|alarm|Wins|wins|detect\w*|ExecViolation|valueFailAt|timeFailAt|RespIntact)\b")
+start = src.index("structure Assumptions")
+end = src.index("\n/--", start)
+body = src[start:end]
+bad = re.compile(r"\b(Determines|Recovers?|Alarm|alarm|Wins|wins|Breaks?|Defeats?|Fails|detect\w*|ExecViolation|attacker\w*)\b")
 errs = []
-# strip docstrings, check each field line that starts a declaration or continues one
 code = re.sub(r"/--.*?-/", "", body, flags=re.S)
 for ln in code.splitlines()[1:]:
     mm = bad.search(ln)
     if mm:
         errs.append(f"assumption text mentions '{mm.group(0)}': {ln.strip()}")
-names = re.findall(r"\n  (a\d\w*) :", code)
+names = re.findall(r"\n  (\w+) :", code)
 print("fields:", ", ".join(names))
+if len(names) < 7:
+    errs.append("expected the seven Assumptions fields")
 if errs:
     print("\n".join(errs)); sys.exit(1)
-print("THREAT AUDIT OK: no Assumptions field mentions alarm/wins/detection")
+print("THREAT AUDIT OK: no Assumptions field mentions a goal")

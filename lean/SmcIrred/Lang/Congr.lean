@@ -6,20 +6,6 @@ public section
 
 namespace SmcIrred.Lang
 
-/-- The generator outputs read by a condition. -/
-@[expose] def Cond.reads : Cond → List Nat
-  | .out k => [k]
-  | .neg k => k.reads
-  | .and a b => a.reads ++ b.reads
-  | _ => []
-
-@[expose] def Instr.reads : Instr → List Nat
-  | .jmpIf k _ => k.reads
-  | _ => []
-
-/-- The generator outputs read by some instruction of the code. -/
-@[expose] def codeReads (code : List Instr) : List Nat := code.flatMap Instr.reads
-
 theorem Cond.eval_congr {sol sol' : Nat → Bool} (env v : Bool) :
     ∀ k : Cond, (∀ i ∈ k.reads, sol i = sol' i) → k.eval sol env v = k.eval sol' env v := by
   intro k
@@ -71,5 +57,13 @@ theorem exec_congr {code : List Instr} {sol sol' : Nat → Bool} (h : ∀ i ∈ 
       simp only []
       rw [Cond.eval_congr env v k hk]
       exact ih _ _ _
+
+/-- A program whose generator outputs it reads are all false runs as with the constant-false outputs. -/
+theorem traceS_of_reads_false {sol : Nat → Bool} (p : Stmt) (h : ∀ i ∈ codeReads (compile p), sol i = false) (c v : Bool) :
+    traceS sol p c v = trace p c v := by
+  unfold trace traceS
+  apply exec_congr _ c
+  intro i hi
+  exact h i hi
 
 end SmcIrred.Lang

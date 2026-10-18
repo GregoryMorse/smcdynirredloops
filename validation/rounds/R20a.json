@@ -1,0 +1,32 @@
+{
+ "round": "R20a",
+ "commands": [
+  "python validation/build_modules.py all",
+  "python validation/axiom_audit.py",
+  "python validation/threat_audit.py"
+ ],
+ "theorems": [
+  "correct",
+  "rtVal_planted",
+  "imm_fails",
+  "imm_determines_iff",
+  "imm_unsound",
+  "static_reading_wrong",
+  "recover",
+  "smcsem_determines",
+  "traceS_of_reads_false"
+ ],
+ "open": [
+  "G25",
+  "G27",
+  "G28",
+  "G29",
+  "G30",
+  "G31",
+  "G32",
+  "G33",
+  "G34",
+  "G35"
+ ],
+ "sorry": 0
+}

@@ -34,7 +34,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R18b | Structured programs reducible, CFT leftist trees (G33) | should | TODO |
 | R19 | Dynamic scheme, faults, static scheme end-to-end | must | DONE 2026-10-18 (abstract model; bridge -> R19c) |
 | R19c | Bridge of the dynamic scheme to the CFG evaluator and schedule construction (G34) | should | TODO |
-| R20a | Security model I: definitions, T1–T3 (crux) | must | TODO |
+| R20a | Security model I: definitions, T1–T3 (crux) | must | DONE 2026-10-18 |
 | R20b | Security model II: T4–T7, necessity, §5.1 texts | must | TODO |
 | R19b | Protected AES/RSA variant: the author implements it, this round integrates (P13, D03) | must | BLOCKED on the author |
 | R21a | Portable native build system: CMake, build/ tree, VS 2022/2026, CI Windows/Linux/macOS | must | TODO |
@@ -193,3 +193,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Findings: the final-execution order theorem only needs, per vertex, that its last write is an execution and that no predecessor is written afterwards (the last executions of the predecessors are then automatically earlier); a fault in a non-final execution is exactly an insertion of a faulty write before a later execution of the same vertex.
 - Not done (G34 -> R19c): bridge to R10, schedule construction, multiple faults, DCA/DPA (R20b).
 - Open: G25, G29 -> R23; G27, G28 -> R8b; G30 -> R13; G31 -> R14b; G32 -> R17b; G33 -> R18b; G34 -> R19c. Next: R20a (security model I), R20b.
+
+## R20a handoff (2026-10-18)
+- Done: `Spec/Threat` (Image, rtVal, Obfuscates, Design, Assumptions S1-S3, ImmCap, SmcSemCap, Determines); `Threat/Correct` (T1 `correct`, `rtVal_planted`); `Threat/Immutable` (T2 `imm_fails`, `imm_determines_iff`, `imm_unsound`, `static_reading_wrong`, `witness`); `Threat/Recover` (T3 `recover`, `smcsem_determines`); `Lang/Congr.traceS_of_reads_false`; `validation/threat_audit.py` adapted (passes); `lean/THREAT_MODEL.md` §1-§4.
+- Not done (G35 -> R20b): remaining literature checks; the `Struct`, `Trace`, `Fault`, `Dca` classes; necessity witnesses for S1-S3; T4-T7; errata `after` texts P21-P24 (P25 optional).
+- Next: R20b; one question to the user: replace §5.1 (P25) or correct only P21-P24.

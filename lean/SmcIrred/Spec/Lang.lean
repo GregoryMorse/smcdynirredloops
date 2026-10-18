@@ -152,4 +152,18 @@ inductive Stmt where
   n := (leaders code).length
   succ := blockSucc code
 
+/-- The generator outputs read by a condition. -/
+@[expose] def Cond.reads : Cond → List Nat
+  | .out k => [k]
+  | .neg k => k.reads
+  | .and a b => a.reads ++ b.reads
+  | _ => []
+
+@[expose] def Instr.reads : Instr → List Nat
+  | .jmpIf k _ => k.reads
+  | _ => []
+
+/-- The generator outputs read by some instruction of the code. -/
+@[expose] def codeReads (code : List Instr) : List Nat := code.flatMap Instr.reads
+
 end SmcIrred.Lang
