@@ -1,0 +1,19 @@
+{
+ "round": "R14b",
+ "commands": [
+  "python validation/build_modules.py all",
+  "python validation/axiom_audit.py",
+  "python validation/rbsd_vectors.py"
+ ],
+ "theorems": [
+  "rCell_good",
+  "rAddGo_val",
+  "rAdd_spec",
+  "rToRbsd_spec",
+  "boundSub_spec"
+ ],
+ "open": [
+  "G31"
+ ],
+ "sorry": 0
+}

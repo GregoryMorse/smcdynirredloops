@@ -107,6 +107,8 @@ import SmcIrred.Arith.Window
 import SmcIrred.Arith.Mul
 import SmcIrred.Arith.Ones
 import SmcIrred.Arith.Ladder
+import SmcIrred.Spec.RBSD
+import SmcIrred.Arith.RBSD
 import SmcIrred.Spec.Lang
 import SmcIrred.Spec.LangFigs
 import SmcIrred.Lang.Common
@@ -251,6 +253,10 @@ set_option maxErrors 100000
 #check @SmcIrred.Arith.mul_by_runs
 #check @SmcIrred.Arith.ladder_spec
 #check @SmcIrred.Arith.ladderStep_shape
+#check @SmcIrred.Arith.rAdd_spec
+#check @SmcIrred.Arith.rToRbsd_spec
+#check @SmcIrred.Arith.rAddGo_val
+#check @SmcIrred.Arith.boundSub_spec
 #check @SmcIrred.Arith.winExp_spec
 #check @SmcIrred.Arith.modexpMontWin_correct
 #check @SmcIrred.Arith.winMuls_total

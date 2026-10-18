@@ -25,7 +25,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R12 | AES specification facts (S-box P07, xtime, key expansion, vectors) | must | DONE 2026-10-18 |
 | R13 | AES compiler correctness | should | TODO |
 | R14 | Arithmetic for RSA (Montgomery, windows, Karatsuba/Toom P08, word size P09) | must | DONE 2026-10-18 (items 1-6; items 7-8 partly -> R14b) |
-| R14b | RBSD carry-free addition, NAF/MOF, Wallace counts (G31) | should | TODO |
+| R14b | RBSD carry-free addition, NAF/MOF, Wallace counts (G31) | should | PARTIAL 2026-10-19 (RBSD, issub bound done; NAF, Wallace, thresholds open) |
 | R15 | RSA compiler correctness | should | TODO |
 | R16 | Tables 1–2: regeneration (M) and data checks (FD) | must | PARTIAL 2026-10-19 (regeneration done; Lean data checks, GMP re-measure -> R16b) |
 | R17 | Transformation language, Figures 5–6 (P18, P19), minimal edges | must | DONE 2026-10-18 (figure instances; general n -> R17b) |
@@ -234,3 +234,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Done: `Smc/Cost`: instrumented mirrors `cExtract`, `cLeave`, `cLoop`, `cBody`, `cCall`, `cntRun` of the Level 2 machine with a count of primitive operations (calls, entries, exits, loop iterations, popped cells, outer-loop iterations); `cntRun_state` and friends prove the state component is the machine itself; potential `mPot` (weight `2·outdeg + 4` per node without an `ent` entry) gives `cCall_bound`, `cntRun_bound`; `chain_le` (the chain is a duplicate-free node list, via `sRun_sim`); `smcSteps_le`: `smcSteps f ≤ 2·|E| + 7·|V|`. Primitive operations only, not processor cycles.
 - Not done (G28 -> R8c): transcription of the `selfmodvmtwosat` instruction list and its refinement of Level 2.
 - Build green, axiom audit 0 violations (5082 declarations).
+
+## R14b handoff (2026-10-19, partial)
+- Done: `Spec.RBSD` (literal models of `add_rbsd` (table, lookup chain `x1`, `(None, y1)`, `(x1, y1)`), `to_rbsd` (`enc1`-`enc3`, `recoding`), `montgomeryBound(issub=True)`), `Arith.RBSD`: `rCell_good` (every table entry on a window allowed by the recoded form exists and equals `x + y - 2 T(x,y) + T(x1,y1)`), `rAddGo_val`/`rAdd_spec` (carry-free addition of recoded operands of any length never fails and returns the sum or difference), `rToRbsd_spec` (recoding preserves the value and gives `Rec1 0`: no digit repeats the nonzero digit below it), `boundSub_spec`. Findings: the transfer is unique (`T(-1,-1) = -1`, `T(1,1) = 1`); the table is wrong on windows the recoded form excludes (`rCell_spec` needs the adjacency condition), so `add_rbsd` is correct only on recoded operands. `validation/rbsd_vectors.py`: 660 `decide` comparisons of the Lean model with `python/virt.py` (M evidence).
+- Not done (G31 stays open): NAF/MOF, carry-save/Wallace counts, Karatsuba thresholds and the extra carry bit, `to_bsd`/`from_bsd`.

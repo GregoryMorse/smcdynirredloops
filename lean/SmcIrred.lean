@@ -106,6 +106,8 @@ public import SmcIrred.Arith.Window
 public import SmcIrred.Arith.Mul
 public import SmcIrred.Arith.Ones
 public import SmcIrred.Arith.Ladder
+public import SmcIrred.Spec.RBSD
+public import SmcIrred.Arith.RBSD
 public import SmcIrred.Spec.Lang
 public import SmcIrred.Spec.LangFigs
 public import SmcIrred.Lang.Common
