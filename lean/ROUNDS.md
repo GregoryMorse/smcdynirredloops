@@ -30,7 +30,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R16 | Tables 1–2: regeneration (M) and data checks (FD) | must | TODO |
 | R17 | Transformation language, Figures 5–6 (P18, P19), minimal edges | must | DONE 2026-10-18 (figure instances; general n -> R17b) |
 | R17b | General-n minimal edges, arbitrary-program transformation (G32) | should | TODO |
-| R18 | Figure 4 C++ code, flattening; structured ⇒ reducible, CFT (should) | must/should | TODO |
+| R18 | Figure 4 C++ code, flattening; structured ⇒ reducible, CFT (should) | must/should | DONE 2026-10-18 (items 1-2; items 3-4 -> R18b) |
+| R18b | Structured programs reducible, CFT leftist trees (G33) | should | TODO |
 | R19 | Dynamic scheme, faults, static scheme end-to-end | must | TODO |
 | R20a | Security model I: definitions, T1–T3 (crux) | must | TODO |
 | R20b | Security model II: T4–T7, necessity, §5.1 texts | must | TODO |
@@ -178,3 +179,10 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Not done (G32 -> R17b): general n for C73/C76, arbitrary programs for C14.
 - Tooling note: `decide` on `cfgOf (compile _)` and on `Irreducible (dfsRun _)` works at these sizes (peak 0.65 GB for the path sweep).
 - Open: G25, G29 -> R23; G27, G28 -> R8b; G30 -> R13; G31 -> R14b; G32 -> R17b. Next: R18 (Fig. 4 code, structuring), R19.
+
+## R18 handoff (2026-10-18)
+- Done: `Spec.IrredLoop` (call events, Figure 4 CFG semantics `G` with condition oracles, a flat machine with statement-level instructions, the three functions of `native/IrredLoop.cpp` as `codeGoto`, `codeLoops`, `codeNoGoto` with the intentional fall-through as `swFall`); `Struct.Machine` (`Star`, determinism `halts_unique`, `star_sound`); `Struct.IrredGoto/IrredLoops/IrredNoGoto` (halting trace of each function iff `Cfg`; per-address meaning functions and invariants); `Struct.IrredLoopCpp` (`three_versions_agree`, `G_moves_are_fig4_edges`); `Spec.Flatten`, `Struct.Flatten` (`flatten_iff`, `state_range`, `fig4_wf`).
+- Findings: the invariants needed (e.g. `is_end` false except just after a `switch` with `EXIT`, `v_first` false after the first `v()`) are exactly those a reader uses; `break` leaving the middle loop skips its `while (!is_end)` test, which is why `EXIT` needs the fall-through into `LOOP`.
+- Not done (G33 -> R18b): items 3-4 (structured programs reducible; CFT leftist trees), native run, front end.
+- Tooling note: `simp [step, code..]` on literal instruction lists plus `cases` on flags decides each address; `refine .cons (c' := ...)` with explicit configurations avoids metavariable trouble.
+- Open: G25, G29 -> R23; G27, G28 -> R8b; G30 -> R13; G31 -> R14b; G32 -> R17b; G33 -> R18b. Next: R19 (dynamic scheme, faults, static scheme).

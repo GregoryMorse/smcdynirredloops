@@ -113,3 +113,11 @@ public import SmcIrred.Lang.Fig6
 public import SmcIrred.Lang.MinEdges
 public import SmcIrred.Lang.Induce
 public import SmcIrred.Lang.NWay
+public import SmcIrred.Spec.IrredLoop
+public import SmcIrred.Spec.Flatten
+public import SmcIrred.Struct.Machine
+public import SmcIrred.Struct.IrredGoto
+public import SmcIrred.Struct.IrredLoops
+public import SmcIrred.Struct.IrredNoGoto
+public import SmcIrred.Struct.IrredLoopCpp
+public import SmcIrred.Struct.Flatten
