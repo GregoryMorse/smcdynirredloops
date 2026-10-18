@@ -1,0 +1,7 @@
+{
+ "round": "R4c",
+ "commands": ["python validation/build_modules.py all", "python validation/axiom_audit.py"],
+ "theorems": ["maxMEE_others", "maxPairs_of_max", "between", "header_of_chain", "indeg_bound"],
+ "open": ["G25", "G26", "G27"],
+ "sorry": 0
+}

@@ -33,6 +33,7 @@ public import SmcIrred.Extremal.MnCount
 public import SmcIrred.Extremal.IrrBound
 public import SmcIrred.Extremal.Count2
 public import SmcIrred.Extremal.MEEBound
+public import SmcIrred.Extremal.MinOther
 public import SmcIrred.Extremal.KnAny
 public import SmcIrred.Spec.TwoSat
 public import SmcIrred.TwoSat.Implication

@@ -11,7 +11,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R3 | Havlak loop nesting forest, Figure 4(c), small CFGs, non-uniqueness | must | DONE 2026-10-17 (algorithm equivalence: open obligation) |
 | R3b | Close G01/G02: Havlak algorithm = declarative LNF; reducible-CFG body uniqueness (scheduled after R5, before R6 if time; mandatory before R23) | must | DONE 2026-10-18 |
 | R4 | Extremal results: K_n, M_n, n−2 bound (MEE bound should) | must | DONE 2026-10-17 (G19 open) |
-| R4c | Close G19 (P15 second half: max-MEE CFGs have >= 2n-3 other edges), after R5 | should | TODO |
+| R4c | Close G19 (P15 second half: max-MEE CFGs have >= 2n-3 other edges), after R5 | should | DONE 2026-10-18 |
 | R5 | 2-SAT: implication graph, APT theorem, unit clauses, Figure 1 | must | DONE 2026-10-17 |
 | R6 | Tarjan's algorithm, cost, reference solver (`tarjan_scc` model -> R6b, G22) | must | done 2026-10-18 |
 | R6b | `Tarjan/CodeModel` (G22) and DNF parity bound (G21) | must | done 2026-10-18 |
@@ -129,3 +129,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Done: `LNF.Algo` (scanOne refactor of the worklist scan), `LNF.HvOrder`..`LNF.HvMain`: `havlak_hdr` (computed header of `x` is `some h` iff `LnfParent h x`), `havlak_hdr_none`, `havlak_irr` for every `J.Valid g r`; invariant `HInv` (union-find chain, representatives = outermost processed header containing the vertex, headers, irreducibility flags, recorded entry lists) preserved by `havlakStep` (`hstep`) and the fold over `byPreDesc` (`havlak_fold`, `havlak_inv`). `LNF.Reducible`: `Spec.LNF` gains `Digraph.Dom`, `NonDomPath`, `Reducible`; `body_dom` (bodies by dominance alone), `body_dfs_independent`, `header_dfs_independent`, `lnfParent_dfs_independent`. G01/G02 closed.
 - `havlak_fig4*` stay as the earlier mechanical evidence; the general theorems supersede them.
 - Open: G25, G26, G27 -> R8; G19 -> R4c. Next: R4c, R8.
+
+## R4c handoff (2026-10-18)
+- Done: `Extremal.MinOther`: `maxMEE_others` (every CFG with `n ≥ 2` whose multiple-entry count is `C(n−1,2)` has `edgeCount ≥ meeCount + (2n−3)`, for every valid jungle). Proof: tightness of `meeCount_bound` gives per-vertex equality (`per_vertex_strict`, `maxPairs_of_max`: each earlier non-parent vertex is MEE-adjacent), hence no vertex between a vertex and its parent in preorder (`between`), every non-last vertex has a child (`child_exists`), a vertex with parent and child heads a loop (`header_of_chain`), and an in-degree count (`indeg_bound`). With `MnLite_others` the bound 2n−3 is attained. G19 closed.
+- Open: G25, G26, G27 -> R8. Next: R8.
