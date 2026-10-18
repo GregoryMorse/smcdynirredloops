@@ -1,0 +1,7 @@
+{
+ "round": "R9",
+ "commands": ["python validation/build_modules.py all", "python validation/axiom_audit.py"],
+ "theorems": ["planted_sat", "forcing_agree", "planted_solve", "planted_smc", "counter_violates", "counter_unsat", "loop_keeps", "no_loop_through_negation"],
+ "open": ["G25", "G27", "G28"],
+ "sorry": 0
+}

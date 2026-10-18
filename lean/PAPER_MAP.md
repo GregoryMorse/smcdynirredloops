@@ -43,7 +43,7 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C37 | §3 ¶1 | 622–623 | node stack replaces the call stack; first instruction → return; topological check marking | F + M | R7, R8 | F part done (Smc.Solve `smcSolve_spec`, Smc.Visit `sRun_sim`); M part: native vectors agree (evidence, R8_native.json); step bound open (G27, R8b) |
 | C38 | §3 ¶1 | 622–623 | lambda callbacks for edges and solutions; set for unsatisfiability | M | R8 | done (M evidence: callbacks exercised by the same vectors, R8_native.json) | |
 | C39 | §3 ¶2, Fig. 2 | 622–623 | blueprint generation; stamping; reuse by restamping SMC offsets | F + M | R7, R8 | F part done in the abstract machine (Smc.Restamp `smcRounds_replicate`); Fig. 2(a): listing = arrays and offset constants (M evidence, validation/native_listing.py, R8_listing.json); cell-to-offset correspondence G25 (R23) |
-| C40 | §3.1 | 623 | planted 2-SAT generator yields the desired values (P04) | F | R9 | open |  |
+| C40 | §3.1 | 623 | planted 2-SAT generator yields the desired values (P04) | F | R9 | done (Gen.Planted: planted_sat, forcing_agree, planted_solve, planted_smc; P04: counter_violates, counter_unsat, loop_keeps, no_loop_through_negation) | |
 | C41 | §4 ¶1 | 623–629 | Boolean-level description; word-level abstractions can be reintroduced | X + F (DSL) | R11 | open |  |
 | C42 | §4, Def. 1 | 623–629 | multi-input AND/OR/XOR/XNOR; decomposition into / X / −1 two-input gates, sequential or tree | F | R11 | open |  |
 | C43 | §4 | 623–629 | NAND, NOR functionally complete; XNOR/NAND/NOR negate one input | F | R11 | open |  |

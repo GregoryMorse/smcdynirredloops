@@ -19,7 +19,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R7 | SMC 2-SAT solver Level 2 ⇒ Tarjan/APT; restamp lemma | must | done 2026-10-18 |
 | R8 | SMC solver VM level (should); native vectors and listing evidence (must) | must/should | DONE 2026-10-18 (items 2–3; item 1 and G27 -> R8b) |
 | R8b | G27 step bound for the Level 2 machine; G28 VM instruction-list refinement (R8 item 1) | should | TODO |
-| R9 | Planted 2-SAT generator (§3.1, P04) | must | TODO |
+| R9 | Planted 2-SAT generator (§3.1, P04) | must | DONE 2026-10-18 |
 | R10 | Boolean-CFG VM: order independence, data-independent counts, subgraphs | must | TODO |
 | R11 | Gate primitives, decoders, adders (P05), DSL compiler correctness | must | TODO |
 | R12 | AES specification facts (S-box P07, xtime, key expansion, vectors) | must | TODO |
@@ -140,3 +140,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Code fix L10 (`#include <memory>`).
 - Pitfall: the listing must be assembled with `/DWINDOWS` (the asm has `IFDEF WINDOWS` branches); without it the Linux branch is listed and arrays differ. x86 listing (ml) not run.
 - Open: G25 -> R23 (cell-to-offset correspondence), G27, G28 -> R8b. Next: R8b or R9.
+
+## R9 handoff (2026-10-18)
+- Done: `Spec.Generator` (`ImpPath`, `impFormula`, `Respecting`, `Planted`: forest of implications respecting the desired assignment `σ`, forcing path `¬ℓ ⇒* ℓ` for each required variable; further implications arbitrary but `σ`-respecting), `Gen.Planted`: `planted_sat` (σ solves the generated formula), `forcing_agree` (every solution agrees with σ on required variables), `planted_solve`/`planted_smc` (the reference solver and the Level 2 machine return a solution, hence agree with σ there), P04: `counter_violates`, `counter_unsat` (acyclic true→false implication destroys σ; with required ends the formula is unsatisfiable), `loop_keeps` (loops among σ-true literals are harmless), `no_loop_through_negation`. The probabilistic choices of the generator are universally quantified (every choice satisfying the conditions).
+- P04 `after` text in `errata/edits.json` is backed (lean_refs set).
+- Open: G25 -> R23; G27, G28 -> R8b. Next: R10 (or R8b).

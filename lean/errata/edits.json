@@ -90,7 +90,7 @@
    "status": "confirmed",
    "confidence": "inferred",
    "evidence": "Counterexamples are elementary (x true, y false; add x -> y: acyclic but violated). The replacement condition is the one Lean proves in R9 (planted generator); the wording of the replacement is inferred from the published construction.",
-   "lean_refs": [],
+   "lean_refs": ["SmcIrred.forcing_agree", "SmcIrred.planted_solve", "SmcIrred.counter_violates", "SmcIrred.counter_unsat", "SmcIrred.loop_keeps", "SmcIrred.no_loop_through_negation"],
    "source": "published PDF p. 623"
   },
   {

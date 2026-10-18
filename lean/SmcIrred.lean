@@ -36,6 +36,7 @@ public import SmcIrred.Extremal.MEEBound
 public import SmcIrred.Extremal.MinOther
 public import SmcIrred.Extremal.KnAny
 public import SmcIrred.Spec.TwoSat
+public import SmcIrred.Spec.Generator
 public import SmcIrred.TwoSat.Implication
 public import SmcIrred.TwoSat.Reach
 public import SmcIrred.TwoSat.APT
@@ -65,3 +66,4 @@ public import SmcIrred.Smc.Visit
 public import SmcIrred.Smc.Final
 public import SmcIrred.Smc.Solve
 public import SmcIrred.Smc.Restamp
+public import SmcIrred.Gen.Planted
