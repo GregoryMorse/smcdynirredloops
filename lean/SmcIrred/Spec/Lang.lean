@@ -16,16 +16,18 @@ inductive Cond where
   | falseC : Cond
   | ttf : Cond
   | c : Cond
+  | out : Nat → Cond
   | neg : Cond → Cond
   | and : Cond → Cond → Cond
 
 /-- Value and new state of the variable read by `ttf`. -/
-@[expose] def Cond.eval (env : Bool) : Cond → Bool → Bool × Bool
+@[expose] def Cond.eval (sol : Nat → Bool) (env : Bool) : Cond → Bool → Bool × Bool
   | .falseC, v => (false, v)
   | .ttf, v => (v, !v)
   | .c, v => (env, v)
-  | .neg k, v => ((!(k.eval env v).1), (k.eval env v).2)
-  | .and k l, v => if (k.eval env v).1 then l.eval env (k.eval env v).2 else (false, (k.eval env v).2)
+  | .out k, v => (sol k, v)
+  | .neg k, v => ((!(k.eval sol env v).1), (k.eval sol env v).2)
+  | .and k l, v => if (k.eval sol env v).1 then l.eval sol env (k.eval sol env v).2 else (false, (k.eval sol env v).2)
 
 /-- Flat code. -/
 inductive Instr where
@@ -36,13 +38,13 @@ inductive Instr where
 
 /-- Execution with a fuel bound: the block trace and the final value of the variable read by `ttf`, if the
 code halts within the fuel (running off the end counts as `halt`). -/
-@[expose] def exec : Nat → List Instr → Bool → Nat → Bool → List Nat → Option (List Nat × Bool)
-  | 0, _, _, _, _, _ => none
-  | f + 1, code, env, pc, v, tr =>
+@[expose] def exec : Nat → List Instr → (Nat → Bool) → Bool → Nat → Bool → List Nat → Option (List Nat × Bool)
+  | 0, _, _, _, _, _, _ => none
+  | f + 1, code, sol, env, pc, v, tr =>
     match code.getD pc .halt with
-    | .blk a => exec f code env (pc + 1) v (tr ++ [a])
-    | .jmp t => exec f code env t v tr
-    | .jmpIf k t => exec f code env (if (k.eval env v).1 then t else pc + 1) (k.eval env v).2 tr
+    | .blk a => exec f code sol env (pc + 1) v (tr ++ [a])
+    | .jmp t => exec f code sol env t v tr
+    | .jmpIf k t => exec f code sol env (if (k.eval sol env v).1 then t else pc + 1) (k.eval sol env v).2 tr
     | .halt => some (tr, v)
 
 /-- Structured statements. `ifGoto k l` is `if (k) goto l;`. -/

@@ -121,3 +121,8 @@ public import SmcIrred.Struct.IrredLoops
 public import SmcIrred.Struct.IrredNoGoto
 public import SmcIrred.Struct.IrredLoopCpp
 public import SmcIrred.Struct.Flatten
+public import SmcIrred.Spec.Dynamic
+public import SmcIrred.Lang.Congr
+public import SmcIrred.Dynamic.FinalExec
+public import SmcIrred.Dynamic.Fault
+public import SmcIrred.Dynamic.StaticScheme

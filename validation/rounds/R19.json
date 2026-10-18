@@ -1,0 +1,34 @@
+{
+ "round": "R19",
+ "commands": [
+  "python validation/build_modules.py all",
+  "python validation/axiom_audit.py"
+ ],
+ "theorems": [
+  "final_isVal",
+  "final_exec_eq_val",
+  "final_exec_input_tied",
+  "schedule_length_le",
+  "fault_nonfinal",
+  "fault_final_overwrites",
+  "fault_final_changes",
+  "wcirc_bad_not_ordered",
+  "final_index_depends",
+  "fault_input_dependent",
+  "static_behaviour",
+  "static_irreducible",
+  "static_scheme"
+ ],
+ "open": [
+  "G25",
+  "G27",
+  "G28",
+  "G29",
+  "G30",
+  "G31",
+  "G32",
+  "G33",
+  "G34"
+ ],
+ "sorry": 0
+}

@@ -30,8 +30,30 @@ namespace SmcIrred.Lang
 /-- Figure 6(c): `if (falseCondition1) goto labelA; while (c && trueThenFalse) { labelA: A; } B;`. -/
 @[expose] def fig6c : Stmt := .seq (.ifGoto .falseC 8) (.seq (.while (.and .c .ttf) (.lab 8 blkA)) blkB)
 
-/-- The block trace of a program run from a state of the `trueThenFalse` variable with condition constant `c`. -/
-@[expose] def trace (p : Stmt) (c v : Bool) : Option (List Nat × Bool) := exec 100 (compile p) c 0 v []
+/-- The block trace of a program run from a state of the `trueThenFalse` variable with condition constant `c`, when
+the generator outputs are `sol` (the listings below do not read them). -/
+@[expose] def traceS (sol : Nat → Bool) (p : Stmt) (c v : Bool) : Option (List Nat × Bool) :=
+  exec 100 (compile p) sol c 0 v []
+
+/-- The block trace of a program that reads no generator output. -/
+@[expose] def trace (p : Stmt) (c v : Bool) : Option (List Nat × Bool) := traceS (fun _ => false) p c v
+
+/-! ### The static scheme: constant conditions read from the generator outputs
+
+`falseCondition1`, `falseCondition2` become the outputs `out 1`, `out 2` of the 2-SAT solver on a planted formula whose
+desired assignment makes them false. -/
+
+/-- Figure 5(b) with solver-output conditions. -/
+@[expose] def fig5bS : Stmt := .seq (.ifGoto (.out 1) 9) (.doWhile (.seq blkA (.lab 9 blkB)) (.out 2))
+
+/-- Figure 5(c) with a solver-output condition. -/
+@[expose] def fig5cS : Stmt := .seq (.ifGoto (.out 1) 9) (.while .ttf (.seq blkA (.lab 9 blkB)))
+
+/-- Figure 6(b) with a solver-output condition. -/
+@[expose] def fig6bS : Stmt := .seq (.ifGoto (.neg .c) 9) (.doWhile (.seq blkA (.lab 9 blkB)) (.out 1))
+
+/-- Figure 6(c) with a solver-output condition. -/
+@[expose] def fig6cS : Stmt := .seq (.ifGoto (.out 1) 8) (.seq (.while (.and .c .ttf) (.lab 8 blkA)) blkB)
 
 /-! ### The graphs as drawn (published Figures 5 and 6)
 

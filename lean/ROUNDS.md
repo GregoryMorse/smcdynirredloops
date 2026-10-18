@@ -32,7 +32,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R17b | General-n minimal edges, arbitrary-program transformation (G32) | should | TODO |
 | R18 | Figure 4 C++ code, flattening; structured ⇒ reducible, CFT (should) | must/should | DONE 2026-10-18 (items 1-2; items 3-4 -> R18b) |
 | R18b | Structured programs reducible, CFT leftist trees (G33) | should | TODO |
-| R19 | Dynamic scheme, faults, static scheme end-to-end | must | TODO |
+| R19 | Dynamic scheme, faults, static scheme end-to-end | must | DONE 2026-10-18 (abstract model; bridge -> R19c) |
+| R19c | Bridge of the dynamic scheme to the CFG evaluator and schedule construction (G34) | should | TODO |
 | R20a | Security model I: definitions, T1–T3 (crux) | must | TODO |
 | R20b | Security model II: T4–T7, necessity, §5.1 texts | must | TODO |
 | R19b | Protected AES/RSA variant: the author implements it, this round integrates (P13, D03) | must | BLOCKED on the author |
@@ -186,3 +187,9 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Not done (G33 -> R18b): items 3-4 (structured programs reducible; CFT leftist trees), native run, front end.
 - Tooling note: `simp [step, code..]` on literal instruction lists plus `cases` on flags decides each address; `refine .cons (c' := ...)` with explicit configurations avoids metavariable trouble.
 - Open: G25, G29 -> R23; G27, G28 -> R8b; G30 -> R13; G31 -> R14b; G32 -> R17b; G33 -> R18b. Next: R19 (dynamic scheme, faults, static scheme).
+
+## R19 handoff (2026-10-18)
+- Done: `Spec.Dynamic` (abstract circuit DAG with gate functions, actions = execution or arbitrary write, `runA`, `IsVal`, `FinalOrdered`, `valOf`, `lastIdx`); `Dynamic.FinalExec` (C77: `final_isVal` needs no induction, `isVal_unique`, `execs_ordered`, `final_exec_eq_val`, `final_exec_input_tied`, `schedule_length_le`); `Dynamic.Fault` (T5: `fault_nonfinal`, `fault_final_overwrites`, `fault_final_changes`, witness circuit `wcirc` with `wcirc_bad_not_ordered`, `final_index_depends`, `fault_input_dependent`); `Spec.Lang` extended with `Cond.out k` and the generator-output argument `sol` of `Cond.eval`/`exec` (`Lang.Congr`: a run reads only the outputs its conditions mention); `Spec.LangFigs` has the solver-output variants `fig5bS`, `fig5cS`, `fig6bS`, `fig6cS`; `Dynamic.StaticScheme` (`static_behaviour`, `static_irreducible`, `static_scheme`: planted formula -> `planted_smc` -> outputs false -> transformed programs execute the original blocks, irreducible loops).
+- Findings: the final-execution order theorem only needs, per vertex, that its last write is an execution and that no predecessor is written afterwards (the last executions of the predecessors are then automatically earlier); a fault in a non-final execution is exactly an insertion of a faulty write before a later execution of the same vertex.
+- Not done (G34 -> R19c): bridge to R10, schedule construction, multiple faults, DCA/DPA (R20b).
+- Open: G25, G29 -> R23; G27, G28 -> R8b; G30 -> R13; G31 -> R14b; G32 -> R17b; G33 -> R18b; G34 -> R19c. Next: R20a (security model I), R20b.
