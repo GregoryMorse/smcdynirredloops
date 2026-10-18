@@ -57,7 +57,7 @@ theorem TMono.of_fields {s t : TState} (hn : t.num = s.num) (ho : t.out = s.out)
 
 theorem TInv.tick {P : List Nat} {s : TState} (h : TInv g P s) (t : Nat) : TInv g P { s with ticks := t } :=
   ⟨h.stk_lt, h.done_lt, h.vis_iff, h.disj, h.stk_nodup, h.out_nodup, h.num_le, h.P_sub, h.P_sorted, h.reach_P,
-    h.closed_out, h.scc_out, h.low_le, h.low_wit, h.fin_low, h.low_min, h.fin_edge, h.fin_vis⟩
+    h.closed_out, h.scc_out, h.low_le, h.low_wit, h.fin_low, h.low_min, h.fin_edge, h.fin_vis, h.done_low.congr rfl (fun _ _ => rfl) (fun _ _ => rfl)⟩
 
 /-- With an empty path the stack is empty. -/
 theorem TInv.stk_nil {s : TState} (h : TInv g [] s) : s.stk = [] := by

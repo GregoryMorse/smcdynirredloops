@@ -143,7 +143,20 @@ theorem TInv.pop {P : List Nat} {s : TState} {v : Nat} {N b : List Nat} (h : TIn
     rcases hx with hx | rfl
     · exact (hmemstk x).2 (Or.inl hx)
     · exact hvstk
-  refine ⟨?_, ?_, ?_, ?_, hbnd, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  have hdl : DoneLow ({ s with stk := b, out := s.out ++ [N ++ [v]], ticks := t } : TState) := by
+    intro C hC
+    rcases List.mem_append.1 hC with hC | hC
+    · obtain ⟨r, h1, h2, h3⟩ := h.done_low C hC
+      exact ⟨r, h1, h2, h3⟩
+    · have : C = N ++ [v] := by simpa using hC
+      subst this
+      refine ⟨v, by simp, hlow, fun u hu hne => ?_⟩
+      have huN : u ∈ N := by
+        rcases List.mem_append.1 hu with hu | hu
+        · exact hu
+        · exact absurd (List.mem_singleton.1 hu) hne
+      exact h.fin_low u (hCv u (Or.inl huN)) (hnotP u huN)
+  refine ⟨?_, ?_, ?_, ?_, hbnd, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, hdl⟩
   · intro w hw
     exact h.stk_lt w ((hmemstk w).2 (Or.inr (Or.inr hw)))
   · intro C hC w hw
@@ -321,7 +334,8 @@ theorem TInv.keep {P : List Nat} {s : TState} {v p : Nat} {P0 : List Nat} (h : T
     · rw [hLn j e]; exact Nat.le_refl _
   have hnP : ∀ x, x ∉ v :: p :: P0 → x ≠ p := fun x hx e => hx (e ▸ List.mem_cons_of_mem _ List.mem_cons_self)
   refine ⟨h.stk_lt, h.done_lt, h.vis_iff, h.disj, h.stk_nodup, h.out_nodup, h.num_le, ?_, ?_, ?_, h.closed_out,
-    h.scc_out, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    h.scc_out, ?_, ?_, ?_, ?_, ?_, ?_,
+    h.done_low.congr rfl (fun _ _ => rfl) (fun w hw => hLn w (fun e => h.disj w (e ▸ hps) hw))⟩
   · intro q hq; exact h.P_sub q (List.mem_cons_of_mem _ hq)
   · exact (List.pairwise_cons.1 h.P_sorted).2
   · intro q hq w hw hqw; exact h.reach_P q (List.mem_cons_of_mem _ hq) w hw hqw

@@ -1,0 +1,7 @@
+{
+ "round": "R6c",
+ "commands": ["python validation/build_modules.py all", "python validation/axiom_audit.py"],
+ "theorems": ["DoneLow", "ctarjan_spec"],
+ "open": ["G25", "G26", "G27"],
+ "sorry": 0
+}

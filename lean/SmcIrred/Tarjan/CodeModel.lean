@@ -84,7 +84,8 @@ theorem DupOf.append {l l' : List (List Nat)} (h : DupOf l l') : ∀ R : List (L
 theorem TInv.bump {P : List Nat} {s : TState} (h : TInv g P s) (k : Nat) (hk : s.cnt ≤ k) :
     TInv g P { s with cnt := k } :=
   ⟨h.stk_lt, h.done_lt, h.vis_iff, h.disj, h.stk_nodup, h.out_nodup, fun w => Nat.le_trans (h.num_le w) hk, h.P_sub,
-    h.P_sorted, h.reach_P, h.closed_out, h.scc_out, h.low_le, h.low_wit, h.fin_low, h.low_min, h.fin_edge, h.fin_vis⟩
+    h.P_sorted, h.reach_P, h.closed_out, h.scc_out, h.low_le, h.low_wit, h.fin_low, h.low_min, h.fin_edge, h.fin_vis,
+    h.done_low.congr rfl (fun _ _ => rfl) (fun _ _ => rfl)⟩
 
 theorem cScan_idle (F' : Nat → Nat → CState → CState) (v : Nat) (s : CState) :
     ∀ ws : List Nat, (∀ w ∈ ws, s.num w ≠ 0 ∧ s.on w = false) → cScan F' v ws s = s := by
@@ -146,11 +147,19 @@ theorem osim_step (g : Digraph) {m : TState} {c : CState} (h : OSim g m c) {v : 
         · rw [h.stk0] at hs; simp at hs
         · exact hd
       obtain ⟨C, hC1, hC2⟩ := hdone
+      obtain ⟨r, hr1, hr2, hr3⟩ := h.inv.done_low C hC1
+      have hvr : v = r := by
+        by_cases e : v = r
+        · exact e
+        · have := hr3 v hC2 e
+          rw [← h.low, ← h.num] at this
+          omega
+      subst hvr
       unfold cFinish
       simp only [hl, ↓reduceIte, popTo, List.mem_singleton]
       refine ⟨hI', by simp [h.cnt], h.num, h.low, h.stk0, ?_, ?_⟩
       · intro w; simp [h.off w]
-      · exact DupOf.dup v C h.dup hC1 hC2
+      · exact DupOf.dup v C h.dup hC1 hr1
     · unfold cFinish
       simp only [hl, ↓reduceIte]
       exact ⟨hI', by simp [h.cnt], h.num, h.low, h.stk0, h.off, h.dup⟩

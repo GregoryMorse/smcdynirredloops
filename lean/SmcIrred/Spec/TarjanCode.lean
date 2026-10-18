@@ -67,11 +67,12 @@ sccs.push_back(vec); }`, followed by the parent's lowlink update performed after
 /-- The vector `sccs` of the legacy code. -/
 @[expose] def ctarjanSccs (g : Digraph) : List (List Nat) := (ctarjan g).out
 
-/-- `out` is `comps` with extra singleton components `[r]` inserted, each after a component containing `r`. -/
+/-- `out` is `comps` with extra singleton components `[r]` inserted, each after a component whose last element (its
+root) is `r`. -/
 inductive DupOf : List (List Nat) → List (List Nat) → Prop
   | nil : DupOf [] []
   | keep {l l' : List (List Nat)} (C : List Nat) : DupOf l l' → DupOf (l ++ [C]) (l' ++ [C])
-  | dup {l l' : List (List Nat)} (r : Nat) (C : List Nat) : DupOf l l' → C ∈ l → r ∈ C → DupOf l (l' ++ [[r]])
+  | dup {l l' : List (List Nat)} (r : Nat) (C : List Nat) : DupOf l l' → C ∈ l → C.getLast? = some r → DupOf l (l' ++ [[r]])
 
 /-- The negation of a literal node (`2x ↔ 2x+1`, the integer `-v` of the code). -/
 @[expose] def nneg (v : Nat) : Nat := if v % 2 = 0 then v + 1 else v - 1

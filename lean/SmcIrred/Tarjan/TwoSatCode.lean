@@ -160,7 +160,7 @@ theorem tsFold_dup {l l' : List (List Nat)} (h : DupOf l l') : TsE (tsFold l) (t
       · exact Or.inl h
       · exact Or.inr (fun r' hr' => by
           rw [List.mem_singleton] at hr'; subst hr'
-          exact h r' (List.mem_flatten.2 ⟨C, hC, hr⟩))
+          exact h r' (List.mem_flatten.2 ⟨C, hC, (by obtain ⟨ys, e⟩ := List.getLast?_eq_some_iff.1 hr; rw [e]; simp)⟩))
     have es := tsComp_single r _ hcr
     refine ⟨⟨he.1.trans es.1.symm, fun x => (he.2 x).trans (es.2 x).symm⟩, tsClosed_of_E hc ?_⟩
     exact ⟨es.1.symm, fun x => (es.2 x).symm⟩

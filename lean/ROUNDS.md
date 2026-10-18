@@ -15,7 +15,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R5 | 2-SAT: implication graph, APT theorem, unit clauses, Figure 1 | must | DONE 2026-10-17 |
 | R6 | Tarjan's algorithm, cost, reference solver (`tarjan_scc` model -> R6b, G22) | must | done 2026-10-18 |
 | R6b | `Tarjan/CodeModel` (G22) and DNF parity bound (G21) | must | done 2026-10-18 |
-| R6c | G23 (re-emitted duplicates are exactly the roots; needs a done-vertex root invariant) | must | TODO |
+| R6c | G23 (re-emitted duplicates are exactly the roots; needs a done-vertex root invariant) | must | done 2026-10-18 |
 | R7 | SMC 2-SAT solver Level 2 ⇒ Tarjan/APT; restamp lemma | must | done 2026-10-18 |
 | R8 | SMC solver VM level (should); native vectors and listing evidence (must) | must/should | TODO |
 | R9 | Planted 2-SAT generator (§3.1, P04) | must | TODO |
@@ -120,3 +120,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Open: G25, G26, G27 -> R8 (offsets, listing match, step bound). Next: R6c (small), R3b, R4c, R8.
 - Hazard: names in `Smc/*` use the `ssim_` prefix because `Tarjan.CodeSim` owns `sim_*`.
 - Evidence file: `validation/rounds/R7.json`.
+
+## R6c handoff (2026-10-18)
+- Done: `TInv` has a new field `done_low` (`DoneLow`: emitted components end with their root, root has lowlink = index, other members lowlink < index; preserved by `enter`, `lowStep`, `pop`, `keep`). `DupOf.dup` now requires `C.getLast? = some r`; `ctarjan_spec` therefore says the re-emitted singleton `[r]` follows a component with root `r`. G23 closed.
+- Open: G25, G26, G27 -> R8; G01/G02 -> R3b; G19 -> R4c. Next: R3b, R4c, R8.

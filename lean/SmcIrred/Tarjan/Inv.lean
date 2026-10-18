@@ -12,6 +12,24 @@ variable {g : Digraph}
 /-- The vertex lies in an emitted component. -/
 @[expose] def TState.Done (s : TState) (w : Nat) : Prop := ∃ C ∈ s.out, w ∈ C
 
+/-- Emitted components end with their root (`lowlink = index`); the other members have `lowlink < index`. -/
+@[expose] def DoneLow (s : TState) : Prop :=
+  ∀ C ∈ s.out, ∃ r, C.getLast? = some r ∧ s.low r = s.num r ∧ ∀ u ∈ C, u ≠ r → s.low u < s.num u
+
+theorem mem_of_getLast' {C : List Nat} {r : Nat} (h : C.getLast? = some r) : r ∈ C := by
+  obtain ⟨ys, e⟩ := List.getLast?_eq_some_iff.1 h
+  rw [e]; simp
+
+theorem DoneLow.congr {s t : TState} (h : DoneLow s) (hout : t.out = s.out) (hnum : ∀ w, (∃ C ∈ s.out, w ∈ C) → t.num w = s.num w)
+    (hlow : ∀ w, (∃ C ∈ s.out, w ∈ C) → t.low w = s.low w) : DoneLow t := by
+  intro C hC
+  rw [hout] at hC
+  obtain ⟨r, h1, h2, h3⟩ := h C hC
+  have hr : ∃ C' ∈ s.out, r ∈ C' := ⟨C, hC, mem_of_getLast' h1⟩
+  refine ⟨r, h1, by rw [hnum r hr, hlow r hr]; exact h2, fun u hu hne => ?_⟩
+  have hu' : ∃ C' ∈ s.out, u ∈ C' := ⟨C, hC, hu⟩
+  rw [hnum u hu', hlow u hu']; exact h3 u hu hne
+
 /-- The invariant of Tarjan's algorithm along the active call path `P` (head = the vertex being scanned): the stack and
 the emitted components partition the visited vertices; emitted components are complete strongly connected components
 whose successors lie in themselves or in earlier components; the lowlinks of stacked vertices witness a path to a
@@ -36,6 +54,7 @@ structure TInv (g : Digraph) (P : List Nat) (s : TState) : Prop where
     (∀ q ∈ P, s.num q < s.num w → s.num q ≤ s.num p) → s.low p ≤ s.low w
   fin_edge : ∀ x ∈ s.stk, x ∉ P → ∀ y, g.edge x y → s.Done y ∨ (y ∈ s.stk ∧ s.low x ≤ s.num y)
   fin_vis : ∀ x, s.num x ≠ 0 → x ∉ P → ∀ y, g.edge x y → s.num y ≠ 0
+  done_low : DoneLow s
 
 theorem tupd_same (f : Nat → Nat) (k x : Nat) : tupd f k x k = x := by simp [tupd]
 
@@ -62,6 +81,7 @@ theorem TInv.init (g : Digraph) : TInv g [] TState.init where
   low_min := by simp
   fin_edge := by simp [TState.init]
   fin_vis := by simp [TState.init]
+  done_low := by simp [TState.init, DoneLow]
 
 theorem TInv.vis_of_stk {P : List Nat} {s : TState} (h : TInv g P s) {w : Nat} (hw : w ∈ s.stk) : s.num w ≠ 0 :=
   (h.vis_iff w).2 (Or.inl hw)
@@ -93,7 +113,8 @@ theorem TInv.enter {P : List Nat} {s : TState} (h : TInv g P s) {v : Nat} (hv : 
   have hnv : tupd s.num v (s.cnt + 1) v = s.cnt + 1 := tupd_same _ _ _
   have hlv : tupd s.low v (s.cnt + 1) v = s.cnt + 1 := tupd_same _ _ _
   have hlt : ∀ w, w ≠ v → s.num w < s.cnt + 1 := fun w _ => Nat.lt_succ_of_le (h.num_le w)
-  refine ⟨?_, h.done_lt, ?_, ?_, ?_, h.out_nodup, ?_, ?_, ?_, ?_, h.closed_out, h.scc_out, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨?_, h.done_lt, ?_, ?_, ?_, h.out_nodup, ?_, ?_, ?_, ?_, h.closed_out, h.scc_out, ?_, ?_, ?_, ?_, ?_, ?_,
+    h.done_low.congr rfl (fun w hw => hnum w (fun e => hvd (e ▸ hw))) (fun w hw => hlow w (fun e => hvd (e ▸ hw)))⟩
   · intro w hw
     rcases List.mem_cons.1 hw with rfl | hw
     · exact hv
@@ -241,7 +262,8 @@ theorem TInv.lowStep {P : List Nat} {s : TState} {v : Nat} (h : TInv g (v :: P) 
   have hl : ∀ j, j ≠ v → tupd s.low v (min (s.low v) (s.num w)) j = s.low j := fun j hj => tupd_ne _ _ hj
   have hwn := h.vis_of_stk hw
   refine ⟨h.stk_lt, h.done_lt, h.vis_iff, h.disj, h.stk_nodup, h.out_nodup, h.num_le, h.P_sub, h.P_sorted,
-    h.reach_P, h.closed_out, h.scc_out, ?_, ?_, ?_, ?_, ?_, h.fin_vis⟩
+    h.reach_P, h.closed_out, h.scc_out, ?_, ?_, ?_, ?_, ?_, h.fin_vis,
+    h.done_low.congr rfl (fun _ _ => rfl) (fun w hw => hl w (fun e => h.disj w (e ▸ hv) hw))⟩
   · intro x hx
     show 1 ≤ tupd s.low v (min (s.low v) (s.num w)) x ∧ tupd s.low v (min (s.low v) (s.num w)) x ≤ s.num x
     by_cases e : x = v
