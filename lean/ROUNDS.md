@@ -31,7 +31,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R17 | Transformation language, Figures 5–6 (P18, P19), minimal edges | must | DONE 2026-10-18 (figure instances; general n -> R17b) |
 | R17b | General-n minimal edges, arbitrary-program transformation (G32) | should | PARTIAL 2026-10-19 (G32 b done; a, c, d, e open) |
 | R18 | Figure 4 C++ code, flattening; structured ⇒ reducible, CFT (should) | must/should | DONE 2026-10-18 (items 1-2; items 3-4 -> R18b) |
-| R18b | Structured programs reducible, CFT leftist trees (G33) | should | TODO |
+| R18b | Structured programs reducible, CFT leftist trees (G33) | should | NOT DONE 2026-10-19 (proof plan recorded in G33) |
 | R19 | Dynamic scheme, faults, static scheme end-to-end | must | DONE 2026-10-18 (abstract model; bridge -> R19c) |
 | R19c | Bridge of the dynamic scheme to the CFG evaluator and schedule construction (G34) | should | DONE 2026-10-19 (call-free circuits; rest G34) |
 | R20a | Security model I: definitions, T1–T3 (crux) | must | DONE 2026-10-18 |
