@@ -45,13 +45,13 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C39 | §3 ¶2, Fig. 2 | 622–623 | blueprint generation; stamping; reuse by restamping SMC offsets | F + M | R7, R8 | F part done in the abstract machine (Smc.Restamp `smcRounds_replicate`); Fig. 2(a): listing = arrays and offset constants (M evidence, validation/native_listing.py, R8_listing.json); cell-to-offset correspondence G25 (R23) |
 | C40 | §3.1 | 623 | planted 2-SAT generator yields the desired values (P04) | F | R9 | done (Gen.Planted: planted_sat, forcing_agree, planted_solve, planted_smc; P04: counter_violates, counter_unsat, loop_keeps, no_loop_through_negation) | |
 | C41 | §4 ¶1 | 623–629 | Boolean-level description; word-level abstractions can be reintroduced | X + F (DSL) | R11 | open |  |
-| C42 | §4, Def. 1 | 623–629 | multi-input AND/OR/XOR/XNOR; decomposition into / X / −1 two-input gates, sequential or tree | F | R11 | open |  |
-| C43 | §4 | 623–629 | NAND, NOR functionally complete; XNOR/NAND/NOR negate one input | F | R11 | open |  |
-| C44 | §4, Def. 2 | 623–629 | SEL; XOR replaceable by OR under one-hot selectors; BSEL | F | R11 | open |  |
-| C45 | §4 | 623–629 | table lookup decomposes into single-bit outputs | F | R11 | open |  |
+| C42 | §4, Def. 1 | 623–629 | multi-input AND/OR/XOR/XNOR; decomposition into / X / −1 two-input gates, sequential or tree | F | R11 | done: `chain_and`, `tree_and`, `tree_gates`, `tree_depth` |  |
+| C43 | §4 | 623–629 | NAND, NOR functionally complete; XNOR/NAND/NOR negate one input | F | R11 | done: `nand_complete`, `nor_complete` |  |
+| C44 | §4, Def. 2 | 623–629 | SEL; XOR replaceable by OR under one-hot selectors; BSEL | F | R11 | done: `sel_or_eq_xor`, `sel_or_counterexample`, `bsel_eq_sel` |  |
+| C45 | §4 | 623–629 | table lookup decomposes into single-bit outputs | F | R11 | done: `table_single_bits` |  |
 | C46 | §4; §4.1 ¶3 | 623–629 | optimal circuit synthesis "NP-hard based on circuit SAT" (P06) | R | R1 | R1 checked | source-checked: see P06 (Ilango, Loff, Oliveira, CCC 2020, https://drops.dagstuhl.de/opus/volltexte/2020/12574/) |
-| C47 | §4; Fig. 3 | 623–629 | two table-lookup representations; nodes-vs-edges trade-off; Fig. 3 count comments | F | R11 | open |  |
-| C48 | §4 | 623–629 | ripple addition (P05), subtraction with borrow, combined add/sub selector | F | R11 | open |  |
+| C47 | §4; Fig. 3 | 623–629 | two table-lookup representations; nodes-vs-edges trade-off; Fig. 3 count comments | F | R11 | done (counts): `decoderShift_cost`, `decoder_cost_ge2`, `decoder_cost_one`; Fig. 3 comments are approximations (decoder_shift has 2^(m+1)+m-4 nodes; decoder (m+4)2^(m-1) nodes for m>=2, OR in-degree m); depth trade-off not proved |  |
+| C48 | §4 | 623–629 | ripple addition (P05), subtraction with borrow, combined add/sub selector | F | R11 | partial: `addBit_post`, `ripple_add`, `ripple_sub`, `cout_combined`; graph-level `addLoop` -> G30 |  |
 | C49 | §4 | 623–629 | constant time maintained; reusable subgraphs with activation edge and repetition; conditional execution loses constant time | F | R10 | done: `order_independent`, `runPass_eq_circ_val`, `costAt_uniform`, `CostWitness.gate_data_dependent` |  |
 | C50 | §4.1 ¶1–2 | 625–626 | AES structure; key expansion by XOR + lookups; xtime as selection; S-box (P07); inverse | F + R | R12 | open |  |
 | C51 | §4.1 ¶2 | 625–626 | S-box subgraph reuse; identification needs recognizing decoder circuits | M + X | R13, R16 | open |  |
@@ -66,7 +66,7 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C60 | §4.3, Tables 1–2 | 627–629 | Nodes, Edges, Exec. N, Exec. E | M | R16 | open |  |
 | C61 | §4.3, Tables 1–2 | 627–629 | timings; RSA worse than quadratic; impractical after 256 bits (P10) | FD + X | R16 | open |  |
 | C62 | §4.3 | 627–629 | machine-word reductions gain "2^32 or 2^64" (P09) | F | R14 | open |  |
-| C63 | Fig. 3 | 628 | the listed Python equals the generator code | M | R11 | open |  |
+| C63 | Fig. 3 | 628 | the listed Python equals the generator code | M | R11 | partial: literal transcription `Spec/Virt`; proved `decoder_post`; script/compiler -> G30 |  |
 | C64 | §5 ¶1 | 629–633 | ILs rare in C [25]; undecidability [18]; read-only code segments | R + X | R1 | R1 checked | source-checked: Stanier and Watson, Softw. Pract. Exper. 42(1) 2012, 117-130, abstract: irreducibility is extremely rare in open-source C |
 | C65 | Fig. 4 | 630 | CFG, jungle with timestamps, Havlak LNF; C++ encodings | F + M | R3, R18 | partial | R2 Graph.Fig4 (CFG, jungle); R3 LNF.Fig4 (fig4_headers, fig4_bodies, fig4_irreducible, fig4_lnf, fig4_mee); R3b LNF.HvMain.havlak_hdr, havlak_irr (Havlak's algorithm = declarative LNF for every valid jungle); C++ encodings R18 |
 | C66 | Table 3 | 630 | decompiler counts | X | R1 | listed (X) |  |

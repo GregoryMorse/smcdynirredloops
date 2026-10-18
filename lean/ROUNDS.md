@@ -21,7 +21,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R8b | G27 step bound for the Level 2 machine; G28 VM instruction-list refinement (R8 item 1) | should | TODO |
 | R9 | Planted 2-SAT generator (§3.1, P04) | must | DONE 2026-10-18 |
 | R10 | Boolean-CFG VM: order independence, data-independent counts, subgraphs | must | DONE |
-| R11 | Gate primitives, decoders, adders (P05), DSL compiler correctness | must | TODO |
+| R11 | Gate primitives, decoders, adders (P05), DSL compiler correctness | must | DONE 2026-10-18 (DSL compiler, graph-level adder, Circ.val bridge -> G30/R13) |
 | R12 | AES specification facts (S-box P07, xtime, key expansion, vectors) | must | TODO |
 | R13 | AES compiler correctness | should | TODO |
 | R14 | Arithmetic for RSA (Montgomery, windows, Karatsuba/Toom P08, word size P09) | must | TODO |
@@ -150,3 +150,9 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Done: `Spec.Circuit` (Kind/Circ/Sub/Lib, `valAt`, `callOf`, `writtenBy`, `costAt`, nesting-depth `level`, `Circ.val`, `Circ.cost`); `Circuit.CodeModel` (`stepCode`/`runPass`/`PassWF`, a literal elif-chain pass in any admissible vertex order); `Circuit.Order`: `order_independent` (every admissible order gives the same values), `runPass_eq_circ_val` (the code pass equals the specification value); `Circuit.Counts`: `callRuns_ungated` (an ungated call runs `reps + 1` times and its final accepting set is the `reps`-fold feedback iteration), `callCost_ungated`, `costAt_flat` (call-free circuits cost `(n, Σ edges)` for every input), `costAt_uniform` (cost independent of the input when every call is activated and ungated and subgraph costs are input independent), and the necessity witness `CostWitness` (a gated subgraph makes the cost data dependent: `gate_data_dependent`; the same circuit ungated costs the same for both inputs; the activation hypothesis is satisfiable).
 - Modelling notes: start token = vertex `c.n`; `edgesOf` counts predecessor edges only (the Python `edgecount` also counts the token edge of each active input, a data-dependent term); the FLOW "pass" branch is needed for call outputs; calls enter the code model through the black-box evaluator `V`.
 - Open: G25 -> R23; G27, G28 -> R8b; G29 (below). Next: R11 (or R8b).
+
+## R11 handoff (2026-10-18)
+- Done: `Spec.Gates`, `Spec.Virt` (literal BITSZ=1 transcription of `python/virt.py`: wires, graph builder, dedup/toggle set models, decoders, adder); `Prims.*`: gate chains/trees/XNOR/NAND/NOR (C42), functional completeness (C43), SEL/BSEL and the OR-for-XOR counterexample (C44), table single bits (C45), evaluation semantics `wev` with `Post` invariants, `decoder_post` (value = one-hot of the input), exact node/edge counts `decoderShift_cost`, `decoder_cost_ge2/one/zero` (C47), one-bit adder gadget `addBit_post` (all three branches of the literal code), `Ripple`: `ripple_add`, `ripple_sub`, `cout_combined`, `published_add_fails` (P05).
+- Findings: Fig. 3 comment counts are approximations; real counts in PAPER_MAP C47. P05 errata `lean_refs` set.
+- Not done (G30 -> R13): graph-level `addLoop`, DSL + compiler theorem, `evalNodes` = `Circ.val` bridge, decoder count script. Possible code observation: `not_to_virtual` on a constant indexes `g[True]` (unchecked, not exercised).
+- Open: G25, G29 -> R23; G27, G28 -> R8b; G30 -> R13. Next: R12 (or R8b).

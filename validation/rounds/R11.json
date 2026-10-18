@@ -1,0 +1,28 @@
+{
+ "round": "R11",
+ "commands": [
+  "python validation/build_modules.py all",
+  "python validation/axiom_audit.py"
+ ],
+ "theorems": [
+  "chain_and",
+  "tree_gates",
+  "nand_complete",
+  "sel_or_eq_xor",
+  "decoder_post",
+  "decoderShift_cost",
+  "decoder_cost_ge2",
+  "addBit_post",
+  "ripple_add",
+  "ripple_sub",
+  "published_add_fails"
+ ],
+ "open": [
+  "G25",
+  "G27",
+  "G28",
+  "G29",
+  "G30"
+ ],
+ "sorry": 0
+}

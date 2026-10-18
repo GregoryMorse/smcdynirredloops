@@ -71,3 +71,17 @@ public import SmcIrred.Spec.Circuit
 public import SmcIrred.Circuit.CodeModel
 public import SmcIrred.Circuit.Order
 public import SmcIrred.Circuit.Counts
+public import SmcIrred.Spec.Gates
+public import SmcIrred.Spec.Virt
+public import SmcIrred.Prims.Gates
+public import SmcIrred.Prims.Complete
+public import SmcIrred.Prims.Sel
+public import SmcIrred.Prims.Eval
+public import SmcIrred.Prims.Logic
+public import SmcIrred.Prims.MapG
+public import SmcIrred.Prims.Nat
+public import SmcIrred.Prims.Decoder
+public import SmcIrred.Prims.Cost
+public import SmcIrred.Prims.DecCount
+public import SmcIrred.Prims.Adder
+public import SmcIrred.Prims.Ripple

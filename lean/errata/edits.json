@@ -113,7 +113,7 @@
    "status": "confirmed",
    "confidence": "certain",
    "evidence": "The next equation in the same sentence defines c_{i+1} from a_i, b_i, c_i; the repository addition_bit_to_virtual computes S = A ^ B ^ carry_in.",
-   "lean_refs": [],
+   "lean_refs": ["SmcIrred.published_add_fails", "SmcIrred.addBit_post", "SmcIrred.ripple_add"],
    "source": "published PDF p. 625; python/virt.py addition_bit_to_virtual"
   },
   {
