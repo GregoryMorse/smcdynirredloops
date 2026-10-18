@@ -22,7 +22,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R9 | Planted 2-SAT generator (§3.1, P04) | must | DONE 2026-10-18 |
 | R10 | Boolean-CFG VM: order independence, data-independent counts, subgraphs | must | DONE |
 | R11 | Gate primitives, decoders, adders (P05), DSL compiler correctness | must | DONE 2026-10-18 (DSL compiler, graph-level adder, Circ.val bridge -> G30/R13) |
-| R12 | AES specification facts (S-box P07, xtime, key expansion, vectors) | must | TODO |
+| R12 | AES specification facts (S-box P07, xtime, key expansion, vectors) | must | DONE 2026-10-18 |
 | R13 | AES compiler correctness | should | TODO |
 | R14 | Arithmetic for RSA (Montgomery, windows, Karatsuba/Toom P08, word size P09) | must | TODO |
 | R15 | RSA compiler correctness | should | TODO |
@@ -156,3 +156,9 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Findings: Fig. 3 comment counts are approximations; real counts in PAPER_MAP C47. P05 errata `lean_refs` set.
 - Not done (G30 -> R13): graph-level `addLoop`, DSL + compiler theorem, `evalNodes` = `Circ.val` bridge, decoder count script. Possible code observation: `not_to_virtual` on a constant indexes `g[True]` (unchecked, not exercised).
 - Open: G25, G29 -> R23; G27, G28 -> R8b; G30 -> R13. Next: R12 (or R8b).
+
+## R12 handoff (2026-10-18)
+- Done: `Spec.AES` (xtime, GF(2^8) multiply, inverse by square-and-multiply, affine and inverse affine, S-box/inverse S-box as functions, the three tables of `aes.py` generated from the file, SubBytes/ShiftRows/MixColumns/AddRoundKey and inverses, key expansion over an abstract byte algebra for 128/192/256, encryption, decryption); `AES.*`: table = specification for all 256 bytes (`sbox_table`, `invSbox_table`), `ginv_mul`, affine invertible and GF(2)-affine, S-box not GF(2)-affine (witness 1, 2), round trip, `xtime` as selection and multiplication by 2, `keyExp_symbolic` (P07/C50), FIPS-197 Appendix C vectors (encryption and decryption, three key sizes) and Appendix A key-expansion tails.
+- Tooling note: the kernel memory budget (Lean -M768) forces small modules and chunked Bool checks (`AES.Check`: `forall_lt_4`, `forall_lt2_4`); heavy `decide +kernel` goes one chunk per theorem, small files. Case-insensitive file system: `Tables.lean` and `TableS.lean` collide.
+- Dropped extra: uniqueness of the inverse (`gmul x y = 1 -> y = ginv x`, 65536 products) exceeded the memory budget; not a paper claim (`ginv_mul` gives the inverse property). MixColumns vs the FIPS matrix form is covered by the vectors only.
+- Open: G25, G29 -> R23; G27, G28 -> R8b; G30 -> R13. Next: R13 (needs R11's compiler, G30) or R8b.

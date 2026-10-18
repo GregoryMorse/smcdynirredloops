@@ -1,0 +1,32 @@
+{
+ "round": "R12",
+ "commands": [
+  "python validation/build_modules.py all",
+  "python validation/axiom_audit.py"
+ ],
+ "theorems": [
+  "sbox_table",
+  "invSbox_table",
+  "ginv_mul",
+  "invAffine_affine",
+  "affine_is_affine",
+  "sbox_not_affine",
+  "invSbox_sbox",
+  "xtime_selection",
+  "keyExp_symbolic",
+  "enc128",
+  "dec128",
+  "enc192",
+  "dec192",
+  "enc256",
+  "dec256"
+ ],
+ "open": [
+  "G25",
+  "G27",
+  "G28",
+  "G29",
+  "G30"
+ ],
+ "sorry": 0
+}

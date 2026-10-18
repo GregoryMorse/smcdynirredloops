@@ -166,7 +166,7 @@
    "status": "confirmed",
    "confidence": "certain",
    "evidence": "FIPS 197 section 5.1.1 (S-box = multiplicative inverse in GF(2^8), then affine transformation); Lean in R12.",
-   "lean_refs": [],
+   "lean_refs": ["SmcIrred.AES.sbox_table", "SmcIrred.AES.ginv_mul", "SmcIrred.AES.invAffine_affine", "SmcIrred.AES.affine_is_affine", "SmcIrred.AES.sbox_not_affine", "SmcIrred.AES.invSbox_sbox"],
    "source": "published PDF p. 625; FIPS 197"
   },
   {

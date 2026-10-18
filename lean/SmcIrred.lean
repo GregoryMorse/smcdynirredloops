@@ -85,3 +85,15 @@ public import SmcIrred.Prims.Cost
 public import SmcIrred.Prims.DecCount
 public import SmcIrred.Prims.Adder
 public import SmcIrred.Prims.Ripple
+public import SmcIrred.Spec.AES
+public import SmcIrred.AES.Check
+public import SmcIrred.AES.TabSbox
+public import SmcIrred.AES.TabInv
+public import SmcIrred.AES.Inverse
+public import SmcIrred.AES.Affine
+public import SmcIrred.AES.AffineLin
+public import SmcIrred.AES.Roundtrip
+public import SmcIrred.AES.NotAffine
+public import SmcIrred.AES.Xtime
+public import SmcIrred.AES.KeyExp
+public import SmcIrred.AES.Vectors
