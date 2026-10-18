@@ -117,6 +117,8 @@ public import SmcIrred.Lang.MinEdges
 public import SmcIrred.Lang.Induce
 public import SmcIrred.Lang.NWay
 public import SmcIrred.Lang.General
+public import SmcIrred.Lang.Struct
+public import SmcIrred.Lang.Blocks
 public import SmcIrred.Spec.IrredLoop
 public import SmcIrred.Spec.Flatten
 public import SmcIrred.Struct.Machine

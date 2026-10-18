@@ -242,3 +242,10 @@ handoff: done / next / open obligations / hazards / evidence file).
 ## R17b handoff (2026-10-19, partial)
 - Done: `Lang.General`: `reducible_no_irreducible` (in a reducible flow graph no loop is irreducible, for every valid jungle: from `body_dom`, `dom_anc`), `reducible_of_lt`, `path_one_edge_reducible_all` (a path of any size plus one edge, via `edge_pathAdd`, `pathAdd_stay`, `pathAdd_reducible`), `nway_reducible`, `nway_irreducible_every_jungle` (for every `k >= 2` and every valid jungle of the n-way conditional with the join-to-first-branch edge: either the loop headed by branch 1 or the one headed by the join is irreducible; needs `Jungle.Valid.laminar`, `no_rightward`, `tree_path`), `nway_one_edge_all`. The jungle of `dfsRun` is covered through `dfsRun_valid`.
 - Not done (G32 stays open): (a) arbitrary programs for C14, (c) figure CFG irreducibility independent of the jungle, (d), (e).
+
+## Work package log (post-R18b, address-level theory for G33/R19b)
+
+- WP1 done: `Lang/Struct.lean` (`SStep_iff`: instruction steps inside the compiled range of a structured statement equal the
+  structured step relation). WP2 started: `Lang/Blocks.lean` (leader enumeration `fl`/`pos`, `blockOf_eq`). Remaining:
+  block edges <-> last-instruction steps, region dominance, reducibility of goto-free programs (G33 b3), protection
+  equivalence and irreducibility for arbitrary structured S, T, then the R19b native deliverables. All still OPEN in GAPS.
