@@ -189,7 +189,7 @@
    "status": "confirmed",
    "confidence": "certain",
    "evidence": "Toom-k performs (2k-1) multiplications on operands of size n/k (standard; Bernstein, Multidigit multiplication for mathematicians); Lean in R14.",
-   "lean_refs": [],
+   "lean_refs": ["SmcIrred.Arith.toomProds_eq", "SmcIrred.Arith.toom_between", "SmcIrred.Arith.toom_published_too_small", "SmcIrred.Arith.toom_witness"],
    "source": "published PDF p. 626"
   },
   {
@@ -212,7 +212,7 @@
    "status": "confirmed",
    "confidence": "inferred",
    "evidence": "Gate-count argument; exact counts for the repository generators in R14. The intended meaning is the author's: confirm in R1 question if kept.",
-   "lean_refs": [],
+   "lean_refs": ["SmcIrred.Arith.words_exact", "SmcIrred.Arith.word_products", "SmcIrred.Arith.words_cover", "SmcIrred.Arith.word_gain_not_exponential"],
    "source": "published PDF p. 627"
   },
   {

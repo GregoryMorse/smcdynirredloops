@@ -24,7 +24,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R11 | Gate primitives, decoders, adders (P05), DSL compiler correctness | must | DONE 2026-10-18 (DSL compiler, graph-level adder, Circ.val bridge -> G30/R13) |
 | R12 | AES specification facts (S-box P07, xtime, key expansion, vectors) | must | DONE 2026-10-18 |
 | R13 | AES compiler correctness | should | TODO |
-| R14 | Arithmetic for RSA (Montgomery, windows, Karatsuba/Toom P08, word size P09) | must | TODO |
+| R14 | Arithmetic for RSA (Montgomery, windows, Karatsuba/Toom P08, word size P09) | must | DONE 2026-10-18 (items 1-6; items 7-8 partly -> R14b) |
+| R14b | RBSD carry-free addition, NAF/MOF, Wallace counts (G31) | should | TODO |
 | R15 | RSA compiler correctness | should | TODO |
 | R16 | Tables 1–2: regeneration (M) and data checks (FD) | must | TODO |
 | R17 | Transformation language, Figures 5–6 (P18, P19), minimal edges | must | TODO |
@@ -162,3 +163,10 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Tooling note: the kernel memory budget (Lean -M768) forces small modules and chunked Bool checks (`AES.Check`: `forall_lt_4`, `forall_lt2_4`); heavy `decide +kernel` goes one chunk per theorem, small files. Case-insensitive file system: `Tables.lean` and `TableS.lean` collide.
 - Dropped extra: uniqueness of the inverse (`gmul x y = 1 -> y = ginv x`, 65536 products) exceeded the memory budget; not a paper claim (`ginv_mul` gives the inverse property). MixColumns vs the FIPS matrix form is covered by the vectors only.
 - Open: G25, G29 -> R23; G27, G28 -> R8b; G30 -> R13. Next: R13 (needs R11's compiler, G30) or R8b.
+
+## R14 handoff (2026-10-18)
+- Done: `Spec.Arith` (literal models of `montgomeryBound` (non-subtraction), `montgomeryREDC`, `montgomeryREDC_eff`, `montgomeryREDC_mul_eff`, the square-and-multiply loop `sqmulF` (parametric in multiplication and squaring so values and counts come from the same loop), `modexpMontgomery`, the power table and main loop of `modexpMontgomeryWindow`, the window-size minimization, a Karatsuba step with split points, `get_consec_ones`/`consec_ones_to_num`, the ladder); `Arith.*`: REDC exact precondition (`T < R N`, result `< N`, `result R = T (mod N)`, necessity witness), bit-serial variants, Montgomery form (`toM`, `mmul_toM`, `redc_toM`), modular exponentiation and window exponentiation correct for every `w >= 1` and `e < 2^B`, counts (`sqmul_counts`, `winMuls_total`, `bestW_values`: 3, 3, 4, 4, 5, 6, 6, 7 for B = 32 ... 4096), Karatsuba identity and squaring variant, Toom counts and P08 witness, schoolbook squaring partial products, word counts (P09), runs of ones round trip and product by runs, the ladder. P08 and P09 errata `lean_refs` set.
+- Findings: `modexpMontgomeryWindow` ends with a stray `print(tbl)` (debug output) and `mul_window`/`mul_const_window` are unfinished and unused (CODE_FIXES L11); the code's "transition points" comment was not recomputed.
+- Not done (G31 -> R14b): RBSD, NAF, Wallace counts, `issub` bound, thresholds of the code's Karatsuba.
+- Tooling note: memory budget again limits `decide +kernel` (`bestW_min_*` per size).
+- Open: G25, G29 -> R23; G27, G28 -> R8b; G30 -> R13; G31 -> R14b. Next: R15 (needs the compiler, G30), R16, or R8b/R14b.

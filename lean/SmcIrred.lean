@@ -97,3 +97,11 @@ public import SmcIrred.AES.NotAffine
 public import SmcIrred.AES.Xtime
 public import SmcIrred.AES.KeyExp
 public import SmcIrred.AES.Vectors
+public import SmcIrred.Spec.Arith
+public import SmcIrred.Arith.Montgomery
+public import SmcIrred.Arith.Eff
+public import SmcIrred.Arith.ModExp
+public import SmcIrred.Arith.Window
+public import SmcIrred.Arith.Mul
+public import SmcIrred.Arith.Ones
+public import SmcIrred.Arith.Ladder

@@ -1,0 +1,35 @@
+{
+ "round": "R14",
+ "commands": [
+  "python validation/build_modules.py all",
+  "python validation/axiom_audit.py"
+ ],
+ "theorems": [
+  "redc_spec",
+  "redcEff_spec",
+  "redcMulEff_spec",
+  "mmul_toM",
+  "modexpMont_correct",
+  "modexpMontWin_correct",
+  "sqmul_counts",
+  "winMuls_total",
+  "bestW_values",
+  "kStep_eq",
+  "kmulS_eq",
+  "toom_between",
+  "toom_published_too_small",
+  "sqPartials_two",
+  "words_exact",
+  "consec_roundtrip",
+  "ladder_spec"
+ ],
+ "open": [
+  "G25",
+  "G27",
+  "G28",
+  "G29",
+  "G30",
+  "G31"
+ ],
+ "sorry": 0
+}
