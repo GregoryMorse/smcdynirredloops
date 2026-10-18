@@ -17,7 +17,7 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C11 | §1 ¶4 | 617–619 | "the only resolution" for structuring is variables + conditions (P12) | F + R | R18 | open |  |
 | C12 | §1 ¶4 | 617–619 | almost-linear LNF algorithms exist; AST translation lacks the same reductions | R + X | R1 | R1 checked | source-checked (almost linear: Ramalingam 1999); AST translation part is X |
 | C13 | §1 ¶5 | 617–619 | every construct embedded into an IL nest designed for quadratic identification | F + X | R4, R17 | open |  |
-| C14 | §1 ¶5 | 617–619 | loops fictitious via opaque predicates: original looping or one iteration | F | R17 | open |  |
+| C14 | §1 ¶5 | 617–619 | loops fictitious via opaque predicates: original looping or one iteration | F | R17 | partial: figure instances only: `fig5_traces`, `fig6_traces` (for both values of `c`, the transformed programs execute the original blocks once, the toggled variable returns to its start value), `fig5b_irreducible`, `fig5c_irreducible`, `fig6b_irreducible`, `fig6c_irreducible`; no theorem for arbitrary programs -> G32 |  |
 | C15 | §1 ¶5 | 617–619 | the 2-SAT solver fixes all exit conditions; beyond static tools | F + FT + X | R9, R19, R20b | open |  |
 | C16 | §1 ¶5 | 617–619 | case study: protected AES/RSA, measured on Windows/Linux x86/x64, IDA/Ghidra (P13) | X | R1 | listed (X) |  |
 | C17 | §2 ¶1 | 619–622 | SAT, CNF, 2-SAT definitions (P01) | F | R5 | done (Spec.TwoSat (TwoSat, Sat, graph)) |  |
@@ -76,10 +76,10 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C70 | §5 | 629–633 | node splitting needs a quadratic amount of duplication (P17) | R + F (should) | R18 | open | source-checked: Carter, Ferrante, Thomborson, POPL 2003, pp. 106-114 (PDF read): exponential, not quadratic; see P17 |
 | C71 | §5 | 629–633 | 1- and 2-node CFGs never contain an IL | F | R3 | done | LNF.Small no_irreducible_of_small, threeNode_irreducible (every valid jungle), threeNode_dfs_valid |
 | C72 | §5 | 629–633 | DREAM: n−2 integer variables; conditions by MEE; n−2 compound conditions | X + F (could) | R18 | open |  |
-| C73 | §5 | 629–633 | minimal 2 edges for a sequence; simulated loop = one node + three edges + SMC/state variable | F | R17 | open |  |
-| C74 | Figs. 5–6 | 632–633 | transformed programs equivalent; ILs induced; graphs match code (P18, P19) | F | R17 | open |  |
-| C75 | §5 | 629–633 | inducing ILs on reducible loops by edges from unreached outside nodes | F | R17 | open |  |
-| C76 | §5 | 629–633 | two-way / n-way extension; conditions from separate 2-SAT outputs; SMC or negated state variable | F | R17, R19 | open |  |
+| C73 | §5 | 629–633 | minimal 2 edges for a sequence; simulated loop = one node + three edges + SMC/state variable | F | R17 | partial: `two_edges_irreducible` (Fig. 5(b)), `cond_one_edge` (one edge suffices, none does not), `simulated_loop_counts` (one vertex, three edges, irreducible), `path_one_edge_reducible` (one added edge to a path never gives an irreducible loop) for paths of at most 6 vertices only -> G32 |  |
+| C74 | Figs. 5–6 | 632–633 | transformed programs equivalent; ILs induced; graphs match code (P18, P19) | F | R17 | done: `fig5_traces`, `fig6_traces`, `fig5b_cfg`, `fig5c_cfg`, `fig6b_cfg`, `fig6c_cfg` (CFGs of the compiled listings), `fig5b_drawn`, `fig6b_drawn`, `drawn5c_no_AB`, `fig5c_cfg_AB`, `fig6c_drawn_extra`, `fig6c_no_AB_edge` (P18, P19) |  |
+| C75 | §5 | 629–633 | inducing ILs on reducible loops by edges from unreached outside nodes | F | R17 | done: `induce_on_loop` (edge from a vertex no loop vertex reaches, into the loop body at a non-header, makes the loop irreducible in every valid jungle), `induce_instance`, `induce_needs_unreached` (necessity witness) |  |
+| C76 | §5 | 629–633 | two-way / n-way extension; conditions from separate 2-SAT outputs; SMC or negated state variable | F | R17, R19 | partial: `nway_one_edge` (n-way conditional, 2 <= n <= 6; one edge from the join into the first branch gives an irreducible loop), `oneway_no_irreducible`; conditions from separate 2-SAT outputs and the SMC / negated-variable realization -> R19 (G32) |  |
 | C77 | §5 | 629–633 | dynamic scheme: dependency order guarantees all dependencies ran, in order; bounded duplication; input-tied order | F | R19 | open |  |
 | C78 | §5.1 ¶1 | 634–635 | security goals; automated vs manual attacks; CFG identification as hard as circuit identification | FT + X | R20a | open |  |
 | C79 | §5.1 ¶2 | 634–635 | "indistinguishable … from a practical standpoint" (P23) | FT + R | R20b | open | source-partial: Buttyán-Horváth survey = ePrint 2015/412 (exists; iO under standard assumptions open); Xu et al. arXiv:1710.01139 listed in the published bibliography |

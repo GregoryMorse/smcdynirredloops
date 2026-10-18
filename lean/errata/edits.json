@@ -455,7 +455,7 @@
    "status": "confirmed",
    "confidence": "inferred",
    "evidence": "Path analysis of the drawn graph against the code while (trueThenFalse) { A; labelB: B; }; Lean R17 proves the equivalence of the repaired graph.",
-   "lean_refs": [],
+   "lean_refs": ["SmcIrred.Lang.fig5_traces", "SmcIrred.Lang.fig5c_cfg", "SmcIrred.Lang.drawn5c_no_AB", "SmcIrred.Lang.fig5c_cfg_AB", "SmcIrred.Lang.fig5c_irreducible"],
    "source": "published PDF p. 632; manuscript TeX figure source"
   },
   {
@@ -473,7 +473,7 @@
    "status": "confirmed",
    "confidence": "inferred",
    "evidence": "Reading of the code in (c); Lean R17 checks the repaired graph against the code semantics.",
-   "lean_refs": [],
+   "lean_refs": ["SmcIrred.Lang.fig6_traces", "SmcIrred.Lang.fig6c_cfg", "SmcIrred.Lang.fig6c_drawn_extra", "SmcIrred.Lang.fig6c_no_AB_edge", "SmcIrred.Lang.fig6c_irreducible"],
    "source": "published PDF p. 633; manuscript TeX figure source"
   },
   {

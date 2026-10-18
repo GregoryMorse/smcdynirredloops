@@ -105,3 +105,11 @@ public import SmcIrred.Arith.Window
 public import SmcIrred.Arith.Mul
 public import SmcIrred.Arith.Ones
 public import SmcIrred.Arith.Ladder
+public import SmcIrred.Spec.Lang
+public import SmcIrred.Spec.LangFigs
+public import SmcIrred.Lang.Common
+public import SmcIrred.Lang.Fig5
+public import SmcIrred.Lang.Fig6
+public import SmcIrred.Lang.MinEdges
+public import SmcIrred.Lang.Induce
+public import SmcIrred.Lang.NWay

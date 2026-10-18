@@ -28,7 +28,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R14b | RBSD carry-free addition, NAF/MOF, Wallace counts (G31) | should | TODO |
 | R15 | RSA compiler correctness | should | TODO |
 | R16 | Tables 1–2: regeneration (M) and data checks (FD) | must | TODO |
-| R17 | Transformation language, Figures 5–6 (P18, P19), minimal edges | must | TODO |
+| R17 | Transformation language, Figures 5–6 (P18, P19), minimal edges | must | DONE 2026-10-18 (figure instances; general n -> R17b) |
+| R17b | General-n minimal edges, arbitrary-program transformation (G32) | should | TODO |
 | R18 | Figure 4 C++ code, flattening; structured ⇒ reducible, CFT (should) | must/should | TODO |
 | R19 | Dynamic scheme, faults, static scheme end-to-end | must | TODO |
 | R20a | Security model I: definitions, T1–T3 (crux) | must | TODO |
@@ -170,3 +171,10 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Not done (G31 -> R14b): RBSD, NAF, Wallace counts, `issub` bound, thresholds of the code's Karatsuba.
 - Tooling note: memory budget again limits `decide +kernel` (`bestW_min_*` per size).
 - Open: G25, G29 -> R23; G27, G28 -> R8b; G30 -> R13; G31 -> R14b. Next: R15 (needs the compiler, G30), R16, or R8b/R14b.
+
+## R17 handoff (2026-10-18)
+- Done: `Spec.Lang` (conditions `falseC`, `ttf` (read-and-toggle `trueThenFalse`), `c`, negation, short-circuit `&&`; flat code with block, jump, conditional jump, halt; structured statements with labels and `goto`; two-pass compilation; basic blocks and the CFG `cfgOf`; fuel-bounded trace semantics `exec`), `Spec.LangFigs` (the six listings of Figures 5 and 6, the five drawn graphs, `WalkTr`), `Lang.Common` (bounded reachability test, `isCFG_of_reachB`), `Lang.Fig5`, `Lang.Fig6`, `Lang.MinEdges`, `Lang.Induce` (`anc_reach`, `body_mono`, `induce_on_loop`), `Lang.NWay`.
+- Findings: the CFGs of the compiled (b) and (c) listings have irreducible loops and the same traces as (a) (`ttf` starts true and is restored: two reads toggle twice). P18 confirmed: in the drawn 5(c) no walk executes A then B (`drawn5c_no_AB`); the corrected graph with the condition node H has one (`fig5c_cfg_AB`). P19 confirmed: the drawn 6(c) has the extra edge A -> B that the code CFG lacks (`fig6c_drawn_extra`, `fig6c_no_AB_edge`). Figures 5(b) and 6(b) as drawn equal the code CFGs minus exit.
+- Not done (G32 -> R17b): general n for C73/C76, arbitrary programs for C14.
+- Tooling note: `decide` on `cfgOf (compile _)` and on `Irreducible (dfsRun _)` works at these sizes (peak 0.65 GB for the path sweep).
+- Open: G25, G29 -> R23; G27, G28 -> R8b; G30 -> R13; G31 -> R14b; G32 -> R17b. Next: R18 (Fig. 4 code, structuring), R19.

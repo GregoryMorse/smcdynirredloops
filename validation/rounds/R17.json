@@ -1,0 +1,38 @@
+{
+ "round": "R17",
+ "commands": [
+  "python validation/build_modules.py all",
+  "python validation/axiom_audit.py"
+ ],
+ "theorems": [
+  "fig5_traces",
+  "fig6_traces",
+  "fig5c_cfg",
+  "fig6c_cfg",
+  "fig5b_irreducible",
+  "fig5c_irreducible",
+  "fig6b_irreducible",
+  "fig6c_irreducible",
+  "drawn5c_no_AB",
+  "fig5c_cfg_AB",
+  "fig6c_drawn_extra",
+  "fig6c_no_AB_edge",
+  "two_edges_irreducible",
+  "cond_one_edge",
+  "simulated_loop_counts",
+  "path_one_edge_reducible",
+  "induce_on_loop",
+  "induce_needs_unreached",
+  "nway_one_edge"
+ ],
+ "open": [
+  "G25",
+  "G27",
+  "G28",
+  "G29",
+  "G30",
+  "G31",
+  "G32"
+ ],
+ "sorry": 0
+}
