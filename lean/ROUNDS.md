@@ -9,7 +9,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R1 | Claim inventory, errata verification, sources, author questions | must | DONE 2026-10-17 |
 | R2 | Graph foundations, DFS jungle, Figure 4(a)(b) | must | DONE 2026-10-17 |
 | R3 | Havlak loop nesting forest, Figure 4(c), small CFGs, non-uniqueness | must | DONE 2026-10-17 (algorithm equivalence: open obligation) |
-| R3b | Close G01/G02: Havlak algorithm = declarative LNF; reducible-CFG body uniqueness (scheduled after R5, before R6 if time; mandatory before R23) | must | TODO |
+| R3b | Close G01/G02: Havlak algorithm = declarative LNF; reducible-CFG body uniqueness (scheduled after R5, before R6 if time; mandatory before R23) | must | DONE 2026-10-18 |
 | R4 | Extremal results: K_n, M_n, n−2 bound (MEE bound should) | must | DONE 2026-10-17 (G19 open) |
 | R4c | Close G19 (P15 second half: max-MEE CFGs have >= 2n-3 other edges), after R5 | should | TODO |
 | R5 | 2-SAT: implication graph, APT theorem, unit clauses, Figure 1 | must | DONE 2026-10-17 |
@@ -124,3 +124,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 ## R6c handoff (2026-10-18)
 - Done: `TInv` has a new field `done_low` (`DoneLow`: emitted components end with their root, root has lowlink = index, other members lowlink < index; preserved by `enter`, `lowStep`, `pop`, `keep`). `DupOf.dup` now requires `C.getLast? = some r`; `ctarjan_spec` therefore says the re-emitted singleton `[r]` follows a component with root `r`. G23 closed.
 - Open: G25, G26, G27 -> R8; G01/G02 -> R3b; G19 -> R4c. Next: R3b, R4c, R8.
+
+## R3b handoff (2026-10-18)
+- Done: `LNF.Algo` (scanOne refactor of the worklist scan), `LNF.HvOrder`..`LNF.HvMain`: `havlak_hdr` (computed header of `x` is `some h` iff `LnfParent h x`), `havlak_hdr_none`, `havlak_irr` for every `J.Valid g r`; invariant `HInv` (union-find chain, representatives = outermost processed header containing the vertex, headers, irreducibility flags, recorded entry lists) preserved by `havlakStep` (`hstep`) and the fold over `byPreDesc` (`havlak_fold`, `havlak_inv`). `LNF.Reducible`: `Spec.LNF` gains `Digraph.Dom`, `NonDomPath`, `Reducible`; `body_dom` (bodies by dominance alone), `body_dfs_independent`, `header_dfs_independent`, `lnfParent_dfs_independent`. G01/G02 closed.
+- `havlak_fig4*` stay as the earlier mechanical evidence; the general theorems supersede them.
+- Open: G25, G26, G27 -> R8; G19 -> R4c. Next: R4c, R8.

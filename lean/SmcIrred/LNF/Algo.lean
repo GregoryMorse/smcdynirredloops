@@ -23,16 +23,20 @@ structure HavlakState where
 
 @[expose] def dedup (l : List Nat) : List Nat := l.foldl (fun acc a => if acc.contains a then acc else acc ++ [a]) []
 
+/-- The examination of one predecessor `y` (represented by `fd y`) of a vertex of the loop of `w`. -/
+@[expose] def scanOne (J : Jungle) (w : Nat) (fd : Nat → Nat) (st : List Nat × List Nat × List Nat × Bool) (y : Nat) :
+    List Nat × List Nat × List Nat × Bool :=
+  let y' := fd y
+  if J.Anc w y' then
+    if y' ≠ w ∧ !st.2.1.contains y' then (st.1 ++ [y'], st.2.1 ++ [y'], st.2.2.1, st.2.2.2)
+    else st
+  else (st.1, st.2.1, st.2.2.1 ++ [y'], true)
+
 /-- Scan predecessors `ys` of a vertex of the loop of `w`: those inside the subtree of `w` join the loop, the others are
 second entries (the loop is irreducible). State: worklist, loop members, recorded entries, irreducible flag. -/
 @[expose] def havlakScan (J : Jungle) (w : Nat) (fd : Nat → Nat) (ys : List Nat)
     (st : List Nat × List Nat × List Nat × Bool) : List Nat × List Nat × List Nat × Bool :=
-  ys.foldl (fun (st : List Nat × List Nat × List Nat × Bool) y =>
-    let y' := fd y
-    if J.Anc w y' then
-      if y' ≠ w ∧ !st.2.1.contains y' then (st.1 ++ [y'], st.2.1 ++ [y'], st.2.2.1, st.2.2.2)
-      else st
-    else (st.1, st.2.1, st.2.2.1 ++ [y'], true)) st
+  ys.foldl (scanOne J w fd) st
 
 @[expose] def havlakDrain (g : Digraph) (J : Jungle) (w : Nat) (hs : HavlakState) (fd : Nat → Nat) :
     Nat → List Nat × List Nat × List Nat × Bool → List Nat × List Nat × Bool

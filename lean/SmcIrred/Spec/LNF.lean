@@ -38,4 +38,20 @@ the header. -/
 @[expose] def Digraph.IsMEE (g : Digraph) (J : Jungle) (x y : Nat) : Prop :=
   g.edge x y ∧ ∃ w, g.Body J w y ∧ y ≠ w ∧ ¬ J.Anc w x
 
+/-- `w` dominates `x` (with respect to the entry `r`): `x` is reachable from `r` and every path from `r` to `x` passes through
+`w`. -/
+@[expose] def Digraph.Dom (g : Digraph) (r w x : Nat) : Prop :=
+  PathIn g (fun _ => True) r x ∧ ¬ PathIn g (fun u => u ≠ w) r x
+
+/-- A path of one or more edges, each leaving a vertex reachable from `r` and not entering a vertex that dominates the
+vertex it leaves (that is, no edge of the path is a back edge in the sense of dominance). -/
+inductive Digraph.NonDomPath (g : Digraph) (r : Nat) : Nat → Nat → Prop
+  | single {a b : Nat} : g.edge a b → PathIn g (fun _ => True) r a → ¬ g.Dom r b a → Digraph.NonDomPath g r a b
+  | step {a b c : Nat} : g.edge a b → PathIn g (fun _ => True) r a → ¬ g.Dom r b a → Digraph.NonDomPath g r b c →
+      Digraph.NonDomPath g r a c
+
+/-- The flow graph is reducible (Hecht–Ullman): the edges that do not enter a vertex dominating their source contain no
+cycle. -/
+@[expose] def Digraph.Reducible (g : Digraph) (r : Nat) : Prop := ∀ v, ¬ g.NonDomPath r v v
+
 end SmcIrred

@@ -10,8 +10,8 @@ Status: `open` (owner round named), `blocked` (needs the user/author), `closed` 
 
 | ID | Gap | Origin | Owner round | Fallback claim if never closed | Status |
 |---|---|---|---|---|---|
-| G01 | `LNF.Algo.havlak` = declarative LNF in general (only `decide` evidence on two DFS orders of Fig. 4) | R3 | R3b (before R23) | Havlak's algorithm is stated as M evidence; all theorems use the declarative LNF | open |
-| G02 | Loop bodies are DFS-independent for reducible CFGs (C28, second half; "should") | R3 | R3b | The paper's uniqueness remark is cited (Havlak) and not Lean-verified | open |
+| G01 | `LNF.Algo.havlak` = declarative LNF in general (only `decide` evidence on two DFS orders of Fig. 4) | R3 | R3b (before R23) | Havlak's algorithm is stated as M evidence; all theorems use the declarative LNF | closed: `LNF.HvMain.havlak_hdr`, `havlak_hdr_none`, `havlak_irr` (every valid jungle) |
+| G02 | Loop bodies are DFS-independent for reducible CFGs (C28, second half; "should") | R3 | R3b | The paper's uniqueness remark is cited (Havlak) and not Lean-verified | closed: `LNF.Reducible.body_dfs_independent`, `lnfParent_dfs_independent` (`Digraph.Reducible` = Hecht–Ullman: edges not entering a dominator of their source are acyclic) |
 | G03 | C05: Denuvo reference [17] (Karthik et al., ICCCNT 2020) unverified | R1 | R23 (re-search) / author | Listed as an unverified citation in the corrected text | open |
 | G04 | C82: Banescu et al. quotation (opaque predicates defeated only in contrived scenarios) unverified | R1 | R20b / author | Claim marked as an unverified citation | open |
 | G05 | C29/C69: Wei–Mao–Zou–Chen SAS 2007 (near-linear Havlak) and Cifuentes 1993 (DCC) not opened | R1 | R23 | Marked cited-unverified | open |

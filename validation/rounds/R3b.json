@@ -1,0 +1,7 @@
+{
+ "round": "R3b",
+ "commands": ["python validation/build_modules.py all", "python validation/axiom_audit.py"],
+ "theorems": ["havlak_hdr", "havlak_hdr_none", "havlak_irr", "hstep", "havlak_fold", "body_dfs_independent", "lnfParent_dfs_independent"],
+ "open": ["G25", "G26", "G27", "G19"],
+ "sorry": 0
+}

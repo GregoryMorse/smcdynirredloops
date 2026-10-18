@@ -15,6 +15,16 @@ public import SmcIrred.LNF.Small
 public import SmcIrred.LNF.Fig4
 public import SmcIrred.LNF.NonUnique
 public import SmcIrred.LNF.Algo
+public import SmcIrred.LNF.HvOrder
+public import SmcIrred.LNF.HvUF
+public import SmcIrred.LNF.HvSem
+public import SmcIrred.LNF.HvScan
+public import SmcIrred.LNF.HvDrain
+public import SmcIrred.LNF.HvClose
+public import SmcIrred.LNF.HvRes
+public import SmcIrred.LNF.HvStep
+public import SmcIrred.LNF.HvMain
+public import SmcIrred.LNF.Reducible
 public import SmcIrred.Extremal.Count
 public import SmcIrred.Extremal.Chain
 public import SmcIrred.Extremal.Kn
