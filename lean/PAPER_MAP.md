@@ -21,7 +21,7 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C15 | §1 ¶5 | 617–619 | the 2-SAT solver fixes all exit conditions; beyond static tools | F + FT + X | R9, R19, R20b | open |  |
 | C16 | §1 ¶5 | 617–619 | case study: protected AES/RSA, measured on Windows/Linux x86/x64, IDA/Ghidra (P13) | X | R1 | listed (X) |  |
 | C17 | §2 ¶1 | 619–622 | SAT, CNF, 2-SAT definitions (P01) | F | R5 | done (Spec.TwoSat (TwoSat, Sat, graph)) |  |
-| C18 | §2 ¶1 | 619–622 | DNF trivially solvable but potentially O(2^n) clauses | F (should) | R5 | open: G21 (R6) |  |
+| C18 | §2 ¶1 | 619–622 | DNF trivially solvable but potentially O(2^n) clauses | F (should) | R5 | done (TwoSat.DNF `dnf_parity_terms`) |  |
 | C19 | §2 ¶1 | 619–622 | k-SAT reduces to 3-SAT; 3-SAT NP-complete | R (+F could) | R1 | R1 checked | standard: Cook-Levin; Karp 1972 (not opened this round) |
 | C20 | §2 ¶2 | 619–622 | 2-SAT NL-complete; NL ⊆ P | R | R1 | R1 checked | standard: Papadimitriou, Computational Complexity, 1994, Ch. 16 (2-SAT NL-complete); Jones, Lien, Laaser 1976 (not opened this round) |
 | C21 | §2 ¶2 | 619–622 | linear time via implication graph + SCC; solution in reverse topological order | F | R5, R6 | done (TwoSat.APT `twoSat_iff_scc`, `apt_correct`; Tarjan.Cost `tarjan_cost`) |  |

@@ -1,0 +1,7 @@
+{
+ "round": "R6b",
+ "commands": ["python validation/build_modules.py all", "python validation/axiom_audit.py"],
+ "theorems": ["ctarjan_spec", "tsFold_dup", "sim_visit", "osim_step", "cRun_sim", "dnf_parity_terms"],
+ "open": ["G22", "G23", "G24"],
+ "sorry": 0
+}

@@ -10,7 +10,7 @@ states its Lean verification, the Palomar entry and the tag.
 (state and handoff notes: `lean/ROUNDS.md`). Decisions in plan §2 are settled; ask the user before
 deviating. Do not browse sibling repositories beyond the paths the plan names.
 
-**Current round: R6** (R0–R5 done 2026-10-17; R3b and R4c pending). Update this line at each round close.
+**Current round: R6c** (R0–R5 done 2026-10-17, R6, R6b 2026-10-18; R3b and R4c pending). Update this line at each round close.
 
 ## Hard rules
 

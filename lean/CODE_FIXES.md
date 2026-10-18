@@ -6,7 +6,7 @@ code once more before editing.
 
 | ID | File | Fix (minimal) | Test | Status |
 |---|---|---|---|---|
-| L01 | `native/selfmodgraph.cpp` `tarjan_scc` | outer loop must skip nodes already visited (today a visited SCC root is re-emitted as a duplicate singleton and a visited non-root is left on the stack); `twosat` is unaffected | duplicate-free SCC list; `twosat` vectors unchanged | open |
+| L01 | `native/selfmodgraph.cpp` `tarjan_scc` | outer loop must skip nodes already visited (today a visited SCC root is re-emitted as a duplicate singleton and a visited non-root is left on the stack); `twosat` is unaffected (Lean: `Tarjan.CodeModel` `ctarjan_spec`) | duplicate-free SCC list; `twosat` vectors unchanged | open (fix owner R21) |
 | L02 | `native/aesmain.c`, `native/rsa.c` | label the VM slot honestly ("Graph VM", not "Irreducible Loop Graph Encryption"); drop or guard the empty AES-192/256 stubs and the commented-out `AES_128_obf_il_encrypt` | harness output | open |
 | L03 | `python/virt.py` `set_bit_range` | slice stop, not stride (`num[a::b]`); only if used, else delete (confirm) | unit test | open |
 | L04 | `python/virt.py` `do_run_virtual` | define `outp = None` when `outmap is None` (NameError today; confirm) | unit test | open |

@@ -38,3 +38,9 @@ public import SmcIrred.Tarjan.Mono
 public import SmcIrred.Tarjan.Correct
 public import SmcIrred.Tarjan.Solver
 public import SmcIrred.Tarjan.Cost
+public import SmcIrred.Spec.TarjanCode
+public import SmcIrred.Spec.Dnf
+public import SmcIrred.Tarjan.TwoSatCode
+public import SmcIrred.Tarjan.CodeSim
+public import SmcIrred.Tarjan.CodeModel
+public import SmcIrred.TwoSat.DNF
