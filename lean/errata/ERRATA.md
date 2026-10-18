@@ -225,12 +225,12 @@ AES encryption with a fixed randomly generated key; node and edge counts of Tabl
 **After:**
 
 ```tex
-State the key used (the repository generates AES graphs with the key bytes 0x12...) and any difference between the regenerated Nodes/Edges/Exec. N/Exec. E and the printed values found in R16.
+State the key used (the repository generates AES graphs with the key bytes 0x12...). Regeneration (R16) gives the printed Nodes, Edges and Exec. N; Exec. E depends on the random dependency order (AES-256: 541018 to 541694 over runs), so it is not fixed by the key.
 ```
 
 **Reason:** Provenance of the measured graph and counts; to be settled by regenerating the graphs (R16).
 
-**Evidence:** python/aes.py gen_aes uses key = b'\x12' * (bits // 8); regeneration result in R16.
+**Evidence:** python/aes.py gen_aes uses key = b'\x12' * (bits // 8); regeneration (R16, validation/data/table_regen.json, evidence class M, not proof) reproduces Nodes, Edges and Exec. N of Tables 1-2.
 
 **Source:** published PDF p. 627; python/aes.py
 
