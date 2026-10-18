@@ -9,7 +9,7 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C03 | Abstract; §4 | 617 | algorithms lowered to multi-input gates; applicable to any CFG | F | R10 | open |  |
 | C04 | Abstract; §6 | 617 | the ideas can be applied separately | X | R1 | listed (X) |  |
 | C05 | §1 ¶1 | 617–619 | VMProtect and Denuvo defeated [16, 17] | R | R1 | R1 checked | source-partial: VMAttack (Kalysch, Götzfried, Müller, ARES 2017, doi 10.1145/3098954.3098995) deobfuscates VMProtect (checked); Denuvo reference [17] (Karthik, Amritha, Sethumadhavan, ICCCNT 2020) not found online: UNVERIFIED |
-| C06 | §1 ¶3 | 617–619 | DFS-based SCC + topological sort implemented by an SMC CFG of the queried graph | F + M | R7, R8 | F part done (Smc.Solve `smcSolve_spec`, Smc.Visit `sRun_sim`); M part and step bound open (G26, G27, R8) |
+| C06 | §1 ¶3 | 617–619 | DFS-based SCC + topological sort implemented by an SMC CFG of the queried graph | F + M | R7, R8 | F part done (Smc.Solve `smcSolve_spec`, Smc.Visit `sRun_sim`); M part: native vectors agree (evidence, R8_native.json); step bound open (G27, R8b) |
 | C07 | §1 ¶3 | 617–619 | stack simplification; generalizable to largely any graph algorithm | X | R1 | listed (X) |  |
 | C08 | §1 ¶3 | 617–619 | SCC + topological sort make an efficient linear 2-SAT solver [2] | F | R5, R6 | done (Tarjan.Solver `twoSatSolve_spec`, Tarjan.Correct `tarjan_spec`) |  |
 | C09 | §1 ¶4 | 617–619 | an IL is a loop with multiple entries; hardest structure for static tools | F (def) + X | R3 | open |  |
@@ -39,10 +39,10 @@ Classes (plan D1): **F** formal, **FT** security statement relative to the threa
 | C33 | §2 ¶7 | 619–622 | restructuring needs duplication [27] or state variables [30, 31]; quadratic variables/conditionals | F + R | R18 | open |  |
 | C34 | §2 ¶8 | 619–622 | prior obfuscation methods; the contribution | R + X | R1 | R1 checked | references exist (published list [3],[4],[5],[9],[19],[20],[28]); content not checked: contribution claims are X |
 | C35 | §3 ¶1 | 622–623 | implication graph = CFG; node code = SCC + reverse topological sort | F | R7 | done (Smc.Solve `smcSolve_spec`, Smc.Visit `sRun_sim`; machine reading of the blueprint: G26) |
-| C36 | §3 ¶1 | 622–623 | implemented in x86 and x86-64 on Windows and Linux | M | R8 | open |  |
-| C37 | §3 ¶1 | 622–623 | node stack replaces the call stack; first instruction → return; topological check marking | F + M | R7, R8 | F part done (Smc.Solve `smcSolve_spec`, Smc.Visit `sRun_sim`); M part and step bound open (G26, G27, R8) |
-| C38 | §3 ¶1 | 622–623 | lambda callbacks for edges and solutions; set for unsatisfiability | M | R8 | open |  |
-| C39 | §3 ¶2, Fig. 2 | 622–623 | blueprint generation; stamping; reuse by restamping SMC offsets | F + M | R7, R8 | F part done in the abstract machine (Smc.Restamp `smcRounds_replicate`); offsets/stamping M part open (G25, R8) |
+| C36 | §3 ¶1 | 622–623 | implemented in x86 and x86-64 on Windows and Linux | M | R8 | done (M evidence: MSVC x64/x86 on Windows, g++ x64 on Linux; R8_native.json, workflow native-twosat) | |
+| C37 | §3 ¶1 | 622–623 | node stack replaces the call stack; first instruction → return; topological check marking | F + M | R7, R8 | F part done (Smc.Solve `smcSolve_spec`, Smc.Visit `sRun_sim`); M part: native vectors agree (evidence, R8_native.json); step bound open (G27, R8b) |
+| C38 | §3 ¶1 | 622–623 | lambda callbacks for edges and solutions; set for unsatisfiability | M | R8 | done (M evidence: callbacks exercised by the same vectors, R8_native.json) | |
+| C39 | §3 ¶2, Fig. 2 | 622–623 | blueprint generation; stamping; reuse by restamping SMC offsets | F + M | R7, R8 | F part done in the abstract machine (Smc.Restamp `smcRounds_replicate`); Fig. 2(a): listing = arrays and offset constants (M evidence, validation/native_listing.py, R8_listing.json); cell-to-offset correspondence G25 (R23) |
 | C40 | §3.1 | 623 | planted 2-SAT generator yields the desired values (P04) | F | R9 | open |  |
 | C41 | §4 ¶1 | 623–629 | Boolean-level description; word-level abstractions can be reintroduced | X + F (DSL) | R11 | open |  |
 | C42 | §4, Def. 1 | 623–629 | multi-input AND/OR/XOR/XNOR; decomposition into / X / −1 two-input gates, sequential or tree | F | R11 | open |  |

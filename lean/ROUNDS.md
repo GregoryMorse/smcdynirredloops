@@ -17,7 +17,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R6b | `Tarjan/CodeModel` (G22) and DNF parity bound (G21) | must | done 2026-10-18 |
 | R6c | G23 (re-emitted duplicates are exactly the roots; needs a done-vertex root invariant) | must | done 2026-10-18 |
 | R7 | SMC 2-SAT solver Level 2 ⇒ Tarjan/APT; restamp lemma | must | done 2026-10-18 |
-| R8 | SMC solver VM level (should); native vectors and listing evidence (must) | must/should | TODO |
+| R8 | SMC solver VM level (should); native vectors and listing evidence (must) | must/should | DONE 2026-10-18 (items 2–3; item 1 and G27 -> R8b) |
+| R8b | G27 step bound for the Level 2 machine; G28 VM instruction-list refinement (R8 item 1) | should | TODO |
 | R9 | Planted 2-SAT generator (§3.1, P04) | must | TODO |
 | R10 | Boolean-CFG VM: order independence, data-independent counts, subgraphs | must | TODO |
 | R11 | Gate primitives, decoders, adders (P05), DSL compiler correctness | must | TODO |
@@ -133,3 +134,9 @@ handoff: done / next / open obligations / hazards / evidence file).
 ## R4c handoff (2026-10-18)
 - Done: `Extremal.MinOther`: `maxMEE_others` (every CFG with `n ≥ 2` whose multiple-entry count is `C(n−1,2)` has `edgeCount ≥ meeCount + (2n−3)`, for every valid jungle). Proof: tightness of `meeCount_bound` gives per-vertex equality (`per_vertex_strict`, `maxPairs_of_max`: each earlier non-parent vertex is MEE-adjacent), hence no vertex between a vertex and its parent in preorder (`between`), every non-last vertex has a child (`child_exists`), a vertex with parent and child heads a loop (`header_of_chain`), and an in-degree count (`indeg_bound`). With `MnLite_others` the bound 2n−3 is attained. G19 closed.
 - Open: G25, G26, G27 -> R8. Next: R8.
+
+## R8 handoff (2026-10-18)
+- Done (M evidence, never proof): `validation/TwoSatVectors.lean` (4 test formulas + 2000 random formulas, fixed seed; verdict from `twoSatSolve`, cross-checked by brute force, counts) -> `validation/data/twosat_vectors.txt`; `validation/native/twosat_harness.cpp` + `validation/native_twosat.py` (MSVC x64/x86, with and without `USE_VM`: 0 failures; alltwosat counts compared on formulas 1–400); `.github/workflows/native-twosat.yml` (g++ Linux x64, with and without `USE_VM`: green); `validation/native_listing.py` (ml64 `/DWINDOWS /Fl /Sa` listing of `native/selfmodmodel.asm` through the product's `parseasmlisting`: `blueprint`, `callblueprint`, `jumptopo` arrays and all offset constants equal those in `native/selfmodgraph.cpp`). Results: `validation/rounds/R8_native.json`, `R8_listing.json`.
+- Code fix L10 (`#include <memory>`).
+- Pitfall: the listing must be assembled with `/DWINDOWS` (the asm has `IFDEF WINDOWS` branches); without it the Linux branch is listed and arrays differ. x86 listing (ml) not run.
+- Open: G25 -> R23 (cell-to-offset correspondence), G27, G28 -> R8b. Next: R8b or R9.
