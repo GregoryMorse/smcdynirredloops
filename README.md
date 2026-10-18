@@ -125,3 +125,7 @@ See LICENSE.
 ## Citation
 
 If you use this code in research, please cite the paper above and include a repository citation. See CITATION.cff for machine-readable metadata.
+
+## Scope note
+
+The irreducible-loop-protected AES/RSA variant announced in the paper and the planted 2-SAT generator of Section 3.1 are not implemented in this repository: `IrredLoop.cpp` implements the stand-alone irreducible-loop constructions, and the AES/RSA/ECDSA drivers execute the graph virtual machine without irreducible-loop protection.

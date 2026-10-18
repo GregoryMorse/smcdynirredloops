@@ -438,10 +438,11 @@ void AES_256_encrypt_intrin(unsigned char* out, unsigned char* in) {
 	AES_encrypt_intrin(in, out, &intrin_key256);
 }
 
-//extern void AES_128_obf_il_encrypt(unsigned char* out, unsigned char* in);
 extern void AES_128_obf_virt_encrypt(unsigned char* out, unsigned char* in);
 extern void AES_128_obf_encrypt(unsigned char* out, unsigned char* in);
 extern void AES_192_obf_virt_encrypt(unsigned char* out, unsigned char* in);
+//the straight-line graph variants for 192 and 256 bits are not generated: these empty stubs leave the output unchanged and the
+//verification below reports a mismatch for the 'Graph Encryption' column (L02)
 extern void AES_192_obf_encrypt(unsigned char* out, unsigned char* in) {}
 extern void AES_256_obf_virt_encrypt(unsigned char* out, unsigned char* in);
 extern void AES_256_obf_encrypt(unsigned char* out, unsigned char* in) {}
@@ -456,7 +457,7 @@ typedef struct aesbitfuncs {
 	void(*f[4])(unsigned char*, unsigned char*);
 } aesbitfuncs;
 
-const char* aesstrs[] = { "C. Ref Encryption", "Instrinsics Encryption", "Graph Encryption", "Irreducible Loop Graph Encryption" };
+const char* aesstrs[] = { "C. Ref Encryption", "Instrinsics Encryption", "Graph Encryption", "Graph VM Encryption" };
 
 aesbitfuncs aesfuncs[] = {
 	{128, userKey, {AES_128_encrypt, AES_128_encrypt_intrin, AES_128_obf_encrypt, AES_128_obf_virt_encrypt}},

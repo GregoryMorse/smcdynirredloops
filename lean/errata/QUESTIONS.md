@@ -10,3 +10,5 @@ Open:
 - P06, P28: wording is proposed in `edits.json`; confirm in R22.
 - P25 / R20b: replace Section 5.1 by the proposed formal subsection (appendix of the errata PDF), or apply only P21-P24 and drop P25?
 - Review of the errata PDF `output/pdf/smcirred-2022-errata.pdf` (R22 gate).
+- L09: `generated/aesgraph.c` (the straight-line graph variant `AES_128_obf_encrypt`) has no emitter; reinstate the emitter (`graph_to_c`, needs `pred`, `deporder`) or drop the graph column/variant?
+- L06 / P11: the AES key is 0x12 in every byte; keep it (and state so in the paper) or regenerate with another key?

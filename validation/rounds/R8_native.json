@@ -4,21 +4,21 @@
   "build_seconds": 4,
   "run_ok": true,
   "run_seconds": 1,
-  "run_tail": "SUMMARY runs=4008 failures=0 countchecks=798\n\nMemory cap: 1499996160 bytes; peak group commit: 37896192 bytes; sampled peak resident: 64131072 bytes; exit 0\n"
+  "run_tail": "SUMMARY runs=6012 failures=0 countchecks=798\n\nMemory cap: 1499996160 bytes; peak group commit: 37793792 bytes; sampled peak resident: 64094208 bytes; exit 0\n"
  },
  "msvc-x86": {
   "build_ok": true,
   "build_seconds": 4,
   "run_ok": true,
-  "run_seconds": 11,
-  "run_tail": "SUMMARY runs=4008 failures=0 countchecks=798\n\nMemory cap: 1499996160 bytes; peak group commit: 38322176 bytes; sampled peak resident: 65531904 bytes; exit 0\n"
+  "run_seconds": 1,
+  "run_tail": "SUMMARY runs=6012 failures=0 countchecks=798\n\nMemory cap: 1499996160 bytes; peak group commit: 38449152 bytes; sampled peak resident: 65445888 bytes; exit 0\n"
  },
  "msvc-x64-vm": {
   "build_ok": true,
   "build_seconds": 5,
   "run_ok": true,
   "run_seconds": 1,
-  "run_tail": "SUMMARY runs=6012 failures=0 countchecks=1197\n\nMemory cap: 1499996160 bytes; peak group commit: 38277120 bytes; sampled peak resident: 64442368 bytes; exit 0\n"
+  "run_tail": "SUMMARY runs=8016 failures=0 countchecks=1197\n\nMemory cap: 1499996160 bytes; peak group commit: 38629376 bytes; sampled peak resident: 64475136 bytes; exit 0\n"
  },
  "msvc-x86-vm": {
   "build_ok": true,

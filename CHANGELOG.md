@@ -8,6 +8,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+- `selfmodgraph.cpp` `tarjan_scc`: the outer loop skips nodes that were already visited (a visited SCC root was emitted again as a duplicate singleton component); `twosat` answers are unchanged. The `tarjan_scc` partition property is now checked by the native 2-SAT harness.
+- `virt.py`: `set_bit_range` replaces the slice `[start, end)` (it used a stride), `reduce_all` no longer fails when `outmap` is `None`, the debug `print(tbl)` of `modexpMontgomeryWindow` and the unfinished unused `mul_window`/`mul_const_window` are removed; optional `SMCIRRED_SEED` environment variable seeds the graph shuffles for reproducible regeneration (default unchanged).
+- `aesmain.c`, `rsa.c`: the virtual-machine column is labelled "Graph VM"; the AES-192/256 straight-line stubs are documented.
+
+### Notes
+- The irreducible-loop-protected AES/RSA variant announced in the paper and the planted 2-SAT generator of Section 3.1 are not implemented in this repository; `IrredLoop.cpp` and the transformation examples are standalone.
+
 ---
 
 ## [1.0.0] — 2022

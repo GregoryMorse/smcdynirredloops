@@ -60,8 +60,8 @@ std::vector<std::vector<int>> tarjan_scc(std::map<int, std::vector<int>> succ)
             sccs.push_back(vec);
         }
     };
-    std::for_each(succ.begin(), succ.end(), [&strongconnect](std::pair<const int, std::vector<int>> p) {
-        strongconnect(p.first);
+    std::for_each(succ.begin(), succ.end(), [&nodes, &strongconnect](std::pair<const int, std::vector<int>> p) {
+        if (nodes.find(p.first) == nodes.end()) strongconnect(p.first);
         });
     return sccs;
 }

@@ -465,7 +465,6 @@ int rsa_sign_verify(unsigned char* in, unsigned char* sig, int bytes, const char
 }
 
 //extern int rsa_decrypt_obf(unsigned char* out, unsigned char* in);
-//extern int rsa_decrypt_obf_il(unsigned char* out, unsigned char* in);
 
 typedef struct rsabitfuncs {
 	const int bits;
@@ -476,9 +475,9 @@ typedef struct rsabitfuncs {
 	const int(*f[3])(unsigned char*, unsigned char*);
 } rsabitfuncs;
 
-const char* rsasignstrs[] = { "GMP Signature", "Graph Signature", "Irreducible Loop Graph Signature" };
+const char* rsasignstrs[] = { "GMP Signature", "Graph Signature", "Graph VM Signature" };
 
-const char* rsastrs[] = { "GMP Decryption", "Graph Decryption", "Irreducible Loop Graph Decryption" };
+const char* rsastrs[] = { "GMP Decryption", "Graph Decryption", "Graph VM Decryption" };
 
 extern void RSA_32_obf_virt_encrypt(unsigned char* out, unsigned char* in);
 extern void RSA_64_obf_virt_encrypt(unsigned char* out, unsigned char* in);

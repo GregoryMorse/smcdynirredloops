@@ -1,4 +1,6 @@
 import graph
+import os, random
+if os.environ.get('SMCIRRED_SEED'): random.seed(int(os.environ['SMCIRRED_SEED'])) #optional reproducible graph regeneration (L05)
 
 def getBitSize(num): return num.bit_length()
 def countSetBits(n):
@@ -341,7 +343,6 @@ def modexpMontgomeryWindow(b, e, m, B, R, Np, R2):
   for j in range(2, 1<<w):
     if (j & 1) == 0 and (j >> 1) in tbl: tbl[j] = montgomeryREDC(tbl[j>>1]*tbl[j>>1], B, R, m, Np)
     else: tbl[j] = montgomeryREDC(tbl[j-1] * b, B, R, m, Np)
-  print(tbl)
   for j in range(((B+w-1) // w)-1, -1, -1):
     res = montgomeryREDC(tbl[e >> (j * w) & ((1 << w)-1)] * res, B, R, m, Np)
     if j == 0: break
@@ -697,6 +698,7 @@ def virt_to_c(fname, funcname, op, g, rounds, inpmap, outmap=None, subg=None):
   graph_to_virt_c_opt(fname, funcname, op, g, pred, deporder, inpmap, outmap, subg, isstr=False)
   graph_to_virt_c_opt(fname, funcname, op, g, pred, deporder, inpmap, outmap, subg)
 def reduce_all(op, g, inpmap, outmap, subg=None):
+  outp = None
   if not outmap is None: outp = set(outmap)
   pred = graph.succ_to_pred(g)
   tn, te = len(g), sum(len(g[x]) for x in g)
@@ -878,7 +880,7 @@ def or_to_virtual(nums, node, g, op):
   return [outp0, outp1] if BITSZ == 2 else [outp0]
 def get_bit_len(num): return len(num)//BITSZ
 def get_bit_range(num, start, end): return num[start*BITSZ:end*BITSZ if not end is None else None]
-def set_bit_range(num, start, end, replace): num[start*BITSZ::end*BITSZ if not end is None else None] = replace
+def set_bit_range(num, start, end, replace): num[start*BITSZ:end*BITSZ if not end is None else None] = replace
 def zero_extend_num(num, bits):
   return num + get_false() * (bits - (len(num)//BITSZ))
 def zero_extend_virtual(nums):
@@ -1214,18 +1216,6 @@ def mul_consec_ones_virtual(num, pos, node, g, op):
       i += 1
     i += 1
   return trim_const(x)
-def mul_window(num1, num2, node, g, op):
-  mlen = max(len(num1), len(num2))//BITSZ
-  if len(num1)//BITSZ != mlen: num1 = num1 + get_false() * (mlen - (len(num1)//BITSZ))
-  if len(num2)//BITSZ != mlen: num2 = num2 + get_false() * (mlen - (len(num2)//BITSZ))
-  opt = min(((mlen+x-1)//x + (1<<(x-1))-1, x) for x in range(2, C.bit_length()>>1))[1]
-  
-def mul_const_window(num, C, node, g, op):
-  opt = min(((C.bit_length()+x-1)//x + (1<<(x-1))-1, x) for x in range(2, C.bit_length()>>1))[1]
-  bitgroups = []
-  for x in range(0, (C.bit_length()+opt-1)//opt):
-    bitgroups.append((C >> (x*opt)) & ((1 << opt)-1))
-  #print(bitgroups, len(set(bitgroups)), opt)
 def montgomeryREDC_to_virtual(T, B, R, N, Np, node, g, op, subg):
   Nconst = constant_to_virtual(N)
   Nf, Npf = get_consec_ones(N), get_consec_ones(Np)

@@ -38,7 +38,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R20b | Security model II: T4–T7, necessity, §5.1 texts | must | DONE 2026-10-18 |
 | R19b | Protected AES/RSA variant: the author implements it, this round integrates (P13, D03) | must | BLOCKED on the author |
 | R21a | Portable native build system: CMake, build/ tree, VS 2022/2026, CI Windows/Linux/macOS | must | TODO |
-| R21 | Code fixes (not errata) and native acceptance | must | TODO |
+| R21 | Code fixes (not errata) and native acceptance | must | PARTIAL 2026-10-19 (L01-L06, L11, D03 done; Linux/R16 reruns and L07-L09 open) |
 | R22 | Errata list (paper only) | must | DONE 2026-10-18 (author review requested) |
 | R23 | Coverage and fidelity audit | must | PARTIAL 2026-10-18 (audit passes; closes after the pending rounds) |
 | R24 | Palomar package, CI, handoff (user submits and registers) | must | TODO |
@@ -217,3 +217,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 ## R19c handoff (2026-10-19)
 - Done: `Spec/DynBridge` (`Circ.Flat`, `Circ.TopoR`, `lookupAcc`, `Circ.toD`); `Dynamic/Bridge`: `valAt_eq_valOf`, `dynamic_eq_evaluator` (every final-ordered schedule over `toD c inp` leaves the evaluator's `Circ.val` at every nesting depth), `range_schedule_eq_evaluator` (the hypotheses are satisfiable).
 - Not done (G34 narrowed): circuits with calls (subgraph runs), schedule construction from the solver's conditions, multiple faults, DCA/DPA beyond T6, the SMC realization of the toggle.
+
+## R21 handoff (2026-10-19, partial)
+- Done: L01 (verified natively on this machine: the new `tarjan_scc` partition check fails without the fix and passes with it; MSVC x64 and x86 6012 runs, `--vm` x64 8016 runs, 0 failures), L02, L03, L04, L05 (`SMCIRRED_SEED`), L06 (comment), L11, D03; `validation/python_fixes_test.py`; `R8_native.json` regenerated after the fixes.
+- Not done: Linux x64 vectors and R16 regeneration after the fixes (CI / R16); L07, L08, L09 (R21a and the author's decision, `QUESTIONS.md`); D01, D02 (after registration); the `aes`/`rsa`/`ecdsa` native builds are CI-only (L07).

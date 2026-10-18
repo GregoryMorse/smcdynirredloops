@@ -1378,6 +1378,7 @@ def test_aes(bits):
   #print(aes_stamped_sat(data))
   #print(aes_sat(data, key))
 def gen_aes(bits):
+  #the key is 0x12 repeated in every byte (a fixed key, not a randomly generated one); the graph encodes this key (L06)
   key = b'\x12' * (bits // 8)
   k = AES_set_encrypt_key(key, bits)
   v = aes_virtual_encrypt(k)

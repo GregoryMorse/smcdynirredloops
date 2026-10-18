@@ -52,6 +52,16 @@ int main(int argc, char** argv)
             cs.push_back({ std::stoi(item.substr(0, k)), std::stoi(item.substr(k + 1)) });
         }
         bool sat = verdict == "SAT";
+        { // L01: the components partition the nodes (no node is emitted twice)
+            auto g = gettwosatgraph(cs);
+            auto comps = tarjan_scc(g);
+            std::map<int, int> seen;
+            for (auto& comp : comps) for (int v : comp) seen[v]++;
+            bool part = seen.size() == g.size();
+            for (auto& kv : seen) if (kv.second != 1) part = false;
+            total++;
+            if (!part) { bad++; std::cout << "FAIL tarjan_scc partition formula " << id << std::endl; }
+        }
         for (auto& s : solvers) {
             total++;
             std::vector<int> sol = s.second(cs);
