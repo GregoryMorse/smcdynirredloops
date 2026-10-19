@@ -21,7 +21,7 @@ Nothing here claims that a real tool fails or succeeds; classes of analyzers are
 
 Goal `Determines A img`: the analyzer reports every cell the program reads with its run-time value.
 Assumptions (`structure Assumptions`; no field mentions a goal, checked by `validation/threat_audit.py`):
-S1 planted formula (`planted`, `extra_respects`, `extra_wf`, `stamped`); S2 the cells read are planted, required, false-valued
+S1 planted formula (`planted`, `extra_respects`, `stamped`; that the extra implications mention only the `n` variables is a typing field `Design.extra_wf` of the data, not an assumption); S2 the cells read are planted, required, false-valued
 (`cells_planted`); S3 the dynamic schedule respects dependencies (`schedule_topo`, `schedule_ordered`). S4 (class capability
 bounds) is the capability structures themselves. Necessity witnesses: below.
 
@@ -43,7 +43,7 @@ bounds) is the capability structures themselves. Necessity witnesses: below.
   schedules give the same (vertex, final value) pairs; repeated executions are visible by address.
 * T7 `not_size_indist`, `scheme_overhead`: not an indistinguishability obfuscator for the vertex count; no VBB claim.
 * Necessity: `nec_forcing`, `nec_stamped`, `nec_false_cells` (run misbehaves), `nec_extra_respects` (solver returns nothing),
-  `nec_schedule`, `nec_topo` (no ordered schedule exists in a cyclic circuit). No witness for `extra_wf` (G36).
+  `nec_schedule`, `nec_topo` (no ordered schedule exists in a cyclic circuit). `extra_wf` is not an assumption: it is a field of `Design` (a formula over its n variables), so it needs no witness.
 * `Threat.solver_succeeds`: under S1 the solver returns a solution.
 
 ## 4. Literature pass (D11 list)

@@ -16,8 +16,8 @@ for ln in code.splitlines()[1:]:
         errs.append(f"assumption text mentions '{mm.group(0)}': {ln.strip()}")
 names = re.findall(r"\n  (\w+) :", code)
 print("fields:", ", ".join(names))
-if len(names) < 7:
-    errs.append("expected the seven Assumptions fields")
+if len(names) < 6:
+    errs.append("expected the six Assumptions fields (extra_wf is a typing field of Design)")
 if errs:
     print("\n".join(errs)); sys.exit(1)
 print("THREAT AUDIT OK: no Assumptions field mentions a goal")

@@ -32,6 +32,7 @@ theorem imm_determines_iff {A : Analyzer} (hC : ImmCap A) (img : Image) :
   req := fun x => x = 1 ∨ x = 2
   forest := [(⟨1, true⟩, ⟨1, false⟩), (⟨2, true⟩, ⟨2, false⟩)]
   extra := []
+  extra_wf := by intro e he; simp at he
   circ := wcirc
   acts := execs [0, 1]
 
@@ -52,7 +53,6 @@ theorem witness_assumptions {orig prog : Stmt} (hc : ∀ k ∈ codeReads (compil
     Assumptions (witness orig prog) where
   planted := witness_planted
   extra_respects := by intro e he; simp [witness] at he
-  extra_wf := by intro e he; simp [witness] at he
   stamped := by simp [witness]
   cells_planted := by
     intro k hk

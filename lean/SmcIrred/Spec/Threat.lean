@@ -68,6 +68,9 @@ structure Design where
   req : Nat → Prop
   forest : List (Lit × Lit)
   extra : List (Lit × Lit)
+  /-- A design is a formula over its `n` variables: every extra implication mentions variables below `n` (a typing
+  condition of the data, like `TwoSat.Wf`, not a hypothesis about the generator or the attacker). -/
+  extra_wf : ∀ e ∈ extra, e.1.var < n ∧ e.2.var < n
   circ : DCirc Bool
   acts : List (Act Bool)
 
@@ -78,7 +81,6 @@ read only through the solver output). S3: the schedule of the dynamic scheme res
 structure Assumptions (d : Design) : Prop where
   planted : Planted d.n d.σ d.req d.forest
   extra_respects : ∀ e ∈ d.extra, Respecting d.σ e
-  extra_wf : ∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n
   stamped : d.img.formula = impFormula d.n (d.forest ++ d.extra)
   cells_planted : ∀ k ∈ d.img.cells, k < d.n ∧ d.req k ∧ d.σ k = false
   schedule_topo : d.circ.Topo

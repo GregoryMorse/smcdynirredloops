@@ -13,14 +13,14 @@ open Lang Dyn
 /-- Under S1 the run-time value of a required variable is its intended value (the solver's output on a planted formula). -/
 theorem rtVal_planted {d : Design} (hA : Assumptions d) {k : Nat} (hk : k < d.n) (hr : d.req k) :
     rtVal d.img k = d.σ k := by
-  obtain ⟨sol, hsol, hout⟩ := planted_smc (extra := d.extra) hA.planted hA.extra_respects hA.extra_wf
+  obtain ⟨sol, hsol, hout⟩ := planted_smc (extra := d.extra) hA.planted hA.extra_respects d.extra_wf
   unfold rtVal
   rw [hA.stamped, hsol]
   exact hout k hk hr
 
 /-- Under S1 the solver succeeds on the stamped formula (S1 is what makes the formula satisfiable). -/
 theorem solver_succeeds {d : Design} (hA : Assumptions d) : smcSolve d.img.formula ≠ none := by
-  obtain ⟨sol, hsol, _⟩ := planted_smc (extra := d.extra) hA.planted hA.extra_respects hA.extra_wf
+  obtain ⟨sol, hsol, _⟩ := planted_smc (extra := d.extra) hA.planted hA.extra_respects d.extra_wf
   rw [hA.stamped, hsol]; simp
 
 theorem trace_obfuscated {orig prog : Stmt} (h : Obfuscates orig prog) (c : Bool) :

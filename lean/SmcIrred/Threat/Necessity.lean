@@ -39,7 +39,7 @@ theorem nec_forcing :
       dForce.img.formula = impFormula dForce.n (dForce.forest ++ dForce.extra) ∧
       (∀ k ∈ dForce.img.cells, k < dForce.n ∧ dForce.req k ∧ dForce.σ k = false) ∧
       dForce.circ.Topo ∧ FinalOrdered dForce.circ dForce.acts ∧ dForce.img.run true ≠ trace fig5a true true :=
-  ⟨rfl, by simp [dForce], by simp [dForce], hw5.extra_respects, hw5.extra_wf, by simp [dForce, imgOf, witness],
+  ⟨rfl, by simp [dForce], by simp [dForce], hw5.extra_respects, dForce.extra_wf, by simp [dForce, imgOf, witness],
     hw5.cells_planted, hw5.schedule_topo, hw5.schedule_ordered,
     run_wrong_of_true (f := impFormula 3 []) (by decide) (by decide)⟩
 
@@ -54,7 +54,7 @@ theorem nec_stamped :
       dStamp.circ.Topo ∧ FinalOrdered dStamp.circ dStamp.acts ∧
       dStamp.img.formula.clauses ≠ (impFormula dStamp.n (dStamp.forest ++ dStamp.extra)).clauses ∧
       dStamp.img.run true ≠ trace fig5a true true :=
-  ⟨rfl, hw5.planted, hw5.extra_respects, hw5.extra_wf, hw5.cells_planted, hw5.schedule_topo, hw5.schedule_ordered,
+  ⟨rfl, hw5.planted, hw5.extra_respects, dStamp.extra_wf, hw5.cells_planted, hw5.schedule_topo, hw5.schedule_ordered,
     by simp [dStamp, imgOf, witness, impFormula],
     run_wrong_of_true (f := impFormula 3 []) (by decide) (by decide)⟩
 
@@ -92,7 +92,7 @@ theorem nec_false_cells :
 @[expose] def extraBad : List (Lit × Lit) := [(⟨1, false⟩, ⟨1, true⟩)]
 
 @[expose] def dExtra : Design :=
-  { witness fig5a fig5bS with extra := extraBad, img := imgOf (impFormula 3 ((witness fig5a fig5bS).forest ++ extraBad)) }
+  { witness fig5a fig5bS with extra := extraBad, extra_wf := by intro e he; simp [extraBad] at he; subst he; decide, img := imgOf (impFormula 3 ((witness fig5a fig5bS).forest ++ extraBad)) }
 
 /-- Necessity of the extra implications respecting the intended assignment (`extra_respects`): with one that does not, the
 stamped formula is unsatisfiable and the solver returns nothing, so T1's premise that the solver produces the cells fails. -/
