@@ -59,12 +59,14 @@ public import SmcIrred.Tarjan.TwoSatLink
 public import SmcIrred.Tarjan.TwoSatLegacy
 public import SmcIrred.TwoSat.DNF
 public import SmcIrred.Spec.SmcMachine
+public import SmcIrred.Spec.SmcVm
 public import SmcIrred.Smc.Rel
 public import SmcIrred.Smc.Finish
 public import SmcIrred.Smc.Sim
 public import SmcIrred.Smc.Visit
 public import SmcIrred.Smc.Final
 public import SmcIrred.Smc.Solve
+public import SmcIrred.Smc.VmRel
 public import SmcIrred.Smc.Restamp
 public import SmcIrred.Smc.Cost
 public import SmcIrred.Gen.Planted
