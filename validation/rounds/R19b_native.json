@@ -1,0 +1,14 @@
+{
+ "msvc-x64": {
+  "build_ok": true,
+  "build_seconds": 3,
+  "run_ok": true,
+  "run_tail": "protected: all checks passed\n\nMemory cap: 1499996160 bytes; peak group commit: 37941248 bytes; sampled peak resident: 54489088 bytes; exit 0\n"
+ },
+ "msvc-x86": {
+  "build_ok": true,
+  "build_seconds": 2,
+  "run_ok": true,
+  "run_tail": "protected: all checks passed\n\nMemory cap: 1499996160 bytes; peak group commit: 38338560 bytes; sampled peak resident: 55377920 bytes; exit 0\n"
+ }
+}

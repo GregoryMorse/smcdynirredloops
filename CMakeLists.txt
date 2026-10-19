@@ -51,6 +51,9 @@ if(SMC_BUILD_VALIDATION)
   if(EXISTS "${SMC_VECTORS}")
     add_test(NAME twosat_vectors COMMAND twosat_harness "${SMC_VECTORS}")
   endif()
+  # R19b: protected AES-128 and modular exponentiation (irreducible loops, planted 2-SAT conditions), portable C99
+  add_executable(protected native/protected.c)
+  add_test(NAME protected_selftest COMMAND protected)
 endif()
 
 if(SMC_BUILD_DRIVERS)
