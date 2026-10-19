@@ -137,6 +137,7 @@ public import SmcIrred.Lang.Congr
 public import SmcIrred.Dynamic.FinalExec
 public import SmcIrred.Dynamic.Fault
 public import SmcIrred.Dynamic.StaticScheme
+public import SmcIrred.Dynamic.StaticSchemeGeneral
 public import SmcIrred.Spec.Threat
 public import SmcIrred.Threat.Correct
 public import SmcIrred.Threat.Recover
