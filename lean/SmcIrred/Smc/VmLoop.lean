@@ -31,7 +31,8 @@ address is popped and jumped to. -/
 theorem vm_visited {g : Digraph} {s1 : SState} {oc : Nat} {m : VM} {w k : Nat} (h : VR g s1 oc m) (hw : w < g.n)
     (hk : s1.ent w = some k) (hpc : m.pc = base g.n w) {c0 : Option Nat} {rest : List (Option Nat)}
     (hstk : s1.stk = c0 :: rest) :
-    ∃ m', Rn g m m' ∧ m'.pc = enc g.n oc c0 ∧ m'.reg = (k : Int) ∧ VR g { s1 with stk := rest } oc m' := by
+    ∃ m', Rn g m m' ∧ m'.pc = enc g.n oc c0 ∧ m'.reg = (k : Int) ∧ VR g { s1 with stk := rest } oc m' ∧
+      m'.mem = m.mem := by
   have hmstk : m.stk = enc g.n oc c0 :: rest.map (enc g.n oc) := by rw [h.stk, hstk]; rfl
   have f0 : m.mem (base g.n w) = .data (k : Int) := by
     have := h.fetch hw (i := 0) (by omega) (Or.inl ⟨by omega, by omega⟩)
@@ -44,7 +45,7 @@ theorem vm_visited {g : Digraph} {s1 : SState} {oc : Nat} {m : VM} {w k : Nat} (
     eff_ret (g := g) (m := m1) st1 (by rw [mem1, p1]; exact f1) (a := enc g.n oc c0) (r := rest.map (enc g.n oc))
       (by rw [stk1, hmstk])
   refine ⟨m2, R1.trans R2, pc2, by rw [reg2, reg1], ?_⟩
-  exact ⟨st2, by rw [sol2, sol1, h.sol], by rw [stk2], by rw [mem2, mem1]; exact h.mem, h.nodup⟩
+  exact ⟨⟨st2, by rw [sol2, sol1, h.sol], by rw [stk2], by rw [mem2, mem1]; exact h.mem, h.nodup⟩, by rw [mem2, mem1]⟩
 
 /-- Steps 10–12 of the successor loop with a positive counter: the counter cell is read and decremented. -/
 theorem vm_iter_head {g : Digraph} {s : SState} {oc : Nat} {m : VM} {x c : Nat} (h : VR g s oc m) (hx : x < g.n)
