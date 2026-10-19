@@ -110,6 +110,17 @@ public import SmcIrred.Arith.Ones
 public import SmcIrred.Arith.Ladder
 public import SmcIrred.Spec.RBSD
 public import SmcIrred.Arith.RBSD
+public import SmcIrred.Spec.Recode
+public import SmcIrred.Arith.NAF
+public import SmcIrred.Arith.Recode
+public import SmcIrred.Spec.CarrySave
+public import SmcIrred.Arith.CarrySave
+public import SmcIrred.Spec.KaratsubaCode
+public import SmcIrred.Arith.KaratsubaCode
+public import SmcIrred.Spec.ModMul
+public import SmcIrred.Arith.ModMul
+public import SmcIrred.Spec.ArithTrace
+public import SmcIrred.Arith.WindowTrace
 public import SmcIrred.Spec.Lang
 public import SmcIrred.Spec.LangFigs
 public import SmcIrred.Lang.Common
