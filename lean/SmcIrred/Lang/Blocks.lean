@@ -2,6 +2,7 @@ module
 
 public import SmcIrred.Lang.Struct
 public import SmcIrred.LNF.Reducible
+public import SmcIrred.Lang.General
 
 public section
 
@@ -119,5 +120,120 @@ theorem blockOf_eq (code : List Instr) {i : Nat} (hi : i < code.length) :
   rw [leaders_eq, fl_filter_le]
   have : min code.length (i + 1) = i + 1 := by omega
   rw [this]
+
+theorem ldr_zero (code : List Instr) : ldr code 0 = true := by simp [ldr, isLeader]
+
+theorem pos_one (code : List Instr) : pos (ldr code) 1 = 1 := by
+  have := pos_succ (ldr code) 0
+  have h0 : pos (ldr code) 0 = 0 := by simp [pos, fl]
+  rw [h0, ldr_zero] at this
+  simpa using this
+
+theorem pos_pos (code : List Instr) {x : Nat} : 1 ≤ pos (ldr code) (x + 1) := by
+  have := pos_mono (ldr code) 1 (x + 1) (by omega)
+  rw [pos_one] at this
+  exact this
+
+theorem pos_lead_succ (code : List Instr) {y : Nat} (hy : ldr code y = true) :
+    pos (ldr code) (y + 1) = pos (ldr code) y + 1 := by
+  rw [pos_succ]; simp [hy]
+
+theorem blockOf_mono (code : List Instr) {x y : Nat} (hxy : x ≤ y) (hy : y < code.length) :
+    blockOf code x ≤ blockOf code y := by
+  rw [blockOf_eq code (by omega), blockOf_eq code hy]
+  have := pos_mono (ldr code) (x + 1) (y + 1) (by omega)
+  omega
+
+theorem blockOf_strict (code : List Instr) {x y : Nat} (hxy : x < y) (hy : y < code.length) (hl : ldr code y = true) :
+    blockOf code x < blockOf code y := by
+  rw [blockOf_eq code (by omega), blockOf_eq code hy]
+  have h1 := pos_mono (ldr code) (x + 1) y (by omega)
+  have h2 := pos_lead_succ code hl
+  have h3 := @pos_pos code x
+  omega
+
+theorem blockOf_lead (code : List Instr) {y : Nat} (hy : y < code.length) (hl : ldr code y = true) :
+    blockOf code y = pos (ldr code) y := by
+  rw [blockOf_eq code hy, pos_lead_succ code hl]; omega
+
+/-- The last address of a block lies in it, and the address after it starts a block. -/
+theorem blockEnd_spec (code : List Instr) {B : Nat} (hB : B < (leaders code).length) :
+    blockEnd code B < code.length ∧ blockOf code (blockEnd code B) = B ∧
+      (blockEnd code B + 1 < code.length → ldr code (blockEnd code B + 1) = true) := by
+  have hlen : (leaders code).length = pos (ldr code) code.length := rfl
+  unfold blockEnd
+  by_cases h : B + 1 < (leaders code).length
+  · have hspec := fl_getD_spec (ldr code) code.length (B + 1) h
+    rw [leaders_eq] at h ⊢
+    obtain ⟨h1, h2, h3⟩ := hspec
+    have hy0 : 1 ≤ (fl (ldr code) code.length).getD (B + 1) 0 := by
+      by_cases h0 : (fl (ldr code) code.length).getD (B + 1) 0 = 0
+      · rw [h0] at h3; simp [pos, fl] at h3
+      · omega
+    have e1 : (fl (ldr code) code.length).getD (B + 1) code.length =
+        (fl (ldr code) code.length).getD (B + 1) 0 := by
+      rw [List.getD_eq_getElem?_getD, List.getD_eq_getElem?_getD, List.getElem?_eq_getElem h]; rfl
+    rw [e1]
+    generalize (fl (ldr code) code.length).getD (B + 1) 0 = y at h1 h2 h3 hy0 ⊢
+    refine ⟨by omega, ?_, fun _ => ?_⟩
+    · rw [blockOf_eq code (by omega)]
+      have : y - 1 + 1 = y := by omega
+      rw [this, h3]; omega
+    · have : y - 1 + 1 = y := by omega
+      rw [this]; exact h1
+  · have e1 : (leaders code).getD (B + 1) code.length = code.length := by
+      rw [List.getD_eq_getElem?_getD, List.getElem?_eq_none (by omega)]; rfl
+    rw [e1]
+    have hn : 0 < code.length := by
+      by_cases h0 : code.length = 0
+      · exfalso
+        have : (leaders code).length = 0 := by simp [leaders, h0]
+        omega
+      · omega
+    refine ⟨by omega, ?_, fun h' => by omega⟩
+    rw [blockOf_eq code (by omega)]
+    have : code.length - 1 + 1 = code.length := by omega
+    rw [this, ← hlen]; omega
+
+/-- A block edge is the successor step of the last instruction of the block. -/
+theorem blockSucc_step (code : List Instr) {a b : Nat} (hb : b ∈ blockSucc code a) :
+    ∃ c, StepI code (blockEnd code a) c ∧ blockOf code c = b := by
+  unfold blockSucc at hb
+  unfold StepI
+  cases hi : code.getD (blockEnd code a) .halt <;> simp only [hi] at hb ⊢
+  · by_cases h : blockEnd code a + 1 < code.length
+    · simp only [h, ↓reduceIte, List.mem_singleton] at hb
+      exact ⟨_, rfl, hb.symm⟩
+    · simp [h] at hb
+  · simp only [List.mem_singleton] at hb
+    exact ⟨_, rfl, hb.symm⟩
+  · simp only [List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at hb
+    rcases hb with h | h
+    · exact ⟨_, Or.inl rfl, h.symm⟩
+    · exact ⟨_, Or.inr rfl, h.symm⟩
+  · simp at hb
+
+theorem ldr_target (code : List Instr) {e t : Nat} (he : e < code.length)
+    (h : (code.getD e .halt).target = some t) : ldr code t = true := by
+  simp only [ldr, isLeader, Bool.or_eq_true, List.any_eq_true]
+  exact Or.inr ⟨e, List.mem_range.2 he, by rw [h]; simp⟩
+
+theorem ldr_next (code : List Instr) {e : Nat} (he : e < code.length)
+    (h : (code.getD e .halt).isTerm = true) : ldr code (e + 1) = true := by
+  simp only [ldr, isLeader, Bool.or_eq_true, List.any_eq_true]
+  exact Or.inr ⟨e, List.mem_range.2 he, by rw [h]; simp⟩
+
+/-- A backward step leaves a jump and enters a leader; the address after it starts a block. -/
+theorem back_leaders (code : List Instr) {e c : Nat} (he : e < code.length) (hs : StepI code e c) (hce : c ≤ e) :
+    ldr code c = true ∧ ldr code (e + 1) = true := by
+  unfold StepI at hs
+  cases hi : code.getD e .halt <;> simp only [hi] at hs
+  · omega
+  · subst hs
+    exact ⟨ldr_target code he (by rw [hi]; rfl), ldr_next code he (by rw [hi]; rfl)⟩
+  · rcases hs with h | h
+    · subst h
+      exact ⟨ldr_target code he (by rw [hi]; rfl), ldr_next code he (by rw [hi]; rfl)⟩
+    · omega
 
 end SmcIrred.Lang
