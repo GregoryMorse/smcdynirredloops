@@ -57,7 +57,7 @@ theorem lnk_last (n x : Nat) : ∀ (pre : List Nat), (pre ++ [x]).Nodup → lnk 
 theorem walk_step {g : Digraph} (hneg : ∀ x, x < g.n → nneg x < g.n) {s : SState} {x : Nat} (hxn : x < g.n)
     (hsx : s.set x ≠ g.n) {m : VM} (hst : m.st = .run) (hmem : ∀ a, m.mem a = img g s a ∨ FreeC g s a)
     (hpc : m.pc = base g.n x + 31) :
-    (s.set x = s.set (nneg x) → ∃ m', Rn g m m' ∧ m'.st = .unsat) ∧
+    (s.set x = s.set (nneg x) → ∃ m', Rn g m m' ∧ m'.st = .unsat ∧ m'.mem = m.mem) ∧
     (s.set x ≠ s.set (nneg x) → ∃ m', Rn g m m' ∧ m'.st = .run ∧ m'.mem = m.mem ∧ m'.pc = base g.n x + 35 ∧
       m'.sol = (if nneg x ∈ m.sol then m.sol else x :: m.sol)) := by
   have hnx : nneg x < g.n := hneg x hxn
@@ -86,7 +86,7 @@ theorem walk_step {g : Digraph} (hneg : ∀ x, x < g.n → nneg x < g.n) {s : SS
       eff_jc_false (g := g) (m := m1) st1 (by rw [mem1, p1]; exact f32) hev
     have p2 : m2.pc = base g.n x + 33 := by omega
     have hj : m2.mem m2.pc = .jmp .unsat := by rw [mem2, mem1, p2]; exact f33
-    exact ⟨_, R1.trans (R2.trans (Rn.of_step (step_unsat st2 hj))), rfl⟩
+    exact ⟨_, R1.trans (R2.trans (Rn.of_step (step_unsat st2 hj))), rfl, by simp [step_unsat st2 hj, mem2, mem1]⟩
   · intro hq
     have hev : (Cnd.regNeSet x).eval g m1 = some true := by
       simp only [Cnd.eval, dataAt, mem1, fN, reg1, Option.map]
@@ -114,7 +114,7 @@ theorem vm_walk {g : Digraph} (hneg : ∀ x, x < g.n → nneg x < g.n) {s : SSta
     ∀ (xs pre : List Nat) (x : Nat) (m : VM) (sol : List Nat), s.chain = pre ++ x :: xs → m.st = .run →
       (∀ a, m.mem a = img g s a ∨ FreeC g s a) → m.pc = base g.n x + 31 → m.sol = sol →
       ∃ m', Rn g m m' ∧ (sSolFold s.set (x :: xs) sol = none → m'.st = .unsat) ∧
-        (∀ r, sSolFold s.set (x :: xs) sol = some r → m'.st = .sat ∧ m'.sol = r) := by
+        (∀ r, sSolFold s.set (x :: xs) sol = some r → m'.st = .sat ∧ m'.sol = r) ∧ m'.mem = m.mem := by
   intro xs
   induction xs with
   | nil =>
@@ -123,8 +123,8 @@ theorem vm_walk {g : Digraph} (hneg : ∀ x, x < g.n → nneg x < g.n) {s : SSta
     have hxn := hlt x hx
     obtain ⟨hA, hB⟩ := walk_step hneg hxn (hset x hx) hst hmem hpc
     by_cases hq : s.set x = s.set (nneg x)
-    · obtain ⟨m', R, st⟩ := hA hq
-      refine ⟨m', R, fun _ => st, ?_⟩
+    · obtain ⟨m', R, st, mm⟩ := hA hq
+      refine ⟨m', R, fun _ => st, ?_, mm⟩
       intro r hr
       simp [sSolFold, hq] at hr
     · obtain ⟨m3, R3, st3, mem3, pc3, sol3⟩ := hB hq
@@ -137,21 +137,23 @@ theorem vm_walk {g : Digraph} (hneg : ∀ x, x < g.n → nneg x < g.n) {s : SSta
         rw [hc]
         rw [lnk_last g.n x pre (by rw [← hc]; exact hnd)]
       have hj : m3.mem m3.pc = .jmp .sat := by rw [pc3]; exact f35
-      refine ⟨_, R3.trans (Rn.of_step (step_sat st3 hj)), fun h => by simp [sSolFold, hq] at h, ?_⟩
-      intro r hr
-      simp only [sSolFold, hq, if_false] at hr
-      simp only [sSolFold, Option.some.injEq] at hr
-      refine ⟨rfl, ?_⟩
-      show m3.sol = r
-      rw [sol3, hsol, hr]
+      refine ⟨_, R3.trans (Rn.of_step (step_sat st3 hj)), fun h => by simp [sSolFold, hq] at h, ?_, ?_⟩
+      · intro r hr
+        simp only [sSolFold, hq, if_false] at hr
+        simp only [sSolFold, Option.some.injEq] at hr
+        refine ⟨rfl, ?_⟩
+        show m3.sol = r
+        rw [sol3, hsol, hr]
+      · show m3.mem = m.mem
+        exact mem3
   | cons y xs ih =>
     intro pre x m sol hc hst hmem hpc hsol
     have hx : x ∈ s.chain := by rw [hc]; simp
     have hxn := hlt x hx
     obtain ⟨hA, hB⟩ := walk_step hneg hxn (hset x hx) hst hmem hpc
     by_cases hq : s.set x = s.set (nneg x)
-    · obtain ⟨m', R, st⟩ := hA hq
-      refine ⟨m', R, fun _ => st, ?_⟩
+    · obtain ⟨m', R, st, mm⟩ := hA hq
+      refine ⟨m', R, fun _ => st, ?_, mm⟩
       intro r hr
       simp [sSolFold, hq] at hr
     · obtain ⟨m3, R3, st3, mem3, pc3, sol3⟩ := hB hq
@@ -166,15 +168,16 @@ theorem vm_walk {g : Digraph} (hneg : ∀ x, x < g.n → nneg x < g.n) {s : SSta
       have hj : m3.mem m3.pc = .jmp (.at (base g.n y + 31)) := by rw [pc3]; exact f35
       obtain ⟨m4, R4, st4, mem4, pc4, reg4, stk4, sol4⟩ := eff_jmp (g := g) (m := m3) st3 hj
       have hc' : s.chain = (pre ++ [x]) ++ y :: xs := by rw [hc]; simp
-      obtain ⟨m5, R5, hu, hs⟩ := ih (pre ++ [x]) y m4 (if nneg x ∈ sol then sol else x :: sol) hc' st4
+      obtain ⟨m5, R5, hu, hs, mm5⟩ := ih (pre ++ [x]) y m4 (if nneg x ∈ sol then sol else x :: sol) hc' st4
         (fun a => by rw [mem4, mem3]; exact hmem a) pc4 (by rw [sol4, sol3, hsol])
-      refine ⟨m5, R3.trans (R4.trans R5), ?_, ?_⟩
+      refine ⟨m5, R3.trans (R4.trans R5), ?_, ?_, ?_⟩
       · intro h
         apply hu
         simpa [sSolFold, hq] using h
       · intro r hr
         apply hs
         simpa [sSolFold, hq] using hr
+      · rw [mm5, mem4, mem3]
 
 
 theorem Vm.VR.oc {g : Digraph} {s : SState} {oc : Nat} {m : VM} (h : VR g s oc m) (hs : ∀ c ∈ s.stk, c ≠ none) (oc' : Nat) :

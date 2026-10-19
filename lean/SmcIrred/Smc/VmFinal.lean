@@ -46,7 +46,8 @@ theorem vmResult_sat {g : Digraph} {K : Nat} {m' : VM} (h : run g K (VM.init g) 
 lists stay in range and whose node set is closed under `nneg`. -/
 theorem vm_correct_gen (g : Digraph) (hG : ∀ x w, w ∈ g.succ x → w < g.n) (hneg : ∀ x, x < g.n → nneg x < g.n) :
     ∃ fuel, vmResult g fuel = some (sSolFold (sRun g (g.n - 1) (List.range g.n) (SState.init g.n)).set
-      (sRun g (g.n - 1) (List.range g.n) (SState.init g.n)).chain []) := by
+      (sRun g (g.n - 1) (List.range g.n) (SState.init g.n)).chain []) ∧
+      ∃ s0 : SState, ∀ a, (run g fuel (VM.init g)).mem a = img g s0 a ∨ FreeC g s0 a := by
   have hCS := callSpec_all hG (g.n - 1)
   have hv0 : VR g (SState.init g.n) 0 (VM.init g) :=
     ⟨rfl, rfl, rfl, fun a => Or.inl (congrFun (image_eq_img g) a), List.nodup_nil⟩
@@ -72,25 +73,33 @@ theorem vm_correct_gen (g : Digraph) (hG : ∀ x w, w ∈ g.succ x → w < g.n) 
     obtain ⟨K, hK⟩ : ∃ K, run g K (VM.init g) = { m3 with st := .sat } :=
       (R1.trans (R2.trans (R3.trans (Rn.of_step (step_sat st3 c2'))))
         : Rn g (VM.init g) { m3 with st := .sat })
-    refine ⟨K, ?_⟩
-    rw [vmResult_sat hK rfl]
-    simp [sSolFold, hsol3]
+    refine ⟨K, ?_, S, fun a => ?_⟩
+    · rw [vmResult_sat hK rfl]
+      simp [sSolFold, hsol3]
+    · rw [hK]
+      show m3.mem a = img g S a ∨ FreeC g S a
+      rw [mem3]
+      exact hv2.mem a
   | cons c cs =>
     have c2' : m3.mem m3.pc = .jmp (.at (base g.n c + 31)) := by rw [c2, hc]; rfl
     obtain ⟨m4, R4, st4, mem4, pc4, reg4, stk4, sol4⟩ := eff_jmp (g := g) (m := m3) st3 c2'
     have hmem : ∀ a, m4.mem a = img g S a ∨ FreeC g S a := fun a => by rw [mem4, mem3]; exact hv2.mem a
-    obtain ⟨m5, R5, hu, hs⟩ := vm_walk hneg hv2.nodup hlt hset cs [] c m4 [] (by rw [hc]; rfl) st4 hmem pc4
+    obtain ⟨m5, R5, hu, hs, mm5⟩ := vm_walk hneg hv2.nodup hlt hset cs [] c m4 [] (by rw [hc]; rfl) st4 hmem pc4
       (by rw [sol4, hsol3])
     obtain ⟨K, hK⟩ : ∃ K, run g K (VM.init g) = m5 := R1.trans (R2.trans (R3.trans (R4.trans R5)))
-    refine ⟨K, ?_⟩
-    cases hr : sSolFold S.set (c :: cs) [] with
-    | none => rw [vmResult_unsat hK (hu hr)]
-    | some r =>
-      obtain ⟨hs1, hs2⟩ := hs r hr
-      rw [vmResult_sat hK hs1, hs2]
+    refine ⟨K, ?_, S, fun a => ?_⟩
+    · cases hr : sSolFold S.set (c :: cs) [] with
+      | none => rw [vmResult_unsat hK (hu hr)]
+      | some r =>
+        obtain ⟨hs1, hs2⟩ := hs r hr
+        rw [vmResult_sat hK hs1, hs2]
+    · rw [hK, mm5, mem4, mem3]
+      exact hv2.mem a
 
 /-- G28: the instruction-level virtual machine of the stamped image computes `smcSolve`. -/
-theorem vm_correct (f : TwoSat) (hw : f.Wf) : ∃ fuel, vmResult f.graph fuel = some (smcSolve f) :=
-  vm_correct_gen f.graph (graph_succ_lt f hw) (fun x hx => nneg_lt hx)
+theorem vm_correct (f : TwoSat) (hw : f.Wf) : ∃ fuel, vmResult f.graph fuel = some (smcSolve f) ∧
+    ∃ s0 : SState, ∀ a, (run f.graph fuel (VM.init f.graph)).mem a = img f.graph s0 a ∨ FreeC f.graph s0 a := by
+  obtain ⟨fuel, h1, h2⟩ := vm_correct_gen f.graph (graph_succ_lt f hw) (fun x hx => nneg_lt hx)
+  exact ⟨fuel, h1, h2⟩
 
 end SmcIrred

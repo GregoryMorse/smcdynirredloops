@@ -18,7 +18,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R6c | G23 (re-emitted duplicates are exactly the roots; needs a done-vertex root invariant) | must | done 2026-10-18 |
 | R7 | SMC 2-SAT solver Level 2 ⇒ Tarjan/APT; restamp lemma | must | done 2026-10-18 |
 | R8 | SMC solver VM level (should); native vectors and listing evidence (must) | must/should | DONE 2026-10-18 (items 2–3; item 1 and G27 -> R8b) |
-| R8b | G27 step bound for the Level 2 machine; G28 VM instruction-list refinement (R8 item 1) | should | PARTIAL 2026-10-19 (G27 done; G28 -> R8c) |
+| R8b | G27 step bound for the Level 2 machine; G28 VM instruction-list refinement (R8 item 1) | should | DONE 2026-10-19 (G27, G28 closed) |
 | R9 | Planted 2-SAT generator (§3.1, P04) | must | DONE 2026-10-18 |
 | R10 | Boolean-CFG VM: order independence, data-independent counts, subgraphs | must | DONE |
 | R11 | Gate primitives, decoders, adders (P05), DSL compiler correctness | must | DONE 2026-10-18 (DSL compiler, graph-level adder, Circ.val bridge -> G30/R13) |
@@ -230,9 +230,9 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Done: regenerated the AES and RSA graphs after the code fixes (`SMCIRRED_SEED=1`, scratchpad copy so tracked `generated/` is untouched, `limited_run.py`, peak < 250 MB). Static nodes/edges for AES-128/192/256 and RSA-32/64/128/256 and the executed node counts equal Tables 1-2 (`validation/data/table_regen.json`); AES executed-edge counts vary with the random dependency order (541018-541694 for AES-256). Evidence class M, not proof.
 - Not done (R16b: G06, G07, G38): Lean `Spec/Data` and ratio checks (C60, C61), the GMP re-measure for P10, P11 provenance, RSA-512/1024.
 
-## R8b handoff (2026-10-19, partial)
+## R8b handoff (2026-10-19, done)
 - Done: `Smc/Cost`: instrumented mirrors `cExtract`, `cLeave`, `cLoop`, `cBody`, `cCall`, `cntRun` of the Level 2 machine with a count of primitive operations (calls, entries, exits, loop iterations, popped cells, outer-loop iterations); `cntRun_state` and friends prove the state component is the machine itself; potential `mPot` (weight `2·outdeg + 4` per node without an `ent` entry) gives `cCall_bound`, `cntRun_bound`; `chain_le` (the chain is a duplicate-free node list, via `sRun_sim`); `smcSteps_le`: `smcSteps f ≤ 2·|E| + 7·|V|`. Primitive operations only, not processor cycles.
-- Not done (G28 -> R8c): transcription of the `selfmodvmtwosat` instruction list and its refinement of Level 2.
+- Done (G28): `Spec/SmcVm` (VM model: 36-instruction blueprint, MODINST patches, interpreter), `Smc/VmRel`, `VmStep`, `VmEnter`, `VmCall`, `VmLoop`, `VmExtract`, `VmLeave`, `VmSim`, `VmRun`, `VmFinal`: `vm_correct` (the stamped image computes `smcSolve f`); `VmRestamp`: `restamp_cover`, `vm_rounds_replicate` (G25). The instruction list is a Lean transcription; fidelity to the C++ listing is evidence.
 - Build green, axiom audit 0 violations (5082 declarations).
 
 ## R14b handoff (2026-10-19, partial)

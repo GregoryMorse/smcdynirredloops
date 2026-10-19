@@ -76,6 +76,7 @@ public import SmcIrred.Smc.VmLeave
 public import SmcIrred.Smc.VmSim
 public import SmcIrred.Smc.VmRun
 public import SmcIrred.Smc.VmFinal
+public import SmcIrred.Smc.VmRestamp
 public import SmcIrred.Smc.Restamp
 public import SmcIrred.Smc.Cost
 public import SmcIrred.Gen.Planted

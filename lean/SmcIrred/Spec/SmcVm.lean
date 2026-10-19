@@ -247,4 +247,33 @@ structure VM where
   | .unsat => some none
   | _ => none
 
+/-- The offsets inside a block that the restamp resets: the visited marker and its `load`/`ret` (0, 1), the peek patch
+(5), the counter (10), the depth checks (13, 20), the lowlink check (22), the lowlink (29), the return jump (30), the
+component (31) and the chain link (35). -/
+@[expose] def patchOffsets : List Nat := [0, 1, 5, 10, 13, 20, 22, 29, 30, 31, 35]
+
+/-- The declared patch cells: the index cell, the tail pointer, the head jump and the `patchOffsets` of every block. -/
+@[expose] def declared (g : Digraph) (a : Nat) : Bool :=
+  a == 0 || a == g.n + 1 || a == g.n + 2 ||
+    (decide (g.n + 3 ≤ a) && decide ((a - (g.n + 3)) / 36 < g.n) && decide ((a - (g.n + 3)) % 36 ∈ patchOffsets))
+
+/-- Restamping (Fig. 2b "Reuse") at the level of the instruction memory: the declared cells are reset to the stamped
+image, every other cell is kept. -/
+@[expose] def restampMem (g : Digraph) (mem : Nat → Ins) : Nat → Ins := fun a => if declared g a then image g a else mem a
+
+/-- The machine after a restamp: the stamped memory, a fresh start, empty stack and solution set. -/
+@[expose] def vmRestamp (g : Digraph) (m : VM) : VM := ⟨restampMem g m.mem, 0, 0, [], [], .run⟩
+
+/-- The answer of a finished run (`none`: it did not finish). -/
+@[expose] def vmAnswer (m : VM) : Option (Option (List Nat)) :=
+  match m.st with
+  | .sat => some (some m.sol)
+  | .unsat => some none
+  | _ => none
+
+/-- `k` successive queries of the stamped image, each run for `fuel` steps and followed by a restamp. -/
+@[expose] def vmRounds (g : Digraph) (fuel : Nat) : Nat → VM → List (Option (Option (List Nat)))
+  | 0, _ => []
+  | k + 1, m => vmAnswer (run g fuel m) :: vmRounds g fuel k (vmRestamp g (run g fuel m))
+
 end SmcIrred.Vm
