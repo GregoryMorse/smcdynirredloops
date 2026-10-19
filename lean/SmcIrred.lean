@@ -122,6 +122,7 @@ public import SmcIrred.Lang.Blocks
 public import SmcIrred.Lang.StructRed
 public import SmcIrred.Lang.NonRed
 public import SmcIrred.Lang.Fwd
+public import SmcIrred.Lang.Protect
 public import SmcIrred.Spec.IrredLoop
 public import SmcIrred.Spec.Flatten
 public import SmcIrred.Struct.Machine
