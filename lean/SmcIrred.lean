@@ -126,6 +126,11 @@ public import SmcIrred.Lang.Protect
 public import SmcIrred.Lang.ProtIrred
 public import SmcIrred.Lang.Insert
 public import SmcIrred.Lang.EntryCycle
+public import SmcIrred.Lang.SubAt
+public import SmcIrred.Lang.ProtectCode
+public import SmcIrred.Lang.ProtectCtx
+public import SmcIrred.Lang.Insert1
+public import SmcIrred.Lang.ProtectClose
 public import SmcIrred.Spec.IrredLoop
 public import SmcIrred.Spec.Flatten
 public import SmcIrred.Struct.Machine
@@ -142,6 +147,7 @@ public import SmcIrred.Dynamic.StaticScheme
 public import SmcIrred.Dynamic.StaticSchemeGeneral
 public import SmcIrred.Gen.Construct
 public import SmcIrred.Data.ProtectedSpecs
+public import SmcIrred.Data.Tables
 public import SmcIrred.Spec.Threat
 public import SmcIrred.Threat.Correct
 public import SmcIrred.Threat.Recover
