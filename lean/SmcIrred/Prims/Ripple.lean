@@ -13,7 +13,7 @@ theorem cout_sub_eq : ∀ a b c : Bool, cout a b c true = ((!a && b) || (c && !(
 /-- The combined carry/borrow equation of the paper: `(a ⊕ s) ∧ b ∨ c ∧ (a ⊕ b ⊕ s)`. -/
 theorem cout_combined : ∀ a b c s : Bool, cout a b c s = (((a != s) && b) || (c && ((a != b) != s))) := by decide
 
-def b2n (b : Bool) : Nat := if b then 1 else 0
+@[expose] def b2n (b : Bool) : Nat := if b then 1 else 0
 
 /-- With the published carry `c_{i+1}` in place of `c_i`, the one-bit sum `1+1+0` would be `1`, not `0`. -/
 theorem published_add_fails : b2n ((true != true) != cout true true false false) ≠ (1 + 1) % 2 := by decide

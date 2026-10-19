@@ -86,6 +86,8 @@ public import SmcIrred.Prims.Cost
 public import SmcIrred.Prims.DecCount
 public import SmcIrred.Prims.Adder
 public import SmcIrred.Prims.Ripple
+public import SmcIrred.Prims.Bridge
+public import SmcIrred.Prims.AdderGraph
 public import SmcIrred.Spec.AES
 public import SmcIrred.AES.Check
 public import SmcIrred.AES.TabSbox
@@ -131,6 +133,7 @@ public import SmcIrred.Lang.ProtectCode
 public import SmcIrred.Lang.ProtectCtx
 public import SmcIrred.Lang.Insert1
 public import SmcIrred.Lang.ProtectClose
+public import SmcIrred.Lang.Window
 public import SmcIrred.Spec.IrredLoop
 public import SmcIrred.Spec.Flatten
 public import SmcIrred.Struct.Machine
