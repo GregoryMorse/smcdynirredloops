@@ -29,6 +29,20 @@ theorem forall_rows (s n : Nat) (f : Nat → Nat → Bool)
   intro a h1 h2 b hb
   exact forall_lt 256 (f a) (List.all_eq_true.1 h a (List.mem_range'_1.2 ⟨h1, h2⟩)) b hb
 
+/-- A one-variable check over `[0, n * k)` proved in `k` blocks of `n`. -/
+theorem forall_chunks (f : Nat → Bool) (n k : Nat)
+    (h : ∀ j, j < k → (List.range' (n * j) n).all f = true) : ∀ x, x < n * k → f x = true := by
+  intro x hx
+  have hn : 0 < n := by
+    cases n with
+    | zero => simp at hx
+    | succ n => omega
+  have hq : x / n < k := (Nat.div_lt_iff_lt_mul hn).2 (by rw [Nat.mul_comm]; exact hx)
+  have h1 : n * (x / n) ≤ x := Nat.mul_div_le x n
+  have h2 : x % n < n := Nat.mod_lt x hn
+  have h3 : n * (x / n) + x % n = x := Nat.div_add_mod x n
+  exact forall_range (n * (x / n)) n f (h (x / n) hq) x h1 (by omega)
+
 /-- A chunked proof of a one-variable check over `[0, 256)`: four blocks of 64. -/
 theorem forall_lt_4 (f : Nat → Bool)
     (h0 : (List.range' 0 64).all f = true) (h1 : (List.range' 64 64).all f = true)

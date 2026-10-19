@@ -118,6 +118,15 @@ import SmcIrred.Lang.MinEdges
 import SmcIrred.Lang.Induce
 import SmcIrred.Lang.NWay
 import SmcIrred.Lang.General
+import SmcIrred.Lang.Struct
+import SmcIrred.Lang.Blocks
+import SmcIrred.Lang.StructRed
+import SmcIrred.Lang.NonRed
+import SmcIrred.Lang.Fwd
+import SmcIrred.Lang.Protect
+import SmcIrred.Lang.ProtIrred
+import SmcIrred.Lang.Insert
+import SmcIrred.Lang.EntryCycle
 import SmcIrred.Spec.IrredLoop
 import SmcIrred.Spec.Flatten
 import SmcIrred.Struct.Machine
@@ -131,6 +140,9 @@ import SmcIrred.Lang.Congr
 import SmcIrred.Dynamic.FinalExec
 import SmcIrred.Dynamic.Fault
 import SmcIrred.Dynamic.StaticScheme
+import SmcIrred.Dynamic.StaticSchemeGeneral
+import SmcIrred.Gen.Construct
+import SmcIrred.Data.ProtectedSpecs
 import SmcIrred.Spec.Threat
 import SmcIrred.Threat.Correct
 import SmcIrred.Threat.Recover
