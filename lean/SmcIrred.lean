@@ -88,6 +88,8 @@ public import SmcIrred.Prims.Adder
 public import SmcIrred.Prims.Ripple
 public import SmcIrred.Prims.Bridge
 public import SmcIrred.Prims.AdderGraph
+public import SmcIrred.Spec.BvDsl
+public import SmcIrred.Prims.BvDsl
 public import SmcIrred.Spec.AES
 public import SmcIrred.AES.Check
 public import SmcIrred.AES.TabSbox

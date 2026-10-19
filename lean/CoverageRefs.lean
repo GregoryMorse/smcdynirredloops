@@ -89,6 +89,8 @@ import SmcIrred.Prims.Adder
 import SmcIrred.Prims.Ripple
 import SmcIrred.Prims.Bridge
 import SmcIrred.Prims.AdderGraph
+import SmcIrred.Spec.BvDsl
+import SmcIrred.Prims.BvDsl
 import SmcIrred.Spec.AES
 import SmcIrred.AES.Check
 import SmcIrred.AES.TabSbox
@@ -247,7 +249,9 @@ set_option maxErrors 100000
 #check @SmcIrred.ripple_add
 #check @SmcIrred.ripple_sub
 #check @SmcIrred.cout_combined
-#check @SmcIrred.addLoop
+#check @SmcIrred.adderBits_add_eq
+#check @SmcIrred.adderBits_sub_eq
+#check @SmcIrred.comp_correct
 #check @SmcIrred.AES.sbox_table
 #check @SmcIrred.AES.invSbox_table
 #check @SmcIrred.AES.ginv_mul
