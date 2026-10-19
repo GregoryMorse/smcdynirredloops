@@ -70,7 +70,9 @@ import SmcIrred.Smc.Restamp
 import SmcIrred.Smc.Cost
 import SmcIrred.Gen.Planted
 import SmcIrred.Spec.Circuit
+import SmcIrred.Spec.RunStat
 import SmcIrred.Circuit.CodeModel
+import SmcIrred.Circuit.RunStat
 import SmcIrred.Circuit.Order
 import SmcIrred.Circuit.Counts
 import SmcIrred.Spec.Gates
@@ -191,6 +193,10 @@ set_option maxErrors 100000
 #check @SmcIrred.runPass_eq_circ_val
 #check @SmcIrred.costAt_uniform
 #check @SmcIrred.CostWitness.gate_data_dependent
+#check @SmcIrred.pyEdges_eq
+#check @SmcIrred.pyEdges_data_dependent
+#check @SmcIrred.dictOf_total_uniform
+#check @SmcIrred.dictOf_total_nonuniform
 #check @SmcIrred.smcSolve_spec
 #check @SmcIrred.sRun_sim
 #check @SmcIrred.smcSteps_le

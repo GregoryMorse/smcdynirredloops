@@ -69,7 +69,9 @@ public import SmcIrred.Smc.Restamp
 public import SmcIrred.Smc.Cost
 public import SmcIrred.Gen.Planted
 public import SmcIrred.Spec.Circuit
+public import SmcIrred.Spec.RunStat
 public import SmcIrred.Circuit.CodeModel
+public import SmcIrred.Circuit.RunStat
 public import SmcIrred.Circuit.Order
 public import SmcIrred.Circuit.Counts
 public import SmcIrred.Spec.Gates
