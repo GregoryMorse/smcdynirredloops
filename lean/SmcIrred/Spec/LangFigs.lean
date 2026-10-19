@@ -72,6 +72,23 @@ theorem fig5bS_eq : fig5bS = prot5 blkA blkB := rfl
 
 theorem fig6bS_eq : fig6bS = prot6 .c blkA blkB := rfl
 
+
+/-! ### The protected forms with the toggled loop variable (Figures 5(c) and 6(c)) for arbitrary code
+
+`protC h S T` is `if (h) goto labelT; while (trueThenFalse) { S; labelT: T; }` (label `9`): Figure 5(c) with `S`, `T` in place of
+the blocks `A`, `B`.  `protC6 cd h S T` is `if (h) goto labelS; while (cd && trueThenFalse) { labelS: S; } T;` (label `8`):
+Figure 6(c) for `if (cd) S; T`. -/
+
+@[expose] def protC (h : Cond) (S T : Stmt) : Stmt :=
+  .seq (.ifGoto h 9) (.while .ttf (.seq S (.lab 9 T)))
+
+@[expose] def protC6 (cd h : Cond) (S T : Stmt) : Stmt :=
+  .seq (.ifGoto h 8) (.seq (.while (.and cd .ttf) (.lab 8 S)) T)
+
+theorem fig5cS_eq : fig5cS = protC (.out 1) blkA blkB := rfl
+
+theorem fig6cS_eq : fig6cS = protC6 .c (.out 1) blkA blkB := rfl
+
 /-! ### The graphs as drawn (published Figures 5 and 6)
 
 The invisible entry nodes of the drawings (`i0`, `i00`: one outside edge into `A` or `B`) are one entry vertex `0`;

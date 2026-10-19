@@ -134,6 +134,7 @@ public import SmcIrred.Lang.ProtectCtx
 public import SmcIrred.Lang.Insert1
 public import SmcIrred.Lang.ProtectClose
 public import SmcIrred.Lang.Window
+public import SmcIrred.Lang.ProtectW
 public import SmcIrred.Spec.IrredLoop
 public import SmcIrred.Spec.Flatten
 public import SmcIrred.Struct.Machine
