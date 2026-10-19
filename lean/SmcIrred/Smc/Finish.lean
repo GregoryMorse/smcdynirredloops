@@ -72,30 +72,41 @@ theorem sExtract_spec (n w : Nat) : ∀ (N tl : List Nat) (s : SState) (fuel : N
         · simp [hu]
         · simp [hu, e]
 
+/-- The own return cell is pushed exactly when nothing was pushed since the entry. -/
+@[expose] def leave5 (w : Nat) (s4 : SState) : SState :=
+  if s4.stk.length = s4.dep w then { s4 with stk := some w :: s4.stk } else s4
+
+theorem sLeave_def (n w : Nat) (s4 : SState) :
+    sLeave n w s4 = if (leave5 w s4).chk w then leave5 w s4 else sExtract n w (leave5 w s4).stk.length (leave5 w s4) := rfl
+
+theorem leave5_eq {t : TState} {s : SState} {pend : Option Nat} (h : SRel g t s pend) {v : Nat}
+    (hq : pend = none ∨ pend = some v) {N tl : List Nat} (hstk : t.stk = N ++ v :: tl) (hdep : s.dep v = tl.length)
+    (hN0 : pend = some v → N = []) :
+    leave5 v s = { s with stk := (N ++ v :: tl).map some } := by
+  unfold leave5
+  rcases hq with hq | hq
+  · subst hq
+    have hs : s.stk = (N ++ v :: tl).map some := by have := h.stk; simp only [StkRel] at this; rw [this, hstk]
+    have hne : ¬ s.stk.length = s.dep v := by rw [hs, hdep]; simp; omega
+    simp only [hne, ↓reduceIte]
+    rw [← hs]
+  · subst hq
+    obtain ⟨tl', e1, e2⟩ := h.stk
+    have hN := hN0 rfl
+    subst hN
+    have : tl' = tl := by rw [hstk] at e1; exact (List.cons.inj e1).2.symm
+    subst this
+    have hc : s.stk.length = s.dep v := by rw [e2, hdep]; simp
+    simp only [hc, ↓reduceIte]
+    rw [e2]; simp
+
 theorem sLeave_eq {t : TState} {s : SState} {pend : Option Nat} (h : SRel g t s pend) {v : Nat}
     (hq : pend = none ∨ pend = some v) {N tl : List Nat} (hstk : t.stk = N ++ v :: tl) (hdep : s.dep v = tl.length)
     (hN0 : pend = some v → N = []) :
     sLeave g.n v s = if s.chk v = true then { s with stk := (N ++ v :: tl).map some }
       else sExtract g.n v (N.length + 1 + tl.length) { s with stk := (N ++ v :: tl).map some } := by
-  have e5 : (if s.stk.length = s.dep v then { s with stk := some v :: s.stk } else s) =
-      ({ s with stk := (N ++ v :: tl).map some } : SState) := by
-    rcases hq with hq | hq
-    · subst hq
-      have hs : s.stk = (N ++ v :: tl).map some := by have := h.stk; simp only [StkRel] at this; rw [this, hstk]
-      have hne : ¬ s.stk.length = s.dep v := by rw [hs, hdep]; simp; omega
-      simp only [hne, ↓reduceIte]
-      rw [← hs]
-    · subst hq
-      obtain ⟨tl', e1, e2⟩ := h.stk
-      have hN := hN0 rfl
-      subst hN
-      have : tl' = tl := by rw [hstk] at e1; exact (List.cons.inj e1).2.symm
-      subst this
-      have hc : s.stk.length = s.dep v := by rw [e2, hdep]; simp
-      simp only [hc, ↓reduceIte]
-      rw [e2]; simp
-  unfold sLeave
-  simp only [e5]
+  have e5 := leave5_eq h hq hstk hdep hN0
+  rw [sLeave_def, e5]
   have hl : ({ s with stk := (N ++ v :: tl).map some } : SState).stk.length = N.length + 1 + tl.length := by simp; omega
   simp only [hl]
 

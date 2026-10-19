@@ -2,6 +2,7 @@ module
 
 public import SmcIrred.Spec.SmcVm
 public import SmcIrred.Smc.Solve
+public import SmcIrred.Smc.VmStep
 
 public section
 
@@ -132,5 +133,79 @@ theorem image_eq_img (g : Digraph) : image g = img g (SState.init g.n) := by
   by_cases hx : (a - (g.n + 3)) / 36 < g.n
   · rw [if_pos hx, blk_init]
   · rw [if_neg hx]
+
+theorem FreeC.mono {g : Digraph} {s s' : SState} (h : ∀ x, s.ent x ≠ none → s'.ent x ≠ none) {a : Nat}
+    (ha : FreeC g s a) : FreeC g s' a := by
+  obtain ⟨x, i, hx, e, hi, hne⟩ := ha
+  exact ⟨x, i, hx, e, hi, h x hne⟩
+
+theorem VR.fetch {g : Digraph} {s : SState} {oc : Nat} {m : VM} (h : VR g s oc m) {x i : Nat} (hx : x < g.n)
+    (hi : i < 36) (hf : (i ≠ 10 ∧ i ≠ 30) ∨ s.ent x = none) : m.mem (base g.n x + i) = blk g s x i := by
+  rcases h.mem (base g.n x + i) with h1 | ⟨x', i', hx', e, hi', hne⟩
+  · rw [h1, img_blk g s hx hi]
+  · exfalso
+    have hxi : x' = x ∧ i' = i := by unfold base at e; omega
+    obtain ⟨rfl, rfl⟩ := hxi
+    rcases hf with ⟨a1, a2⟩ | hn
+    · omega
+    · exact hne hn
+
+theorem blk_other {g : Digraph} (s : SState) {x i : Nat} (hs : i ∉ [0, 1, 5, 13, 20, 22, 29, 31, 35]) :
+    blk g s x i = blueprint g x i := by
+  simp only [List.mem_cons, List.not_mem_nil, or_false, not_or] at hs
+  obtain ⟨h0, h1, h5, h13, h20, h22, h29, h31, h35⟩ := hs
+  unfold blk
+  simp [h0, h1, h5, h13, h20, h22, h29, h31, h35]
+
+theorem VR.fetch_bp {g : Digraph} {s : SState} {oc : Nat} {m : VM} (h : VR g s oc m) {x i : Nat} (hx : x < g.n)
+    (hi : i < 36) (hf : (i ≠ 10 ∧ i ≠ 30) ∨ s.ent x = none) (hs : i ∉ [0, 1, 5, 13, 20, 22, 29, 31, 35]) :
+    m.mem (base g.n x + i) = blueprint g x i := by
+  rw [h.fetch hx hi hf, blk_other s hs]
+
+theorem VR.mem_zero {g : Digraph} {s : SState} {oc : Nat} {m : VM} (h : VR g s oc m) : m.mem 0 = .data s.idx := by
+  rcases h.mem 0 with h1 | ⟨x, i, hx, e, hi, hne⟩
+  · rw [h1, img_zero]
+  · exfalso; unfold base at e; omega
+
+theorem blk_congr_fields {g : Digraph} {s s' : SState} {x : Nat} (i : Nat) (he : s.ent x = s'.ent x)
+    (hp : s.pk x = s'.pk x) (hd : s.dep x = s'.dep x) (hc : s.chk x = s'.chk x) (hl : s.low x = s'.low x)
+    (hset : s.set x = s'.set x) (hch : i = 35 → lnk g.n s.chain x = lnk g.n s'.chain x) :
+    blk g s x i = blk g s' x i := by
+  unfold blk
+  rw [he, hp, hd, hc, hl, hset]
+  by_cases h35 : i = 35
+  · subst h35; simp [hch rfl]
+  · simp [h35]
+
+theorem img_congr {g : Digraph} {s s' : SState} (a : Nat) (h0 : a = 0 → s.idx = s'.idx)
+    (hc1 : a = g.n + 1 → tailSlot g.n s.chain = tailSlot g.n s'.chain)
+    (hc2 : a = g.n + 2 → headT g.n s.chain = headT g.n s'.chain)
+    (hb : ∀ x i, x < g.n → i < 36 → a = base g.n x + i → blk g s x i = blk g s' x i) : img g s a = img g s' a := by
+  unfold img
+  by_cases e0 : a = 0
+  · subst e0; simp [h0 rfl]
+  by_cases e1 : a ≤ g.n
+  · simp [e0, e1]
+  by_cases e2 : a = g.n + 1
+  · subst e2; simp [hc1 rfl]
+  by_cases e3 : a = g.n + 2
+  · subst e3; simp [hc2 rfl]
+  simp only [e0, e1, e2, e3, if_false]
+  by_cases hx : (a - (g.n + 3)) / 36 < g.n
+  · rw [if_pos hx, if_pos hx]
+    exact hb _ _ hx (Nat.mod_lt _ (by omega)) (by unfold base; omega)
+  · rw [if_neg hx, if_neg hx]
+
+theorem VR.mem_n1 {g : Digraph} {s : SState} {oc : Nat} {m : VM} (h : VR g s oc m) :
+    m.mem (g.n + 1) = .data (tailSlot g.n s.chain : Nat) := by
+  rcases h.mem (g.n + 1) with h1 | ⟨x, i, hx, e, hi, hne⟩
+  · rw [h1, img_n1]
+  · exfalso; unfold base at e; omega
+
+theorem VR.mem_n2 {g : Digraph} {s : SState} {oc : Nat} {m : VM} (h : VR g s oc m) :
+    m.mem (g.n + 2) = .jmp (headT g.n s.chain) := by
+  rcases h.mem (g.n + 2) with h1 | ⟨x, i, hx, e, hi, hne⟩
+  · rw [h1, img_n2]
+  · exfalso; unfold base at e; omega
 
 end SmcIrred.Vm

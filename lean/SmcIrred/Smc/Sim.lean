@@ -115,6 +115,36 @@ theorem tEdge_visited (F : Nat → Nat → TState → TState) (v w : Nat) (t : T
   simp only [hw, ↓reduceIte]
   by_cases h2 : w ∈ t.stk <;> simp [h2]
 
+/-- One edge of the successor loop: a visit of an unvisited successor or the stub of a visited one. -/
+theorem ssim_edge (g : Digraph) (v f : Nat)
+    (hF : ∀ (w : Nat) (t : TState) (s : SState) (pend : Option Nat), ScanQ g v t s pend → t.num w = 0 → w < g.n →
+      tUn t.num g.n ≤ f →
+      ScanQ g v (tVisit (revG g) f w (some v) t) (sStep v (sCall g f v w s)) none ∧
+      VPost t (tVisit (revG g) f w (some v) t) s (sStep v (sCall g f v w s)))
+    {t : TState} {s : SState} {pend : Option Nat} (h : ScanQ g v t s pend) {w : Nat} (hwn : w < g.n)
+    (hun : tUn t.num g.n ≤ f) :
+    ∃ pend1, ScanQ g v (tEdge (fun w p t => tVisit (revG g) f w (some p) t) v w t)
+          (sStep v (sCall g f v w s)) pend1 ∧
+        VPost t (tEdge (fun w p t => tVisit (revG g) f w (some p) t) v w t) s (sStep v (sCall g f v w s)) := by
+  by_cases h1 : t.num w = 0
+  · have hu : tEdge (fun w p t => tVisit (revG g) f w (some p) t) v w t =
+        tVisit (revG g) f w (some v) { t with ticks := t.ticks + 1 } := by
+      unfold tEdge; simp only [h1, ↓reduceIte]
+    rw [hu]
+    have := hF w { t with ticks := t.ticks + 1 } s pend (h.tick _) h1 hwn hun
+    exact ⟨none, this.1, this.2.tickL _⟩
+  · have hvis := h.vis
+    obtain ⟨hs1, hs2⟩ := tEdge_visited (fun w p t => tVisit (revG g) f w (some p) t) v w t h1
+    have hent : s.ent w ≠ none := fun e => h1 ((h.rel.none_iff w).1 e)
+    have hrel := ssim_visited_edge (g := g) (fun w p t => tVisit (revG g) f w (some p) t) f h.rel hvis h1
+    have hdep := sCall_visited_dep (g := g) f v w s hent
+    refine ⟨pend, ⟨hrel, h.hp, ?_, ?_⟩, ⟨?_, ⟨[], by simp [hs1]⟩, ?_⟩⟩
+    · obtain ⟨N, tl, e1, e2, e3⟩ := h.shape
+      exact ⟨N, tl, by rw [hs1]; exact e1, by rw [hdep]; exact e2, e3⟩
+    · rw [hs2]; exact h.vis
+    · intro u hu; rw [hs2]; exact hu
+    · intro u _; rw [hdep]
+
 theorem ssim_scan (g : Digraph) (v f : Nat)
     (hF : ∀ (w : Nat) (t : TState) (s : SState) (pend : Option Nat), ScanQ g v t s pend → t.num w = 0 → w < g.n →
       tUn t.num g.n ≤ f →
@@ -131,28 +161,7 @@ theorem ssim_scan (g : Digraph) (v f : Nat)
     intro t s pend h hw hun
     have hwn : w < g.n := hw w List.mem_cons_self
     have hws : ∀ x ∈ ws, x < g.n := fun x hx => hw x (List.mem_cons_of_mem _ hx)
-    have hstep : ∃ pend1, ScanQ g v (tEdge (fun w p t => tVisit (revG g) f w (some p) t) v w t)
-          (sStep v (sCall g f v w s)) pend1 ∧
-        VPost t (tEdge (fun w p t => tVisit (revG g) f w (some p) t) v w t) s (sStep v (sCall g f v w s)) := by
-      by_cases h1 : t.num w = 0
-      · have hu : tEdge (fun w p t => tVisit (revG g) f w (some p) t) v w t =
-            tVisit (revG g) f w (some v) { t with ticks := t.ticks + 1 } := by
-          unfold tEdge; simp only [h1, ↓reduceIte]
-        rw [hu]
-        have := hF w { t with ticks := t.ticks + 1 } s pend (h.tick _) h1 hwn hun
-        exact ⟨none, this.1, this.2.tickL _⟩
-      · have hvis := h.vis
-        obtain ⟨hs1, hs2⟩ := tEdge_visited (fun w p t => tVisit (revG g) f w (some p) t) v w t h1
-        have hent : s.ent w ≠ none := fun e => h1 ((h.rel.none_iff w).1 e)
-        have hrel := ssim_visited_edge (g := g) (fun w p t => tVisit (revG g) f w (some p) t) f h.rel hvis h1
-        have hdep := sCall_visited_dep (g := g) f v w s hent
-        refine ⟨pend, ⟨hrel, h.hp, ?_, ?_⟩, ⟨?_, ⟨[], by simp [hs1]⟩, ?_⟩⟩
-        · obtain ⟨N, tl, e1, e2, e3⟩ := h.shape
-          exact ⟨N, tl, by rw [hs1]; exact e1, by rw [hdep]; exact e2, e3⟩
-        · rw [hs2]; exact h.vis
-        · intro u hu; rw [hs2]; exact hu
-        · intro u _; rw [hdep]
-    obtain ⟨pend1, hq1, hp1⟩ := hstep
+    obtain ⟨pend1, hq1, hp1⟩ := ssim_edge g v f hF h hwn hun
     have hun1 : tUn (tEdge (fun w p t => tVisit (revG g) f w (some p) t) v w t).num g.n ≤ f :=
       Nat.le_trans (tUn_mono (s := t) (fun u hu => hp1.mono u hu) g.n) hun
     obtain ⟨pend2, hq2, hp2⟩ := ih _ _ pend1 hq1 hws hun1

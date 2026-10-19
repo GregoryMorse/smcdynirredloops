@@ -76,6 +76,64 @@ theorem visit_close (g : Digraph) {t tS : TState} {s s1 sL : SState} {pend pend2
     · exact ⟨N' ++ [w], by show (tFinish w none tS).stk = _; rw [hB, e4']; simp⟩
   · exact hdepu
 
+theorem visit_enter_q (g : Digraph) {t : TState} {s : SState} {pend : Option Nat} {x w f : Nat}
+    (h : ScanQ g x t s pend) (hw0 : t.num w = 0) (hwn : w < g.n) (hun : tUn t.num g.n ≤ f + 1) :
+    ScanQ g w (tEnterSt t w) (sEnter w (sPre x w s)) (some w) ∧ tUn (tEnterSt t w).num g.n ≤ f ∧
+    (sEnter w (sPre x w s)).dep w = t.stk.length ∧ ∀ u, u ≠ w → (sEnter w (sPre x w s)).dep u = s.dep u := by
+  have hrel1 := ssim_enter_call h.rel hw0 hwn (scanQ_pend h) h.hp
+  have hdep1 : (sEnter w (sPre x w s)).dep w = t.stk.length := by
+    obtain ⟨tl, e1, e2⟩ := hrel1.stk
+    have e1' : w :: t.stk = w :: tl := e1
+    have htl : tl = t.stk := (List.cons.inj e1').2.symm
+    rw [sEnter_dep, e2, htl]; simp
+  have hs1dep' : ∀ u, u ≠ w → (sEnter w (sPre x w s)).dep u = s.dep u := by
+    intro u hne
+    rw [sEnter_dep_ne _ _ _ hne, sPre_dep]
+  refine ⟨⟨hrel1, Or.inr rfl, ⟨[], t.stk, by simp [tEnterSt], hdep1, fun _ => rfl⟩, by simp [tEnterSt, tupd]⟩, ?_,
+    hdep1, hs1dep'⟩
+  have := tUn_lt (s := t) (t := tEnterSt t w) (tEnterSt_mono t w hw0) hw0 (by simp [tEnterSt, tupd]) g.n hwn
+  omega
+
+theorem top_enter_q (g : Digraph) (f : Nat) (hf : g.n = f + 1) {t : TState} {s : SState} (h : SRel g t s none)
+    {w : Nat} (hw0 : t.num w = 0) (hwn : w < g.n) :
+    ScanQ g w (tEnterSt t w) (sEnter w { s with stk := none :: s.stk }) (some w) ∧ tUn (tEnterSt t w).num g.n ≤ f := by
+  have hrel1 := ssim_enter_top h hw0 hwn
+  have hdep1 : (sEnter w { s with stk := none :: s.stk }).dep w = t.stk.length := by
+    obtain ⟨tl, e1, e2⟩ := hrel1.stk
+    have e1' : w :: t.stk = w :: tl := e1
+    have htl : tl = t.stk := (List.cons.inj e1').2.symm
+    rw [sEnter_dep, e2, htl]; simp
+  refine ⟨⟨hrel1, Or.inr rfl, ⟨[], t.stk, by simp [tEnterSt], hdep1, fun _ => rfl⟩, by simp [tEnterSt, tupd]⟩, ?_⟩
+  have := tUn_lt (s := t) (t := tEnterSt t w) (tEnterSt_mono t w hw0) hw0 (by simp [tEnterSt, tupd]) g.n hwn
+  have := tUn_le t g.n
+  omega
+
+theorem SRel.lt {g : Digraph} {t : TState} {s : SState} {p : Option Nat} (h : SRel g t s p) {u : Nat}
+    (hu : s.ent u ≠ none) : u < g.n := by
+  obtain ⟨L, h1, h2, h3, h4⟩ := h.bound
+  exact h4 u ((h2 u).2 hu)
+
+theorem SRel.ent_mono {g : Digraph} {t t' : TState} {s s' : SState} {p p' : Option Nat} (h : SRel g t s p)
+    (h' : SRel g t' s' p') (hm : ∀ u, t.num u ≠ 0 → t'.num u ≠ 0) : ∀ u, s.ent u ≠ none → s'.ent u ≠ none := by
+  intro u hu hn
+  exact hm u (fun h0 => hu ((h.none_iff u).2 h0)) ((h'.none_iff u).1 hn)
+
+theorem SRel.stk_ne_n {g : Digraph} {t : TState} {s : SState} {p : Option Nat} (h : SRel g t s p) {u : Nat}
+    (hu : u ∈ t.stk) : s.ent u ≠ some g.n := by
+  have e := h.stk_ent u hu
+  have hn0 : t.num u ≠ 0 := fun h0 => by rw [(h.none_iff u).2 h0] at e; simp at e
+  rw [e]
+  have h1 := h.num_le u
+  obtain ⟨L, hL1, hL2, hL3, hL4⟩ := h.bound
+  have hsub : L ⊆ List.range g.n := fun v hv => List.mem_range.2 (hL4 v hv)
+  have hlen : L.length ≤ g.n := by
+    have := List.Nodup.length_le_of_subset hL1 hsub
+    simpa using this
+  have h2 := h.idx
+  intro hh
+  have := Option.some.inj hh
+  omega
+
 theorem ssim_visit (g : Digraph) : ∀ (F : Nat) (w : Nat) (t : TState) (s : SState) (pend : Option Nat) (x : Nat),
     ScanQ g x t s pend → t.num w = 0 → w < g.n → tUn t.num g.n ≤ F →
     ScanQ g x (tVisit (revG g) F w (some x) t) (sStep x (sCall g F x w s)) none ∧
@@ -94,26 +152,13 @@ theorem ssim_visit (g : Digraph) : ∀ (F : Nat) (w : Nat) (t : TState) (s : SSt
         ((sLeave g.n w (sLoop (sCall g f) w (tsuccs (revG g) w) (sEnter w (sPre x w s)))).low w,
           sLeave g.n w (sLoop (sCall g f) w (tsuccs (revG g) w) (sEnter w (sPre x w s)))) := rfl
     rw [hb]
-    have hrel1 := ssim_enter_call h.rel hw0 hwn (scanQ_pend h) h.hp
-    have hdep1 : (sEnter w (sPre x w s)).dep w = t.stk.length := by
-      obtain ⟨tl, e1, e2⟩ := hrel1.stk
-      have e1' : w :: t.stk = w :: tl := e1
-      have htl : tl = t.stk := (List.cons.inj e1').2.symm
-      rw [sEnter_dep, e2, htl]; simp
-    have hq1 : ScanQ g w (tEnterSt t w) (sEnter w (sPre x w s)) (some w) :=
-      ⟨hrel1, Or.inr rfl, ⟨[], t.stk, by simp [tEnterSt], hdep1, fun _ => rfl⟩, by simp [tEnterSt, tupd]⟩
-    have hun1 : tUn (tEnterSt t w).num g.n ≤ f := by
-      have := tUn_lt (s := t) (t := tEnterSt t w) (tEnterSt_mono t w hw0) hw0 (by simp [tEnterSt, tupd]) g.n hwn
-      omega
+    obtain ⟨hq1, hun1, hdep1, hs1dep'⟩ := visit_enter_q g h hw0 hwn hun
     have hws : ∀ w' ∈ tsuccs (revG g) w, w' < g.n := by
       intro w' hm
       have := (List.mem_filter.1 hm).2
       exact of_decide_eq_true this
     obtain ⟨pend2, hq2, hp2⟩ := ssim_scan g w f
       (fun w' t' s' pend' hq hz hn hu => ih w' t' s' pend' w hq hz hn hu) _ _ _ _ hq1 hws hun1
-    have hs1dep' : ∀ u, u ≠ w → (sEnter w (sPre x w s)).dep u = s.dep u := by
-      intro u hne
-      rw [sEnter_dep_ne _ _ _ hne, sPre_dep]
     exact visit_close g h hw0 hdep1 hs1dep' hq2 hp2
 
 /-- A visit started by the outer loop (the call cell is `none`). -/
@@ -121,18 +166,7 @@ theorem ssim_top (g : Digraph) (f : Nat) (hf : g.n = f + 1) {t : TState} {s : SS
     (hw0 : t.num w = 0) (hwn : w < g.n) :
     SRel g (tVisit (revG g) (f + 1) w none t) (sBody g (sCall g f) w { s with stk := none :: s.stk }).2 none := by
   rw [tVisit_succ]
-  have hrel1 := ssim_enter_top h hw0 hwn
-  have hdep1 : (sEnter w { s with stk := none :: s.stk }).dep w = t.stk.length := by
-    obtain ⟨tl, e1, e2⟩ := hrel1.stk
-    have e1' : w :: t.stk = w :: tl := e1
-    have htl : tl = t.stk := (List.cons.inj e1').2.symm
-    rw [sEnter_dep, e2, htl]; simp
-  have hq1 : ScanQ g w (tEnterSt t w) (sEnter w { s with stk := none :: s.stk }) (some w) :=
-    ⟨hrel1, Or.inr rfl, ⟨[], t.stk, by simp [tEnterSt], hdep1, fun _ => rfl⟩, by simp [tEnterSt, tupd]⟩
-  have hun1 : tUn (tEnterSt t w).num g.n ≤ f := by
-    have := tUn_lt (s := t) (t := tEnterSt t w) (tEnterSt_mono t w hw0) hw0 (by simp [tEnterSt, tupd]) g.n hwn
-    have := tUn_le t g.n
-    omega
+  obtain ⟨hq1, hun1⟩ := top_enter_q g f hf h hw0 hwn
   have hws : ∀ w' ∈ tsuccs (revG g) w, w' < g.n := by
     intro w' hm
     exact of_decide_eq_true (List.mem_filter.1 hm).2

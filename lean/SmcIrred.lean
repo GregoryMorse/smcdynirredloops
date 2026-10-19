@@ -66,7 +66,13 @@ public import SmcIrred.Smc.Sim
 public import SmcIrred.Smc.Visit
 public import SmcIrred.Smc.Final
 public import SmcIrred.Smc.Solve
+public import SmcIrred.Smc.VmStep
 public import SmcIrred.Smc.VmRel
+public import SmcIrred.Smc.VmEnter
+public import SmcIrred.Smc.VmCall
+public import SmcIrred.Smc.VmLoop
+public import SmcIrred.Smc.VmExtract
+public import SmcIrred.Smc.VmLeave
 public import SmcIrred.Smc.Restamp
 public import SmcIrred.Smc.Cost
 public import SmcIrred.Gen.Planted
