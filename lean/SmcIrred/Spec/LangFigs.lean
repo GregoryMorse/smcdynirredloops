@@ -55,6 +55,23 @@ desired assignment makes them false. -/
 /-- Figure 6(c) with a solver-output condition. -/
 @[expose] def fig6cS : Stmt := .seq (.ifGoto (.out 1) 8) (.seq (.while (.and .c .ttf) (.lab 8 blkA)) blkB)
 
+/-! ### The protected forms for arbitrary code
+
+`prot h S T k` is the shape of Figures 5(b) and 6(b) with the blocks `A`, `B` replaced by arbitrary statements `S`, `T`:
+`if (h) goto labelT; do { S; labelT: T; } while (k);`. The label `9` is the one of the figures (the statements `S`, `T` of the
+theorems carry no labels). Figure 5(b) is `prot5` (conditions `out 1`, `out 2`), Figure 6(b) is `prot6 c` (`!c`, `out 1`). -/
+
+@[expose] def prot (h : Cond) (S T : Stmt) (k : Cond) : Stmt :=
+  .seq (.ifGoto h 9) (.doWhile (.seq S (.lab 9 T)) k)
+
+@[expose] def prot5 (S T : Stmt) : Stmt := prot (.out 1) S T (.out 2)
+
+@[expose] def prot6 (cd : Cond) (S T : Stmt) : Stmt := prot (.neg cd) S T (.out 1)
+
+theorem fig5bS_eq : fig5bS = prot5 blkA blkB := rfl
+
+theorem fig6bS_eq : fig6bS = prot6 .c blkA blkB := rfl
+
 /-! ### The graphs as drawn (published Figures 5 and 6)
 
 The invisible entry nodes of the drawings (`i0`, `i00`: one outside edge into `A` or `B`) are one entry vertex `0`;
