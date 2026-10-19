@@ -124,6 +124,8 @@ public import SmcIrred.Lang.NonRed
 public import SmcIrred.Lang.Fwd
 public import SmcIrred.Lang.Protect
 public import SmcIrred.Lang.ProtIrred
+public import SmcIrred.Lang.Insert
+public import SmcIrred.Lang.EntryCycle
 public import SmcIrred.Spec.IrredLoop
 public import SmcIrred.Spec.Flatten
 public import SmcIrred.Struct.Machine
