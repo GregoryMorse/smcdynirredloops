@@ -149,6 +149,8 @@ public import SmcIrred.Lang.ProtectCtx
 public import SmcIrred.Lang.Insert1
 public import SmcIrred.Lang.ProtectClose
 public import SmcIrred.Lang.Window
+public import SmcIrred.Spec.Toggle
+public import SmcIrred.Lang.Toggle
 public import SmcIrred.Lang.ProtectW
 public import SmcIrred.Spec.IrredLoop
 public import SmcIrred.Spec.Flatten
@@ -161,6 +163,7 @@ public import SmcIrred.Struct.Flatten
 public import SmcIrred.Spec.Dynamic
 public import SmcIrred.Lang.Congr
 public import SmcIrred.Dynamic.FinalExec
+public import SmcIrred.Dynamic.Schedule
 public import SmcIrred.Dynamic.Fault
 public import SmcIrred.Dynamic.StaticScheme
 public import SmcIrred.Dynamic.StaticSchemeGeneral
@@ -177,3 +180,4 @@ public import SmcIrred.Threat.DCA
 public import SmcIrred.Threat.Necessity
 public import SmcIrred.Spec.DynBridge
 public import SmcIrred.Dynamic.Bridge
+public import SmcIrred.Dynamic.BridgeCalls

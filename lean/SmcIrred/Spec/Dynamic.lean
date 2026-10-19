@@ -46,4 +46,13 @@ execution no predecessor of `v` is written. -/
 @[expose] def lastIdx (s : List Nat) (v : Nat) : Option Nat :=
   ((List.range s.length).filter fun i => s.getD i 0 = v).getLast?
 
+/-- The number of extra executions of the vertex `v` fixed by the condition outputs `o`: one for each of its condition variables
+that is true. -/
+@[expose] def condReps (cs : Nat → List Nat) (o : Nat → Bool) (v : Nat) : Nat := ((cs v).filter fun i => o i).length
+
+/-- The schedule fixed by the condition outputs `o` for a circuit with `n` vertices: the vertices in numbering order, vertex `v`
+executed `1 + condReps cs o v` times in a row. -/
+@[expose] def condSchedule (cs : Nat → List Nat) (o : Nat → Bool) (n : Nat) : List Nat :=
+  (List.range n).flatMap fun v => List.replicate (condReps cs o v + 1) v
+
 end SmcIrred.Dyn

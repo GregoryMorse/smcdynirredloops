@@ -150,6 +150,8 @@ import SmcIrred.Lang.ProtectCtx
 import SmcIrred.Lang.Insert1
 import SmcIrred.Lang.ProtectClose
 import SmcIrred.Lang.Window
+import SmcIrred.Spec.Toggle
+import SmcIrred.Lang.Toggle
 import SmcIrred.Lang.ProtectW
 import SmcIrred.Spec.IrredLoop
 import SmcIrred.Spec.Flatten
@@ -162,6 +164,7 @@ import SmcIrred.Struct.Flatten
 import SmcIrred.Spec.Dynamic
 import SmcIrred.Lang.Congr
 import SmcIrred.Dynamic.FinalExec
+import SmcIrred.Dynamic.Schedule
 import SmcIrred.Dynamic.Fault
 import SmcIrred.Dynamic.StaticScheme
 import SmcIrred.Dynamic.StaticSchemeGeneral
@@ -178,6 +181,7 @@ import SmcIrred.Threat.DCA
 import SmcIrred.Threat.Necessity
 import SmcIrred.Spec.DynBridge
 import SmcIrred.Dynamic.Bridge
+import SmcIrred.Dynamic.BridgeCalls
 
 set_option maxErrors 100000
 
@@ -377,6 +381,9 @@ set_option maxErrors 100000
 #check @SmcIrred.Lang.nway_one_edge_all
 #check @SmcIrred.Lang.nway_irreducible_every_jungle
 #check @SmcIrred.Lang.oneway_no_irreducible
+#check @SmcIrred.Lang.cell_realizes_ttf
+#check @SmcIrred.Lang.evalC_enc
+#check @SmcIrred.Lang.execC_enc
 #check @SmcIrred.Dyn.final_isVal
 #check @SmcIrred.Dyn.final_exec_eq_val
 #check @SmcIrred.Dyn.final_exec_input_tied
