@@ -114,6 +114,7 @@ import SmcIrred.Arith.Ladder
 import SmcIrred.Spec.RBSD
 import SmcIrred.Arith.RBSD
 import SmcIrred.Spec.Recode
+import SmcIrred.Spec.WNaf
 import SmcIrred.Arith.NAF
 import SmcIrred.Arith.Recode
 import SmcIrred.Spec.CarrySave
@@ -124,6 +125,7 @@ import SmcIrred.Spec.ModMul
 import SmcIrred.Arith.ModMul
 import SmcIrred.Spec.ArithTrace
 import SmcIrred.Arith.WindowTrace
+import SmcIrred.Arith.WNaf
 import SmcIrred.Spec.Lang
 import SmcIrred.Spec.LangFigs
 import SmcIrred.Lang.Common
@@ -316,6 +318,10 @@ set_option maxErrors 100000
 #check @SmcIrred.Arith.alt_mof
 #check @SmcIrred.Arith.mof_not_lighter
 #check @SmcIrred.Arith.mofTotal_closed
+#check @SmcIrred.Arith.sval_wnaf
+#check @SmcIrred.Arith.wnaf_digits
+#check @SmcIrred.Arith.wnaf_spaced
+#check @SmcIrred.Arith.wnaf_zero_window
 #check @SmcIrred.Arith.rAdd_spec
 #check @SmcIrred.Arith.rToRbsd_spec
 #check @SmcIrred.Arith.rAddGo_val
