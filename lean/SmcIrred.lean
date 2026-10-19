@@ -154,6 +154,9 @@ public import SmcIrred.Lang.Window
 public import SmcIrred.Spec.Toggle
 public import SmcIrred.Lang.Toggle
 public import SmcIrred.Lang.ProtectW
+public import SmcIrred.Lang.ProtectMany
+public import SmcIrred.Spec.ProtectedProgs
+public import SmcIrred.Lang.ProtectedProgs
 public import SmcIrred.Spec.IrredLoop
 public import SmcIrred.Spec.Flatten
 public import SmcIrred.Struct.Machine

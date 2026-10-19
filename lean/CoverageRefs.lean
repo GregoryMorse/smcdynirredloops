@@ -155,6 +155,9 @@ import SmcIrred.Lang.Window
 import SmcIrred.Spec.Toggle
 import SmcIrred.Lang.Toggle
 import SmcIrred.Lang.ProtectW
+import SmcIrred.Lang.ProtectMany
+import SmcIrred.Spec.ProtectedProgs
+import SmcIrred.Lang.ProtectedProgs
 import SmcIrred.Spec.IrredLoop
 import SmcIrred.Spec.Flatten
 import SmcIrred.Struct.Machine
@@ -205,6 +208,9 @@ set_option maxErrors 100000
 #check @SmcIrred.Digraph.Irreducible
 #check @SmcIrred.Struct.flatten_iff
 #check @SmcIrred.static_scheme
+#check @SmcIrred.Lang.aes_protected
+#check @SmcIrred.Lang.modexp_protected
+#check @SmcIrred.Lang.protect_many_structured
 #check @SmcIrred.Lang.fig5_traces
 #check @SmcIrred.Lang.fig6_traces
 #check @SmcIrred.Lang.fig5b_irreducible
