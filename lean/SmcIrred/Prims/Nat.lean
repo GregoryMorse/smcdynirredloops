@@ -109,6 +109,9 @@ theorem natBits_eq_bitsOf : ∀ (m i : Nat), natBits i m = bitsOf i m := by
   | zero => intro i; rfl
   | succ m ih => intro i; simp only [natBits, bitsOf, ih]
 
+theorem natBits_range (a w : Nat) : natBits a w = (List.range w).map (fun j => a.testBit j) := by
+  rw [natBits_eq_bitsOf, ← bitsOf_range]
+
 theorem zeroExt_constBits (i m : Nat) (h : bitLen i ≤ m) :
     zeroExt m (constBits i) = (bitsOf i m).map Wire.cst := by
   unfold zeroExt constBits

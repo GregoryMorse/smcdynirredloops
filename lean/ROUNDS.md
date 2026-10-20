@@ -26,7 +26,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R13 | AES compiler correctness | should | DONE 2026-10-20 (AES-128/192/256 graphs compute `encrypt`; node/edge count comparison -> G39) |
 | R14 | Arithmetic for RSA (Montgomery, windows, Karatsuba/Toom P08, word size P09) | must | DONE 2026-10-18 (items 1-6; items 7-8 partly -> R14b) |
 | R14b | RBSD carry-free addition, NAF/MOF, Wallace counts (G31) | should | PARTIAL 2026-10-19 (RBSD, issub bound done; NAF, Wallace, thresholds open) |
-| R15 | RSA compiler correctness | should | TODO |
+| R15 | RSA compiler correctness | should | DONE 2026-10-20 |
 | R16 | Tables 1–2: regeneration (M) and data checks (FD) | must | PARTIAL 2026-10-19 (regeneration done; Lean data checks, GMP re-measure -> R16b) |
 | R17 | Transformation language, Figures 5–6 (P18, P19), minimal edges | must | DONE 2026-10-18 (figure instances; general n -> R17b) |
 | R17b | General-n minimal edges, arbitrary-program transformation (G32) | should | PARTIAL 2026-10-19 (G32 b done; a, c, d, e open) |
@@ -256,3 +256,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Not done (G39 -> R16b): Lean `#eval` node/edge counts of `aesGraph` against `aes.py` with the same key (R13 item 3, class M).
 - Hazards: `tblW sBoxTable = 8` rests on `bitLen 202 = 8` (chain of `bitLen_div`); `xt_check` uses `decide +kernel` over 256 cases (no `native_decide`).
 
+
+## R15 handoff (2026-10-20, done)
+- Done: `Prims/BvVal` (numeric value of `slice`, `cat`, `ite`, `add`, `sub`; `IsVal`), `Spec/RsaProg` (schoolbook `mulE`, `redcE` = `montgomeryREDC` with `montgomeryBound`, `mmulG`, `winTblG`, `sqLoopG`, `winStepG`, `winExpG`, `rsaCircuit`, `rsaGraph`), `RSA/Mont` (`val_mulE`, `val_boundE`, `val_redcE`: one compiled product has the value `Arith.redc`), `RSA/Circuit` (`mmulG_rel`, `tblStep_rel`, `winTbl_rel`, `sqLoop_rel`, `winStep_rel`, `winLoop_rel`, `winExpG_rel`: the table, window loop and squarings relate step by step to `Arith.winExp`), `RSA/Graph` (`rsaCircuit_rel`, `rsaGraph_correct`).
+- Statement: for odd `1 < N <= 2^B`, Montgomery constants, `w >= 1`, `e < 2^B`, `a < N` on the `B` input nodes, the output wires of the graph carry `a ^ e % N` (via `Arith.modexpMontWin_correct`). It concerns the Lean transcription; the Python variants (Karatsuba, add/subtract multiplier for constants, constant folding, subgraph sharing) are not in the Lean graph (G40 -> R16b).
+- Hazard: `winStep_rel` needed `generalize` on the product and `subst` for the `j = 0` case (whnf timeout otherwise).

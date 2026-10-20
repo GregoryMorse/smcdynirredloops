@@ -1,6 +1,7 @@
 module
 
 public import SmcIrred.Prims.BvDsl
+public import SmcIrred.Prims.BvVal
 public import SmcIrred.Spec.AESProg
 public import SmcIrred.AES.Xtime
 public import SmcIrred.AES.TabSbox
@@ -14,9 +15,6 @@ namespace SmcIrred
 Bit lists are `natBits value width`. The lemmas relate the semantics of the expression constructors on such lists to the
 bitwise operations of the natural numbers, so that the semantics of the AES program can be read as the byte-level
 specification. -/
-
-theorem natBits_range (a w : Nat) : natBits a w = (List.range w).map (fun j => a.testBit j) := by
-  rw [natBits_eq_bitsOf, ← bitsOf_range]
 
 theorem natBits_pad (a w d : Nat) (h : a < 2 ^ w) :
     natBits a w ++ List.replicate d false = natBits a (w + d) := by
@@ -79,9 +77,6 @@ theorem byte_slice : ∀ (bs : List Nat) (b : Nat), b < bs.length →
       rw [e, List.drop_append, List.drop_eq_nil_of_le (by omega), List.nil_append,
         Nat.add_sub_cancel_left, ih b (by simpa using h)]
       simp
-
-/-- A valuation that is the identity on constants. -/
-@[expose] def IsVal (v : Wire → Bool) : Prop := ∀ b, v (.cst b) = b
 
 theorem sem_byteE (v : Wire → Bool) (W : List Wire) (bs : List Nat) (hW : W.map v = AES.bits8 bs) (b : Nat)
     (hb : b < bs.length) : (AES.byteE W b).sem v = natBits (bs.getD b 0) 8 := by

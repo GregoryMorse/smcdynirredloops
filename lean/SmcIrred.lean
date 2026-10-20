@@ -123,6 +123,11 @@ public import SmcIrred.AES.BitVal
 public import SmcIrred.AES.Program
 public import SmcIrred.AES.Circuit
 public import SmcIrred.AES.KeyOK
+public import SmcIrred.Prims.BvVal
+public import SmcIrred.Spec.RsaProg
+public import SmcIrred.RSA.Mont
+public import SmcIrred.RSA.Circuit
+public import SmcIrred.RSA.Graph
 public import SmcIrred.Spec.Arith
 public import SmcIrred.Arith.Montgomery
 public import SmcIrred.Arith.Eff
