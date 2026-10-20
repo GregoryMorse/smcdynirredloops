@@ -24,14 +24,16 @@ theorem stOK_map16 (g : Nat → Nat) (h : ∀ i, i < 16 → g i < 256) : StOK ((
   obtain ⟨i, hi, rfl⟩ := hx
   exact h i hi
 
-theorem getD_lt256 {s : List Nat} (hs : StOK s) (j : Nat) : s.getD j 0 < 256 := by
+theorem getD_lt256_all {s : List Nat} (hs : ∀ x ∈ s, x < 256) (j : Nat) : s.getD j 0 < 256 := by
   by_cases hj : j < s.length
   · have : s.getD j 0 = s[j] := by simp [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem hj]
     rw [this]
-    exact hs.2 _ (List.getElem_mem hj)
+    exact hs _ (List.getElem_mem hj)
   · have : s.getD j 0 = 0 := by
       simp [List.getD_eq_getElem?_getD, List.getElem?_eq_none (Nat.not_lt.1 hj)]
     rw [this]; omega
+
+theorem getD_lt256 {s : List Nat} (hs : StOK s) (j : Nat) : s.getD j 0 < 256 := getD_lt256_all hs.2 j
 
 theorem xor_lt256 {a b : Nat} (ha : a < 256) (hb : b < 256) : a ^^^ b < 256 := by
   have := Nat.xor_lt_two_pow (n := 8) (x := a) (y := b) (by simpa using ha) (by simpa using hb)

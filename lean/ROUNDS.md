@@ -23,7 +23,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R10 | Boolean-CFG VM: order independence, data-independent counts, subgraphs | must | DONE |
 | R11 | Gate primitives, decoders, adders (P05), DSL compiler correctness | must | DONE 2026-10-18 (DSL compiler, graph-level adder, Circ.val bridge -> G30/R13) |
 | R12 | AES specification facts (S-box P07, xtime, key expansion, vectors) | must | DONE 2026-10-18 |
-| R13 | AES compiler correctness | should | TODO |
+| R13 | AES compiler correctness | should | DONE 2026-10-20 (AES-128/192/256 graphs compute `encrypt`; node/edge count comparison -> G39) |
 | R14 | Arithmetic for RSA (Montgomery, windows, Karatsuba/Toom P08, word size P09) | must | DONE 2026-10-18 (items 1-6; items 7-8 partly -> R14b) |
 | R14b | RBSD carry-free addition, NAF/MOF, Wallace counts (G31) | should | PARTIAL 2026-10-19 (RBSD, issub bound done; NAF, Wallace, thresholds open) |
 | R15 | RSA compiler correctness | should | TODO |
@@ -249,3 +249,10 @@ handoff: done / next / open obligations / hazards / evidence file).
   structured step relation). WP2 started: `Lang/Blocks.lean` (leader enumeration `fl`/`pos`, `blockOf_eq`). Remaining:
   block edges <-> last-instruction steps, region dominance, reducibility of goto-free programs (G33 b3), protection
   equivalence and irreducibility for arbitrary structured S, T, then the R19b native deliverables. All still OPEN in GAPS.
+
+## R13 handoff (2026-10-20, done)
+- Done: `Spec/VirtSel` (literal transcription of `multi_selection_to_virtual` for one bit: `selLoop`, `selV`; `multi_to_virtual` for several numbers `colsV`; `selection_to_virtual` `iteV`; `table_lookup_virtual` `tableLookupV`, `tblW`), `Prims/SelPost` (`selLoop_post`, `selV_post`, `colsV_post` with `mapG_wire_inv`, `iteV_post`, `tableLookupV_post`, `oneHot_count`, `xorL_oneHot_sel`), `Spec/BvDsl` gained `slice`, `cat`, `ite`, `tbl` (and `BvExp.width`; `tbl` requires `tab.length = 2^width`), `Prims/BvDsl` `comp_correct` extended (`BvExp.sem_length`), `Spec/AESProg` (stage expressions `arkE`, `subShiftE`, `mixE`, `xtimeE`, `aesRound`, `aesCircuit`, `aesGraph`, `bits8`, `blockBytes`), `AES/BitVal` (bridging: `bitwiseB_nat`, `slice_natBits`, `byte_slice`, `xt_check` by a 256-case kernel check, `sem_tblSbox`, `sem_bxor8`), `AES/Program` (`sem_arkE`, `sem_subShiftE`, `sem_mixE`, `addRoundKey_mixColumns`), `AES/Circuit` (`aesCircuit_correct`, `aesGraph_correct`), `AES/KeyOK` (`expandedKey_ok`, `aes128Graph_correct`, `aes192Graph_correct`, `aes256Graph_correct`).
+- Statement: for every key and block (inputs supported on the 128 input nodes) the output wires of the compiled graph carry the bits of `Spec.AES.encrypt`; the graph is built from simple nodes only. It concerns the Lean transcription of the generator; fidelity to `python/virt.py` and `python/aes.py` is evidence (the Python shares `xtime` per column, the Lean program builds it twice).
+- Not done (G39 -> R16b): Lean `#eval` node/edge counts of `aesGraph` against `aes.py` with the same key (R13 item 3, class M).
+- Hazards: `tblW sBoxTable = 8` rests on `bitLen 202 = 8` (chain of `bitLen_div`); `xt_check` uses `decide +kernel` over 256 cases (no `native_decide`).
+

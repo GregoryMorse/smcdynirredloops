@@ -103,7 +103,10 @@ public import SmcIrred.Prims.Ripple
 public import SmcIrred.Prims.Bridge
 public import SmcIrred.Prims.AdderGraph
 public import SmcIrred.Spec.BvDsl
+public import SmcIrred.Spec.VirtSel
+public import SmcIrred.Prims.SelPost
 public import SmcIrred.Prims.BvDsl
+public import SmcIrred.Spec.AESProg
 public import SmcIrred.Spec.AES
 public import SmcIrred.AES.Check
 public import SmcIrred.AES.TabSbox
@@ -116,6 +119,10 @@ public import SmcIrred.AES.NotAffine
 public import SmcIrred.AES.Xtime
 public import SmcIrred.AES.KeyExp
 public import SmcIrred.AES.Vectors
+public import SmcIrred.AES.BitVal
+public import SmcIrred.AES.Program
+public import SmcIrred.AES.Circuit
+public import SmcIrred.AES.KeyOK
 public import SmcIrred.Spec.Arith
 public import SmcIrred.Arith.Montgomery
 public import SmcIrred.Arith.Eff
