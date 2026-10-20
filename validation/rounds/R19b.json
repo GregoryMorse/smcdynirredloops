@@ -1,0 +1,18 @@
+{
+ "round": "R19b",
+ "status": "done",
+ "commands": [
+  "python validation/protected_vectors.py",
+  "ctest (protected_selftest)",
+  "python validation/build_modules.py SmcIrred.Lang.ProtectedProgs"
+ ],
+ "evidence": "validation/rounds/R19b_native.json; cmake.yml builds and tests native/protected.c on Windows/Linux/macOS",
+ "lean": [
+  "aes_protected",
+  "modexp_protected",
+  "protect_many_structured",
+  "protect6_structured"
+ ],
+ "open": [],
+ "sorry": 0
+}

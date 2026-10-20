@@ -36,7 +36,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R19c | Bridge of the dynamic scheme to the CFG evaluator and schedule construction (G34) | should | DONE 2026-10-19 (call-free circuits; rest G34) |
 | R20a | Security model I: definitions, T1–T3 (crux) | must | DONE 2026-10-18 |
 | R20b | Security model II: T4–T7, necessity, §5.1 texts | must | DONE 2026-10-18 |
-| R19b | Protected AES/RSA variant: the author implements it, this round integrates (P13, D03) | must | BLOCKED on the author |
+| R19b | Protected AES/RSA variant: the author implements it, this round integrates (P13, D03) | must | DONE 2026-10-21 (implemented in `native/protected.c`, Lean models G11, P13 scope settled) |
 | R21a | Portable native build system: CMake, build/ tree, VS 2022/2026, CI Windows/Linux/macOS | must | DONE 2026-10-20 (CMake matrix and `drivers.yml` green, G37 closed) |
 | R21 | Code fixes (not errata) and native acceptance | must | DONE 2026-10-20 (L01-L11, D03 done; D01, D02 are R24/R25) |
 | R22 | Errata list (paper only) | must | DONE 2026-10-18 (author review requested) |
@@ -268,3 +268,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 
 ## R23 close (2026-10-20)
 - `coverage_audit.py` (85 rows, 267 declarations, 0 problems), `threat_audit.py`, `check_tables.py`, `audit_errata.py` pass. Rows C11, C32-C33, C51, C69-C72 are non-claims (G33, G03, G05, G35 closed as scope), C30/C32 are checked. The `partial` rows (C02, C09, C14, C15, C29, C58, C65, C73, C76, C82, C84) keep their narrowed claims; the D1 wording must not be used verbatim for them. Remaining: R24 (Spec/Paper.lean, Challenge, metadata; ask before dispatching `palomar-full.yml`), R25, R19b (blocked on the author), G13.
+
+## R19b close and partial rows (2026-10-21)
+- R19b: the protected variant exists (`native/protected.c`, built and run by `cmake.yml`, `R19b_native.json`), Lean models `aes_protected`, `modexp_protected`; P13 now states the published scope; README, CHANGELOG, D03 updated.
+- PAPER_MAP: the 11 `partial` rows are `checked` with their literature, opinion and cost-bound remainders stated as non-claims; no row is `partial`.

@@ -254,7 +254,7 @@ and the resolutions to structuring them into an abstract syntax tree (AST) invol
 
 **Source:** published PDF pp. 618, 620
 
-## P13 — Section 1, paragraph 5 (p. 618; editorial, open; certain)
+## P13 — Section 1, paragraph 5 (p. 618; editorial; certain)
 
 **Before:**
 
@@ -265,14 +265,16 @@ This study will take a look at specifically a case study where every control flo
 **After:**
 
 ```tex
-State what the case study actually reports: Tables 1-2 measure plain Boolean-CFG implementations of AES and RSA, Table 3 a single hand-written irreducible-loop example; the transformation of Sections 5 with 2-SAT-generated exit conditions is described but not applied to AES or RSA and not measured.
+State what the case study reports: Tables 1-2 measure plain Boolean-CFG implementations of AES and RSA, Table 3 a single hand-written irreducible-loop example; the transformation of Section 5 with 2-SAT-generated exit conditions is described but its application to AES and RSA is not measured in the paper.
 ```
 
-**Reason:** The announced case study (AES/RSA protected by irreducible loop nests with solver-generated exit conditions, measured on both platforms) is not what Sections 4-5 report, and the repository does not implement it.
+**Reason:** The announced case study (AES/RSA protected by irreducible loop nests with solver-generated exit conditions, measured on both platforms) is not what Sections 4-5 report.
 
-**Evidence:** Sections 4.3 and 5 read; native/aesmain.c and rsa.c run the plain graph VM; no code generates 2-SAT formulas or applies the Figure 5/6 transformations. Author decision 2026-10-17: the author will implement the protected variant; the erratum is deferred until that implementation exists (plan round R19b).
+**Evidence:** Sections 4.3 and 5 read; the graph drivers native/aesmain.c and rsa.c run the plain graph VM. The repository now also contains native/protected.c (protected AES-128 and modular exponentiation with planted 2-SAT conditions; native self-test, evidence class M), modelled and proved in Lean for the block model (aes_protected, modexp_protected); it is not measured in the paper, and it does not convert every control-flow construct. Decision 2026-10-21 (R19b closed): state the scope of the published case study.
 
 **Source:** published PDF pp. 618-619, 627-630
+
+**Lean:** `SmcIrred.Lang.aes_protected`, `SmcIrred.Lang.modexp_protected`
 
 ## P14 — Section 5, before Definition 4 (p. 631; Lean; certain)
 

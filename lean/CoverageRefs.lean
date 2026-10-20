@@ -248,6 +248,10 @@ set_option maxErrors 100000
 #check @SmcIrred.Lang.protectD_structured
 #check @SmcIrred.Lang.protect_structured
 #check @SmcIrred.Lang.protect6_structured
+#check @SmcIrred.Threat.correct
+#check @SmcIrred.Threat.imm_fails
+#check @SmcIrred.Threat.imm_unsound
+#check @SmcIrred.Threat.recover
 #check @SmcIrred.TwoSat
 #check @SmcIrred.TwoSat.Sat
 #check @SmcIrred.TwoSat.graph
@@ -272,6 +276,8 @@ set_option maxErrors 100000
 #check @SmcIrred.irreducible_not_unique
 #check @SmcIrred.body_dfs_independent
 #check @SmcIrred.lnfParent_dfs_independent
+#check @SmcIrred.havlak_hdr
+#check @SmcIrred.havlak_irr
 #check @SmcIrred.Lang.structured_reducible
 #check @SmcIrred.Lang.structured_no_irreducible
 #check @SmcIrred.Lang.irreducible_needs_goto
@@ -470,17 +476,13 @@ set_option maxErrors 100000
 #check @SmcIrred.Threat.nec_extra_respects
 #check @SmcIrred.Threat.nec_schedule
 #check @SmcIrred.Threat.nec_topo
-#check @SmcIrred.Threat.correct
 #check @SmcIrred.Threat.not_size_indist
 #check @SmcIrred.Threat.scheme_overhead
-#check @SmcIrred.Threat.imm_fails
 #check @SmcIrred.Threat.imm_determines_iff
-#check @SmcIrred.Threat.imm_unsound
 #check @SmcIrred.Threat.static_reading_wrong
 #check @SmcIrred.Threat.fault_class
 #check @SmcIrred.Threat.dca_last
 #check @SmcIrred.Threat.dca_final_obs
 #check @SmcIrred.Threat.dca_repeats_visible
 #check @SmcIrred.Threat.dca_witness
-#check @SmcIrred.Threat.recover
 #check @SmcIrred.Threat.smcsem_determines

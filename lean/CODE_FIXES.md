@@ -19,4 +19,4 @@ code once more before editing.
 | L11 | `python/virt.py` | `modexpMontgomeryWindow` prints the table (`print(tbl)`, debug output); `mul_window` and `mul_const_window` are unfinished and unused (delete or finish; confirm) | unit test | done (R21): `print(tbl)` and the two unused unfinished functions removed; `validation/python_fixes_test.py` |
 | D01 | `README.md` | Lean section (R24); Palomar ID and tag after registration (R25) | | open |
 | D02 | `CITATION.cff` | add the formalization reference after registration | | open |
-| D03 | `README.md` / `CHANGELOG.md` | state that the irreducible-loop-protected AES/RSA variant and the planted 2-SAT generator of Section 3.1 are not implemented in the repository (per the P13 answer) | | done (R21): README scope note and CHANGELOG |
+| D03 | `README.md` / `CHANGELOG.md` | state that the irreducible-loop-protected AES/RSA variant and the planted 2-SAT generator of Section 3.1 are not implemented in the repository (per the P13 answer) | | superseded (2026-10-21, R19b): `native/protected.c` implements the variant; README and CHANGELOG state it |

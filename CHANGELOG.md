@@ -14,7 +14,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `aesmain.c`, `rsa.c`: the virtual-machine column is labelled "Graph VM"; the AES-192/256 straight-line stubs are documented.
 
 ### Notes
-- The irreducible-loop-protected AES/RSA variant announced in the paper and the planted 2-SAT generator of Section 3.1 are not implemented in this repository; `IrredLoop.cpp` and the transformation examples are standalone.
+- `native/protected.c`: planted 2-SAT generator (Section 3.1) and protected AES-128 and modular exponentiation (Figures 5(b), 6(b)), with a native self-test; the graph drivers remain unprotected.
 
 ---
 
