@@ -176,6 +176,8 @@ import SmcIrred.Lang.ProtectCode
 import SmcIrred.Lang.ProtectCtx
 import SmcIrred.Lang.Insert1
 import SmcIrred.Lang.ProtectClose
+import SmcIrred.Lang.CtxLoop
+import SmcIrred.Lang.CtxLoop6
 import SmcIrred.Lang.Window
 import SmcIrred.Spec.Toggle
 import SmcIrred.Lang.Toggle
@@ -242,6 +244,10 @@ set_option maxErrors 100000
 #check @SmcIrred.Lang.fig5c_irreducible
 #check @SmcIrred.Lang.fig6b_irreducible
 #check @SmcIrred.Lang.fig6c_irreducible
+#check @SmcIrred.Lang.protectC_structured
+#check @SmcIrred.Lang.protectD_structured
+#check @SmcIrred.Lang.protect_structured
+#check @SmcIrred.Lang.protect6_structured
 #check @SmcIrred.TwoSat
 #check @SmcIrred.TwoSat.Sat
 #check @SmcIrred.TwoSat.graph

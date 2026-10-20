@@ -175,6 +175,8 @@ public import SmcIrred.Lang.ProtectCode
 public import SmcIrred.Lang.ProtectCtx
 public import SmcIrred.Lang.Insert1
 public import SmcIrred.Lang.ProtectClose
+public import SmcIrred.Lang.CtxLoop
+public import SmcIrred.Lang.CtxLoop6
 public import SmcIrred.Lang.Window
 public import SmcIrred.Spec.Toggle
 public import SmcIrred.Lang.Toggle

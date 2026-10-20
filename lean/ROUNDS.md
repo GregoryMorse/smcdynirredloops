@@ -29,9 +29,9 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R15 | RSA compiler correctness | should | DONE 2026-10-20 |
 | R16 | Tables 1–2: regeneration (M) and data checks (FD) | must | PARTIAL 2026-10-19 (regeneration done; Lean data checks, GMP re-measure -> R16b) |
 | R17 | Transformation language, Figures 5–6 (P18, P19), minimal edges | must | DONE 2026-10-18 (figure instances; general n -> R17b) |
-| R17b | General-n minimal edges, arbitrary-program transformation (G32) | should | PARTIAL 2026-10-19 (G32 b done; a, c, d, e open) |
+| R17b | General-n minimal edges, arbitrary-program transformation (G32) | should | DONE 2026-10-20 (G32 a3 closed one (c) pair in a goto-free context; d, e non-claims) |
 | R18 | Figure 4 C++ code, flattening; structured ⇒ reducible, CFT (should) | must/should | DONE 2026-10-18 (items 1-2; items 3-4 -> R18b) |
-| R18b | Structured programs reducible, CFT leftist trees (G33) | should | NOT DONE 2026-10-19 (proof plan recorded in G33) |
+| R18b | Structured programs reducible, CFT leftist trees (G33) | should | DONE 2026-10-20 (G33 b proved; a, c recorded as non-claims) |
 | R19 | Dynamic scheme, faults, static scheme end-to-end | must | DONE 2026-10-18 (abstract model; bridge -> R19c) |
 | R19c | Bridge of the dynamic scheme to the CFG evaluator and schedule construction (G34) | should | DONE 2026-10-19 (call-free circuits; rest G34) |
 | R20a | Security model I: definitions, T1–T3 (crux) | must | DONE 2026-10-18 |
@@ -261,3 +261,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Done: `Prims/BvVal` (numeric value of `slice`, `cat`, `ite`, `add`, `sub`; `IsVal`), `Spec/RsaProg` (schoolbook `mulE`, `redcE` = `montgomeryREDC` with `montgomeryBound`, `mmulG`, `winTblG`, `sqLoopG`, `winStepG`, `winExpG`, `rsaCircuit`, `rsaGraph`), `RSA/Mont` (`val_mulE`, `val_boundE`, `val_redcE`: one compiled product has the value `Arith.redc`), `RSA/Circuit` (`mmulG_rel`, `tblStep_rel`, `winTbl_rel`, `sqLoop_rel`, `winStep_rel`, `winLoop_rel`, `winExpG_rel`: the table, window loop and squarings relate step by step to `Arith.winExp`), `RSA/Graph` (`rsaCircuit_rel`, `rsaGraph_correct`).
 - Statement: for odd `1 < N <= 2^B`, Montgomery constants, `w >= 1`, `e < 2^B`, `a < N` on the `B` input nodes, the output wires of the graph carry `a ^ e % N` (via `Arith.modexpMontWin_correct`). It concerns the Lean transcription; the Python variants (Karatsuba, add/subtract multiplier for constants, constant folding, subgraph sharing) are not in the Lean graph (G40 -> R16b).
 - Hazard: `winStep_rel` needed `generalize` on the product and `subst` for the `j = 0` case (whnf timeout otherwise).
+
+## R17b/R18b close (2026-10-20)
+- Done: `Lang.CtxLoop` (Fig 5(c)) and `Lang.CtxLoop6` (Fig 6(c)) in any goto-free program (`protectC_structured`, `protectD_structured`); G32 closed with (d), (e) as non-claims; G33 closed with (a), (c) as non-claims (native run is CI evidence under G37).
+- Open: G37 (b), (c) (CI/generator work, owner R24); R16b (G06, G07, G40), G08/G12, R21a, R21, R23, R24, R25.
