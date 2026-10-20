@@ -2,7 +2,7 @@ module
 
 public import SmcIrred.Spec.VirtSel
 public import SmcIrred.Prims.Decoder
-public import SmcIrred.Prims.BvDsl
+public import SmcIrred.Prims.Nat
 
 public section
 

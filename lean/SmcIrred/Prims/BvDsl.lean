@@ -4,6 +4,7 @@ public import SmcIrred.Spec.BvDsl
 public import SmcIrred.Prims.AdderGraph
 public import SmcIrred.Prims.MapG
 public import SmcIrred.Prims.Nat
+public import SmcIrred.Prims.SelPost
 
 public section
 
@@ -18,12 +19,6 @@ library (`comp_circuit_correct`).  `sem` itself is arithmetic: the bitwise opera
 the sum with its carry bit and the difference is taken modulo `2^m` (`sem_add_val`, `sem_sub_val`). -/
 
 theorem Wire.inb_iff (n : Nat) (w : Wire) : w.inb n ↔ w.ok n := by cases w <;> exact Iff.rfl
-
-theorem natBits_eq_bitsOf : ∀ (m i : Nat), natBits i m = bitsOf i m := by
-  intro m
-  induction m with
-  | zero => intro i; rfl
-  | succ m ih => intro i; simp only [natBits, bitsOf, ih]
 
 theorem natBits_length (m i : Nat) : (natBits i m).length = m := by
   rw [natBits_eq_bitsOf]; exact bitsOf_length m i
@@ -139,6 +134,36 @@ theorem sem_sub_val (v : Wire → Bool) (a b : BvExp) :
   simp only [BvExp.sem]
   exact bv_natBits _ _ (Nat.mod_lt _ (Nat.two_pow_pos _))
 
+theorem padB_length (m : Nat) (l : List Bool) (h : l.length ≤ m) : (padB m l).length = m := by
+  simp [padB]; omega
+
+theorem bitwiseB_length (f : Bool → Bool → Bool) (a b : List Bool) :
+    (bitwiseB f a b).length = max a.length b.length := by
+  unfold bitwiseB
+  rw [List.length_map, List.length_zip, padB_length _ _ (Nat.le_max_left _ _), padB_length _ _ (Nat.le_max_right _ _)]
+  simp
+
+/-- The static width is the length of the meaning. -/
+theorem BvExp.sem_length (v : Wire → Bool) : ∀ e : BvExp, (e.sem v).length = e.width := by
+  intro e
+  induction e with
+  | inp ws => simp [BvExp.sem, BvExp.width]
+  | lit n => simp [BvExp.sem, BvExp.width, natBits_length]
+  | bnot a ih => simp [BvExp.sem, BvExp.width, ih]
+  | band a b iha ihb => simp [BvExp.sem, BvExp.width, bitwiseB_length, iha, ihb]
+  | bor a b iha ihb => simp [BvExp.sem, BvExp.width, bitwiseB_length, iha, ihb]
+  | bxor a b iha ihb => simp [BvExp.sem, BvExp.width, bitwiseB_length, iha, ihb]
+  | add a b iha ihb => simp [BvExp.sem, BvExp.width, natBits_length, iha, ihb]
+  | sub a b iha ihb => simp [BvExp.sem, BvExp.width, natBits_length, iha, ihb]
+  | slice a i n ih => simp [BvExp.sem, BvExp.width, ih]
+  | cat a b iha ihb => simp [BvExp.sem, BvExp.width, iha, ihb]
+  | ite c a b ihc iha ihb =>
+    simp only [BvExp.sem, BvExp.width, iha, ihb]
+    split
+    · exact padB_length _ _ (by rw [iha]; exact Nat.le_max_left _ _)
+    · exact padB_length _ _ (by rw [ihb]; exact Nat.le_max_right _ _)
+  | tbl idx tab ih => simp [BvExp.sem, BvExp.width, natBits_length]
+
 /-! ### Congruence of `sem` under extension of the state -/
 
 theorem sem_ext {inp : Nat → Bool} {gb gb' : GB} (h : Ext gb gb') :
@@ -156,6 +181,10 @@ theorem sem_ext {inp : Nat → Bool} {gb gb' : GB} (h : Ext gb gb') :
   | bxor a b iha ihb => intro he; simp only [BvExp.sem, iha he.1, ihb he.2]
   | add a b iha ihb => intro he; simp only [BvExp.sem, iha he.1, ihb he.2]
   | sub a b iha ihb => intro he; simp only [BvExp.sem, iha he.1, ihb he.2]
+  | slice a i n ih => intro he; simp only [BvExp.sem, ih he]
+  | cat a b iha ihb => intro he; simp only [BvExp.sem, iha he.1, ihb he.2]
+  | ite c a b ihc iha ihb => intro he; simp only [BvExp.sem, ihc he.1, iha he.2.1, ihb he.2.2]
+  | tbl idx tab ih => intro he; simp only [BvExp.sem, ih he.1]
 
 theorem BvExp.ok_mono {n n' : Nat} (h : n ≤ n') : ∀ (e : BvExp), e.ok n → e.ok n' := by
   intro e
@@ -168,6 +197,10 @@ theorem BvExp.ok_mono {n n' : Nat} (h : n ≤ n') : ∀ (e : BvExp), e.ok n → 
   | bxor a b iha ihb => intro he; exact ⟨iha he.1, ihb he.2⟩
   | add a b iha ihb => intro he; exact ⟨iha he.1, ihb he.2⟩
   | sub a b iha ihb => intro he; exact ⟨iha he.1, ihb he.2⟩
+  | slice a i n ih => exact ih
+  | cat a b iha ihb => intro he; exact ⟨iha he.1, ihb he.2⟩
+  | ite c a b ihc iha ihb => intro he; exact ⟨ihc he.1, iha he.2.1, ihb he.2.2⟩
+  | tbl idx tab ih => intro he; exact ⟨ih he.1, he.2⟩
 
 /-! ### Bitwise gadgets over two vectors -/
 
@@ -364,6 +397,75 @@ theorem comp_correct (hinp : ∀ i, k ≤ i → inp i = false) :
     have hlb : (b.comp (a.comp gb).2).1.length = (b.sem (wev gb inp)).length := by rw [← hmapb, List.length_map]
     rw [hf, hmapa, hmapb, hla, hlb]
     exact adderBits_sub_eq (a.sem (wev gb inp)) (b.sem (wev gb inp))
+
+  | slice a i n ih =>
+    intro gb hk hr he
+    obtain ⟨e1, r1, o1, v1⟩ := ih gb hk hr he
+    refine ⟨e1, r1, ?_, ?_⟩
+    · intro w hw
+      exact o1 w (List.mem_of_mem_drop (List.mem_of_mem_take hw))
+    · simp only [BvExp.comp, BvExp.sem, List.map_take, List.map_drop, v1]
+  | cat a b iha ihb =>
+    intro gb hk hr he
+    obtain ⟨e1, r1, o1, v1⟩ := iha gb hk hr he.1
+    have hk1 : k ≤ (a.comp gb).2.n := Nat.le_trans hk e1.n_le
+    have hb1 : b.ok (a.comp gb).2.n := BvExp.ok_mono e1.n_le b he.2
+    obtain ⟨e2, r2, o2, v2⟩ := ihb (a.comp gb).2 hk1 r1 hb1
+    refine ⟨e1.trans e2, r2, ?_, ?_⟩
+    · intro w hw
+      rcases List.mem_append.1 hw with h | h
+      · exact ok_mono (o1 w h) e2.n_le
+      · exact o2 w h
+    · simp only [BvExp.comp, BvExp.sem, List.map_append]
+      rw [v2, sem_ext e1 b he.2]
+      have : (a.comp gb).1.map (wev (b.comp (a.comp gb).2).2 inp) = a.sem (wev gb inp) := by
+        rw [← v1]
+        exact List.map_congr_left (fun w hw => wev_ext e2 (o1 w hw))
+      rw [this]
+  | ite c a b ihc iha ihb =>
+    intro gb hk hr he
+    obtain ⟨e1, r1, o1, v1⟩ := ihc gb hk hr he.1
+    have hk1 : k ≤ (c.comp gb).2.n := Nat.le_trans hk e1.n_le
+    have ha1 : a.ok (c.comp gb).2.n := BvExp.ok_mono e1.n_le a he.2.1
+    have hb1 : b.ok (c.comp gb).2.n := BvExp.ok_mono e1.n_le b he.2.2
+    obtain ⟨e2, r2, o2, v2⟩ := iha (c.comp gb).2 hk1 r1 ha1
+    have hk2 : k ≤ (a.comp (c.comp gb).2).2.n := Nat.le_trans hk1 e2.n_le
+    have hb2 : b.ok (a.comp (c.comp gb).2).2.n := BvExp.ok_mono e2.n_le b hb1
+    obtain ⟨e3, r3, o3, v3⟩ := ihb (a.comp (c.comp gb).2).2 hk2 r2 hb2
+    have hk3 : k ≤ (b.comp (a.comp (c.comp gb).2).2).2.n := Nat.le_trans hk2 e3.n_le
+    have hs : ((c.comp gb).1.getD 0 (.cst false)).ok (b.comp (a.comp (c.comp gb).2).2).2.n :=
+      ok_mono (getD_ok o1) (Nat.le_trans e2.n_le e3.n_le)
+    have ha3 : ∀ w ∈ (a.comp (c.comp gb).2).1, w.ok (b.comp (a.comp (c.comp gb).2).2).2.n :=
+      fun w hw => ok_mono (o2 w hw) e3.n_le
+    obtain ⟨e4, r4, o4, v4⟩ := iteV_post hinp hk3 r3 hs _ _ ha3 o3
+    refine ⟨e1.trans (e2.trans (e3.trans e4)), r4, o4, ?_⟩
+    have hca : (c.comp gb).1.map (wev (b.comp (a.comp (c.comp gb).2).2).2 inp) = c.sem (wev gb inp) := by
+      rw [← v1]
+      exact List.map_congr_left (fun w hw => wev_ext (e2.trans e3) (o1 w hw))
+    have hma : (a.comp (c.comp gb).2).1.map (wev (b.comp (a.comp (c.comp gb).2).2).2 inp) = a.sem (wev gb inp) := by
+      have : (a.comp (c.comp gb).2).1.map (wev (b.comp (a.comp (c.comp gb).2).2).2 inp) =
+          (a.comp (c.comp gb).2).1.map (wev (a.comp (c.comp gb).2).2 inp) :=
+        List.map_congr_left (fun w hw => wev_ext e3 (o2 w hw))
+      rw [this, v2, sem_ext e1 a he.2.1]
+    have hmb : (b.comp (a.comp (c.comp gb).2).2).1.map (wev (b.comp (a.comp (c.comp gb).2).2).2 inp) =
+        b.sem (wev gb inp) := by
+      rw [v3, sem_ext e2 b hb1, sem_ext e1 b he.2.2]
+    have hla : (a.comp (c.comp gb).2).1.length = (a.sem (wev gb inp)).length := by rw [← hma, List.length_map]
+    have hlb : (b.comp (a.comp (c.comp gb).2).2).1.length = (b.sem (wev gb inp)).length := by
+      rw [← hmb, List.length_map]
+    simp only [BvExp.comp, BvExp.sem]
+    rw [v4]
+    rw [getD_wev, hca, hla, hlb, hma, hmb]
+  | tbl idx tab ih =>
+    intro gb hk hr he
+    obtain ⟨e1, r1, o1, v1⟩ := ih gb hk hr he.1
+    have hk1 : k ≤ (idx.comp gb).2.n := Nat.le_trans hk e1.n_le
+    have hlen : (idx.comp gb).1.length = idx.width := by
+      rw [← BvExp.sem_length (wev gb inp) idx, ← v1, List.length_map]
+    obtain ⟨e2, r2, o2, v2⟩ := tableLookupV_post hinp hk1 r1 (idx.comp gb).1 o1 tab (by rw [hlen]; exact he.2)
+    refine ⟨e1.trans e2, r2, o2, ?_⟩
+    simp only [BvExp.comp, BvExp.sem]
+    rw [v2, v1]
 
 /-- The same in the circuit of the extended state under the Boolean-CFG evaluator (any depth and library). -/
 theorem comp_circuit_correct (hinp : ∀ i, k ≤ i → inp i = false) (e : BvExp) {gb : GB} (hk : k ≤ gb.n) (hr : Reach gb)

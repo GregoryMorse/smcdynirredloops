@@ -1,6 +1,7 @@
 module
 
 public import SmcIrred.Spec.Virt
+public import SmcIrred.Spec.BvDsl
 
 public section
 
@@ -101,6 +102,12 @@ theorem bitsOf_range : ∀ m i, (List.range m).map (fun j => i.testBit j) = bits
       apply List.map_congr_left
       intro j _
       simp [Function.comp, Nat.testBit_succ]
+
+theorem natBits_eq_bitsOf : ∀ (m i : Nat), natBits i m = bitsOf i m := by
+  intro m
+  induction m with
+  | zero => intro i; rfl
+  | succ m ih => intro i; simp only [natBits, bitsOf, ih]
 
 theorem zeroExt_constBits (i m : Nat) (h : bitLen i ≤ m) :
     zeroExt m (constBits i) = (bitsOf i m).map Wire.cst := by
