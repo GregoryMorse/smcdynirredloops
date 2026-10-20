@@ -205,12 +205,12 @@ Rows 128 and 256 both show 9.141ms (x86) and 7.640ms (x86-64); row 32 shows 851m
 **After:**
 
 ```tex
-Replace the C gmp cells of row 256 (and 32 if a unit slip) by the measured values supplied by the author.
+Row 32: replace 851ms and 707ms by 851us and 707us (units). Row 256: the C gmp cells repeat the row-128 cells; replace them by values measured on the machine of the other rows (supplied by the author).
 ```
 
-**Reason:** The 256-bit cells duplicate the 128-bit cells, which is implausible, and the 32-bit cells exceed the 64-bit cells (likely microseconds).
+**Reason:** The 256-bit cells duplicate the 128-bit cells, which is implausible, and the 32-bit cells exceed the 64-bit cells (the unit is microseconds, not milliseconds).
 
-**Evidence:** Rendered page 629 compared with the manuscript TeX; validation/check_tables.py. The correct values are not recoverable from the repository. Author decision 2026-10-17: re-measure to confirm the cells are wrong first (R16), then apply the minimal correction, which may mean regenerating the column.
+**Evidence:** Re-measurement of the repository's native/rsa.c (GMP decryption, 1000 iterations, GitHub windows-2022 runner, MSVC Release x64, GMP 6.2.1-4; validation/data/driver_timing.json, evidence class M, not proof): 0.50, 0.75, 2.41 and 11.6 ms for 32, 64, 128 and 256 bits, increasing in the bit length with row 256 about 4.8 times row 128, so the repeated 256-bit cells and the 32-bit cells above the 64-bit cells are wrong. The hosted runner is not the author's machine, so the 256-bit cells are not derivable from it. Author decision 2026-10-17: re-measure first, then apply the minimal correction.
 
 **Source:** published PDF p. 629
 

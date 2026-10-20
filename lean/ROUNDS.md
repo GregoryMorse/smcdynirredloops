@@ -27,7 +27,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R14 | Arithmetic for RSA (Montgomery, windows, Karatsuba/Toom P08, word size P09) | must | DONE 2026-10-18 (items 1-6; items 7-8 partly -> R14b) |
 | R14b | RBSD carry-free addition, NAF/MOF, Wallace counts (G31) | should | DONE 2026-10-20 |
 | R15 | RSA compiler correctness | should | DONE 2026-10-20 |
-| R16 | Tables 1–2: regeneration (M) and data checks (FD) | must | PARTIAL 2026-10-19 (regeneration done; Lean data checks, GMP re-measure -> R16b) |
+| R16 | Tables 1–2: regeneration (M) and data checks (FD) | must | DONE 2026-10-20 (regeneration, Lean data checks, GMP re-measure) |
 | R17 | Transformation language, Figures 5–6 (P18, P19), minimal edges | must | DONE 2026-10-18 (figure instances; general n -> R17b) |
 | R17b | General-n minimal edges, arbitrary-program transformation (G32) | should | DONE 2026-10-20 (G32 a3 closed one (c) pair in a goto-free context; d, e non-claims) |
 | R18 | Figure 4 C++ code, flattening; structured ⇒ reducible, CFT (should) | must/should | DONE 2026-10-18 (items 1-2; items 3-4 -> R18b) |
@@ -37,10 +37,10 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R20a | Security model I: definitions, T1–T3 (crux) | must | DONE 2026-10-18 |
 | R20b | Security model II: T4–T7, necessity, §5.1 texts | must | DONE 2026-10-18 |
 | R19b | Protected AES/RSA variant: the author implements it, this round integrates (P13, D03) | must | BLOCKED on the author |
-| R21a | Portable native build system: CMake, build/ tree, VS 2022/2026, CI Windows/Linux/macOS | must | PARTIAL 2026-10-19 (local Windows verified; CI matrix pending, G37) |
-| R21 | Code fixes (not errata) and native acceptance | must | PARTIAL 2026-10-19 (L01-L06, L11, D03 done; Linux/R16 reruns and L07-L09 open) |
+| R21a | Portable native build system: CMake, build/ tree, VS 2022/2026, CI Windows/Linux/macOS | must | DONE 2026-10-20 (CMake matrix and `drivers.yml` green, G37 closed) |
+| R21 | Code fixes (not errata) and native acceptance | must | DONE 2026-10-20 (L01-L11, D03 done; D01, D02 are R24/R25) |
 | R22 | Errata list (paper only) | must | DONE 2026-10-18 (author review requested) |
-| R23 | Coverage and fidelity audit | must | PARTIAL 2026-10-18 (audit passes; closes after the pending rounds) |
+| R23 | Coverage and fidelity audit | must | DONE 2026-10-20 (coverage, threat and errata audits pass; D1 wording is limited by the `partial` and `non-claim` rows listed in PAPER_MAP, which R24 copies into the Palomar notes) |
 | R24 | Palomar package, CI, handoff (user submits and registers) | must | TODO |
 | R25 | Tag (after registration); corrected manuscript deferred by the user (errata list only for now) | must | TODO |
 
@@ -265,3 +265,6 @@ handoff: done / next / open obligations / hazards / evidence file).
 ## R17b/R18b close (2026-10-20)
 - Done: `Lang.CtxLoop` (Fig 5(c)) and `Lang.CtxLoop6` (Fig 6(c)) in any goto-free program (`protectC_structured`, `protectD_structured`); G32 closed with (d), (e) as non-claims; G33 closed with (a), (c) as non-claims (native run is CI evidence under G37).
 - Open: G37 (b), (c) (CI/generator work, owner R24); R16b (G06, G07, G40), G08/G12, R21a, R21, R23, R24, R25.
+
+## R23 close (2026-10-20)
+- `coverage_audit.py` (85 rows, 267 declarations, 0 problems), `threat_audit.py`, `check_tables.py`, `audit_errata.py` pass. Rows C11, C32-C33, C51, C69-C72 are non-claims (G33, G03, G05, G35 closed as scope), C30/C32 are checked. The `partial` rows (C02, C09, C14, C15, C29, C58, C65, C73, C76, C82, C84) keep their narrowed claims; the D1 wording must not be used verbatim for them. Remaining: R24 (Spec/Paper.lean, Challenge, metadata; ask before dispatching `palomar-full.yml`), R25, R19b (blocked on the author), G13.

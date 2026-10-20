@@ -272,6 +272,9 @@ set_option maxErrors 100000
 #check @SmcIrred.irreducible_not_unique
 #check @SmcIrred.body_dfs_independent
 #check @SmcIrred.lnfParent_dfs_independent
+#check @SmcIrred.Lang.structured_reducible
+#check @SmcIrred.Lang.structured_no_irreducible
+#check @SmcIrred.Lang.irreducible_needs_goto
 #check @SmcIrred.smcRounds_replicate
 #check @SmcIrred.restamp_cover
 #check @SmcIrred.vm_rounds_replicate
@@ -406,6 +409,8 @@ set_option maxErrors 100000
 #check @SmcIrred.val_boundE
 #check @SmcIrred.Arith.redc
 #check @SmcIrred.Arith.winExp
+#check @SmcIrred.Data.rsa_cfg_worse_than_quadratic
+#check @SmcIrred.Data.rsa_execN_worse_than_quadratic
 #check @SmcIrred.Arith.words_exact
 #check @SmcIrred.Arith.word_products
 #check @SmcIrred.Arith.word_gain_not_exponential
