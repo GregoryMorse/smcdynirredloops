@@ -46,6 +46,15 @@ bounds) is the capability structures themselves. Necessity witnesses: below.
   `nec_schedule`, `nec_topo` (no ordered schedule exists in a cyclic circuit). `extra_wf` is not an assumption: it is a field of `Design` (a formula over its n variables), so it needs no witness.
 * `Threat.solver_succeeds`: under S1 the solver returns a solution.
 
+## 3c. Non-claims (G36)
+These are scope statements: none of them is proved, assumed or hidden in a hypothesis.
+* T4 has no lower bound on node splitting or on any restructuring method's cost (Carter-Ferrante-Thomborson and DREAM are literature, G33).
+* The classes `Struct`, `Trace`, `Fault` and `Dca` are views of the model (state variable, `obs`, a replaced write, `finalObs`), not
+  attacker algorithms; no lower bound on the cost of any analyzer is claimed.
+* T7 concerns the vertex-count observable only; it is not a statement about any other observable and not about virtual black-box
+  obfuscation.
+* Assumptions S1-S3 are structural and each has a necessity witness (`nec_*`); `extra_wf` is a typing field, not an assumption.
+
 ## 4. Literature pass (D11 list)
 Verified online this round: Barak et al., J. ACM 59(2), 2012, doi 10.1145/2160158.2160159 (impossibility of black-box
 obfuscation in general; the model: virtual black box); Collberg–Thomborson–Low, POPL 1998, pp. 184–196 (opaque constructs;
