@@ -52,7 +52,7 @@ jobs:
           $env:PATH = "$PWD/native/deps/gmp/bin/x64;$env:PATH"
           $bin = 'build/cmake/bin/Release'
           if (-not (Test-Path $bin)) { $bin = 'build/cmake/bin' }
-          foreach ($d in 'aes', 'ecdsa', 'rsa') { cmd /c "build\cmakein\Release\$d.exe < NUL > run-$d.log 2>&1"; "$d exit $LASTEXITCODE" | Tee-Object -Append run-status.log }
+          foreach ($d in 'aes', 'ecdsa', 'rsa') { cmd /c "build\cmake\bin\Release\$d.exe < NUL > run-$d.log 2>&1"; "$d exit $LASTEXITCODE" | Tee-Object -Append run-status.log }
           Get-Content run-*.log | Select-String -Pattern 'seconds|Encryption|Decryption|Sign' | Select-Object -First 200
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
