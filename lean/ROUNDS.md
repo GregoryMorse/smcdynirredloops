@@ -25,7 +25,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R12 | AES specification facts (S-box P07, xtime, key expansion, vectors) | must | DONE 2026-10-18 |
 | R13 | AES compiler correctness | should | DONE 2026-10-20 (AES-128/192/256 graphs compute `encrypt`; node/edge count comparison -> G39) |
 | R14 | Arithmetic for RSA (Montgomery, windows, Karatsuba/Toom P08, word size P09) | must | DONE 2026-10-18 (items 1-6; items 7-8 partly -> R14b) |
-| R14b | RBSD carry-free addition, NAF/MOF, Wallace counts (G31) | should | PARTIAL 2026-10-19 (RBSD, issub bound done; NAF, Wallace, thresholds open) |
+| R14b | RBSD carry-free addition, NAF/MOF, Wallace counts (G31) | should | DONE 2026-10-20 |
 | R15 | RSA compiler correctness | should | DONE 2026-10-20 |
 | R16 | Tables 1–2: regeneration (M) and data checks (FD) | must | PARTIAL 2026-10-19 (regeneration done; Lean data checks, GMP re-measure -> R16b) |
 | R17 | Transformation language, Figures 5–6 (P18, P19), minimal edges | must | DONE 2026-10-18 (figure instances; general n -> R17b) |

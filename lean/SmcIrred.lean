@@ -151,6 +151,7 @@ public import SmcIrred.Arith.ModMul
 public import SmcIrred.Spec.ArithTrace
 public import SmcIrred.Arith.WindowTrace
 public import SmcIrred.Arith.WNaf
+public import SmcIrred.Arith.WNafWeight
 public import SmcIrred.Spec.Lang
 public import SmcIrred.Spec.LangFigs
 public import SmcIrred.Lang.Common

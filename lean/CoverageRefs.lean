@@ -152,6 +152,7 @@ import SmcIrred.Arith.ModMul
 import SmcIrred.Spec.ArithTrace
 import SmcIrred.Arith.WindowTrace
 import SmcIrred.Arith.WNaf
+import SmcIrred.Arith.WNafWeight
 import SmcIrred.Spec.Lang
 import SmcIrred.Spec.LangFigs
 import SmcIrred.Lang.Common
@@ -378,6 +379,7 @@ set_option maxErrors 100000
 #check @SmcIrred.Arith.wnaf_digits
 #check @SmcIrred.Arith.wnaf_spaced
 #check @SmcIrred.Arith.wnaf_zero_window
+#check @SmcIrred.Arith.wnaf_wt_le_popc
 #check @SmcIrred.Arith.rAdd_spec
 #check @SmcIrred.Arith.rToRbsd_spec
 #check @SmcIrred.Arith.rAddGo_val
