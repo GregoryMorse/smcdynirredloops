@@ -65,7 +65,7 @@ graph_info.json
 # Generated crypto C artifacts (output of python/ emitters → written to generated/)
 generated/*vm.c
 generated/*vmstr.c
-generated/aesgraph.c
+generated/aes*graph.c
 generated/aesc.c
 generated/aesvm.c
 

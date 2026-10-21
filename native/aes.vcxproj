@@ -162,6 +162,8 @@
     <ClCompile Include="../generated/aes192vm.c" />
     <ClCompile Include="../generated/aes256vm.c" />
     <ClCompile Include="../generated/aesgraph.c" />
+    <ClCompile Include="../generated/aes192graph.c" />
+    <ClCompile Include="../generated/aes256graph.c" />
     <ClCompile Include="aesmain.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

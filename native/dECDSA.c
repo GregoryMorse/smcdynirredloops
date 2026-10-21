@@ -5,7 +5,7 @@
 //./dECDSA < test_hash | xxd -ps -c 128 -u
 //./ecdsa_verify.py 78E0E9DACCC47DE94D674DF3B35624A2F08E600B26B3444077022AD575AF4DB73084B4B8657EEA12396FDE260432BA7BDB3E092D61A42F830150D6CC8D798F9F F7FD41E28DFCCA32C1CEEF637C202CA6E99E57F18AFEF957DF0866B4CDD60F5C 8007ABC1CD96650531BD8039893E8CF549A52D26E2A8A0E4700087523A7156A42794DE699028D0768259367AD4676BFE2DACCA139263A684D0A7434EA3842BC4
 
-#include <Windows.h>
+#include "smctime.h"
 #include <stdio.h>
 
 // Parameters of NIST Curve P-256: y^2 = x^3 + ax + b mod p
@@ -390,20 +390,17 @@ void timing()
 {
     unsigned char sig[64];
     unsigned char hash[32] = { 0xF7, 0xFD, 0x41, 0xE2, 0x8D, 0xFC, 0xCA, 0x32, 0xC1, 0xCE, 0xEF, 0x63, 0x7C, 0x20, 0x2C, 0xA6, 0xE9, 0x9E, 0x57, 0xF1, 0x8A, 0xFE, 0xF9, 0x57, 0xDF, 0x08, 0x66, 0xB4, 0xCD, 0xD6, 0x0F, 0x5C };
-    LARGE_INTEGER start;
-    LARGE_INTEGER stop;
-    LARGE_INTEGER frequency;
-    QueryPerformanceFrequency(&frequency);
-    QueryPerformanceCounter(&start);
-    for (int i = 0; i < 10; i++)
+    int iters = smc_iterations() < 10 ? smc_iterations() : 10; /* 10 signatures as in the paper; SMC_ITERATIONS may lower it */
+    double start = smc_now();
+    for (int i = 0; i < iters; i++)
         ECDSA_256_sign(sig, hash);
-    QueryPerformanceCounter(&stop);
-    printf("GMP ECDSA p256: %lf seconds\n", (double)(stop.QuadPart - start.QuadPart) / (double)frequency.QuadPart);
-    QueryPerformanceCounter(&start);
-    for (int i = 0; i < 10; i++)
+    double stop = smc_now();
+    printf("GMP ECDSA p256: %lf seconds\n", stop - start);
+    start = smc_now();
+    for (int i = 0; i < iters; i++)
         vm_ECDSA_256_sign(sig, hash);
-    QueryPerformanceCounter(&stop);
-    printf("Graph ECDSA p256: %lf seconds\n", (double)(stop.QuadPart - start.QuadPart) / (double)frequency.QuadPart);
+    stop = smc_now();
+    printf("Graph ECDSA p256: %lf seconds\n", stop - start);
 }
 
 void test()

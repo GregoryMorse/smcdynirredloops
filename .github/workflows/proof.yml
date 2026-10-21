@@ -68,7 +68,7 @@ jobs:
           python python/rsa.py
           python python/aes.py
           python python/ecdsab.py
-          # python/aes.py also emits generated/aesgraph.c (the straight-line graph variant of AES-128, L09)
+          # python/aes.py also emits generated/aesgraph.c, aes192graph.c and aes256graph.c (the straight-line graph variants, L09)
       - name: GMP 6.2.1-4 (ShiftMediaProject prebuilt for VS2022, hash-pinned) into native/deps/gmp
         shell: pwsh
         run: |

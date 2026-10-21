@@ -200,9 +200,10 @@ void run_vm(unsigned long vmi, unsigned long vml, L* const vmo, unsigned char* c
 				L* __restrict eip = &e[a[2]];
 				L* __restrict eaip = &e[a[3]];
 				for (unsigned long k = a[1]; k != 0; ) {
-					unsigned long i = 0, x = 0, b = 32 ^ ((k ^ 32) & -(k < 32));
+					unsigned long i = 0, b = 32 ^ ((k ^ 32) & -(k < 32));
+					unsigned int x = 0;
 					do {
-						x |= d[*(eip++)] << i;
+						x |= (unsigned int)d[*(eip++)] << i;
 					} while (++i != b);
 					k -= b;
 					c |= x & *(eaip++);

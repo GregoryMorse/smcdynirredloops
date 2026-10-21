@@ -2,7 +2,7 @@ name: cmake
 
 # Portable CMake build of the native code (plan R21a): selfmodgraph, the native 2-SAT harness and its vectors, on Windows,
 # Linux and macOS (Intel and arm64). The x86-64 self-modifying blueprint is executed only where the host is x86-64.
-# The AES/RSA/ECDSA drivers (SMC_BUILD_DRIVERS) are built by the MSBuild baseline of proof.yml.
+# The AES/RSA/ECDSA drivers (SMC_BUILD_DRIVERS) are built by proof.yml (MSBuild), drivers.yml (Windows) and drivers-portable.yml.
 on:
   push:
   pull_request:

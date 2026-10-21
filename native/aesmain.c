@@ -1,4 +1,5 @@
-#include <Windows.h>
+#include "smctime.h"
+#include <stdint.h>
 #include "stdio.h"
 
 typedef const unsigned int L;
@@ -255,9 +256,10 @@ void run_vm(unsigned long vmi, unsigned long vml, L* const vmo, unsigned char* c
 				L* __restrict eip = &e[a[2]];
 				L* __restrict eaip = &e[a[3]];
 				for (unsigned long k = a[1]; k != 0; ) {
-					unsigned long i = 0, x = 0, b = 32 ^ ((k ^ 32) & -(k < 32));
+					unsigned long i = 0, b = 32 ^ ((k ^ 32) & -(k < 32));
+					unsigned int x = 0;
 					do {
-						x |= d[*(eip++)] << i;
+						x |= (unsigned int)d[*(eip++)] << i;
 					} while (++i != b);
 					k -= b;
 					c |= x & *(eaip++);
@@ -271,8 +273,13 @@ void run_vm(unsigned long vmi, unsigned long vml, L* const vmo, unsigned char* c
 	}
 }
 
-__declspec(align(16)) struct aes_key_struct { //must 16-byte align for intrinsics
-	unsigned long rd_key[60];
+#ifdef _MSC_VER
+#define SMC_ALIGNED_STRUCT(name) __declspec(align(16)) struct name
+#else
+#define SMC_ALIGNED_STRUCT(name) struct __attribute__((aligned(16))) name
+#endif
+SMC_ALIGNED_STRUCT(aes_key_struct) { //must 16-byte align for intrinsics; 32-bit words (unsigned long is 64-bit on LP64 hosts)
+	uint32_t rd_key[60];
 	int rounds;
 };
 
@@ -280,7 +287,19 @@ typedef struct aes_key_struct AES_KEY;
 AES_KEY intrin_key;
 AES_KEY intrin_key192;
 AES_KEY intrin_key256;
-typedef unsigned long u32;
+typedef uint32_t u32;
+
+const unsigned char userKey[16] = { 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12 };
+const unsigned char userKey192[24+8] = { 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12,
+									0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12 };
+const unsigned char userKey256[32] = { 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12,
+									0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12 };
+
+
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+#define SMC_AESNI 1
+#endif
+#ifdef SMC_AESNI
 
 #ifdef _MSC_VER
 #include <intrin.h>
@@ -412,12 +431,6 @@ void AES_encrypt_intrin(const unsigned char* in, unsigned char* out,
 	}
 	_mm_storeu_si128((__m128i*)out, m);
 }
-const unsigned char userKey[16] = { 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12 };
-const unsigned char userKey192[24+8] = { 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12,
-									0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12 };
-const unsigned char userKey256[32] = { 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12,
-									0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12 };
-
 void AES_intrin_fix_keys()
 {
 	AES_set_encrypt_key_intrin(userKey, 128, &intrin_key);
@@ -437,15 +450,23 @@ void AES_256_encrypt_intrin(unsigned char* out, unsigned char* in) {
 	//AES_set_encrypt_key_intrin(userKey256, 256, &intrin_key256);
 	AES_encrypt_intrin(in, out, &intrin_key256);
 }
+#else
+/* no AES-NI on this architecture (e.g. arm64): the 'Intrinsics' column falls back to the C reference implementation */
+extern void AES_128_encrypt(unsigned char* out, unsigned char* in);
+extern void AES_192_encrypt(unsigned char* out, unsigned char* in);
+extern void AES_256_encrypt(unsigned char* out, unsigned char* in);
+void AES_intrin_fix_keys() {}
+void AES_128_encrypt_intrin(unsigned char* out, unsigned char* in) { AES_128_encrypt(out, in); }
+void AES_192_encrypt_intrin(unsigned char* out, unsigned char* in) { AES_192_encrypt(out, in); }
+void AES_256_encrypt_intrin(unsigned char* out, unsigned char* in) { AES_256_encrypt(out, in); }
+#endif
 
 extern void AES_128_obf_virt_encrypt(unsigned char* out, unsigned char* in);
 extern void AES_128_obf_encrypt(unsigned char* out, unsigned char* in);
 extern void AES_192_obf_virt_encrypt(unsigned char* out, unsigned char* in);
-//the straight-line graph variants for 192 and 256 bits are not generated: these empty stubs leave the output unchanged and the
-//verification below reports a mismatch for the 'Graph Encryption' column (L02)
-extern void AES_192_obf_encrypt(unsigned char* out, unsigned char* in) {}
+extern void AES_192_obf_encrypt(unsigned char* out, unsigned char* in);
 extern void AES_256_obf_virt_encrypt(unsigned char* out, unsigned char* in);
-extern void AES_256_obf_encrypt(unsigned char* out, unsigned char* in) {}
+extern void AES_256_obf_encrypt(unsigned char* out, unsigned char* in);
 extern void AES_fix_keys();
 extern void AES_128_encrypt(unsigned char* out, unsigned char* in);
 extern void AES_192_encrypt(unsigned char* out, unsigned char* in);
@@ -478,16 +499,12 @@ void timing(aesbitfuncs f)
 {
 	unsigned char out[16] = { 0 };
 	char inp[16] = "Hello world!!!!";
-	LARGE_INTEGER start;
-	LARGE_INTEGER stop;
-	LARGE_INTEGER frequency;
-	QueryPerformanceFrequency(&frequency);
 	for (int c = 0; c < 4; c++) {
-		QueryPerformanceCounter(&start);
-		for (int i = 0; i < 1000; i++)
+		double start = smc_now();
+		for (int i = 0; i < smc_iterations(); i++)
 			f.f[c](out, (unsigned char*)inp);
-		QueryPerformanceCounter(&stop);
-		printf("AES-%u %s: %lf seconds\n", f.bits, aesstrs[c], (double)(stop.QuadPart - start.QuadPart) / (double)frequency.QuadPart);
+		double stop = smc_now();
+		printf("AES-%u %s: %lf seconds\n", f.bits, aesstrs[c], stop - start);
 	}
 }
 

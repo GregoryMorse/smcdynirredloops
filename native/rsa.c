@@ -8,10 +8,9 @@
 // rsa.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <Windows.h>
+#include "smctime.h"
 
 #include <stdio.h>
-#include <malloc.h>
 
 typedef const unsigned int L;
 //extern unsigned char scrtchrsa256[];
@@ -266,9 +265,10 @@ void run_vm(unsigned long vmi, unsigned long vml, L* const vmo, unsigned char* c
 				L* __restrict eip = &e[a[2]];
 				L* __restrict eaip = &e[a[3]];
 				for (unsigned long k = a[1]; k != 0; ) {
-					unsigned long i = 0, x = 0, b = 32 ^ ((k ^ 32) & -(k < 32));
+					unsigned long i = 0, b = 32 ^ ((k ^ 32) & -(k < 32));
+					unsigned int x = 0;
 					do {
-						x |= d[*(eip++)] << i;
+						x |= (unsigned int)d[*(eip++)] << i;
 					} while (++i != b);
 					k -= b;
 					c |= x & *(eaip++);
@@ -574,16 +574,12 @@ void timing(rsabitfuncs f)
 	for (int i = 0; i < f.bits / 8 - f.padSize; i++) inp[i] = 1;
 	unsigned char* out = (unsigned char*)_malloca(f.bits / 8);
 	rsa_encrypt(out, (unsigned char*)inp, f.bits / 8 - f.padSize, f.bits / 8, f.n, f.e);
-	LARGE_INTEGER start;
-	LARGE_INTEGER stop;
-	LARGE_INTEGER frequency;
-	QueryPerformanceFrequency(&frequency);
 	for (int c = 0; c < 2; c++) {
-		QueryPerformanceCounter(&start);
-		for (int i = 0; i < 1000; i++)
+		double start = smc_now();
+		for (int i = 0; i < smc_iterations(); i++)
 			f.f[c]((unsigned char*)inp, out);
-		QueryPerformanceCounter(&stop);
-		printf("RSA-%u %s: %lf seconds\n", f.bits, rsastrs[c], (double)(stop.QuadPart - start.QuadPart) / (double)frequency.QuadPart);
+		double stop = smc_now();
+		printf("RSA-%u %s: %lf seconds\n", f.bits, rsastrs[c], stop - start);
 	}
 }
 
