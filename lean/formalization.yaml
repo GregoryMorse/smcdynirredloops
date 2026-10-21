@@ -1,0 +1,160 @@
+# formalization.yaml v0.4 (schema pinned in validation/palomar/policy; checked by validation/palomar/validate_metadata.py)
+version: "v0.4"
+
+project:
+  name: "smcdynirredloops: Lean verification of control flow obfuscation with irreducible loops and self-modifying code"
+  description: >-
+    Lean 4 development (no Mathlib) of the mathematics, algorithms and security statements of Morse, Alqaradaghi and
+    Kozsik, "Control flow obfuscation with irreducible loops and self-modifying code": a self-modifying-code solver for
+    2-SAT and its planted instance generator, the extremal numbers of irreducible loops and multiple-entry edges (the
+    families Kn and Mn), the irreducible-loop transformations of Figures 5 and 6, the Boolean control-flow graphs of AES,
+    and the security statements of Section 5.1 relative to an explicit structural threat model. Two Challenges are
+    submitted from one development: Challenge.lean (solver, extremal numbers, transformations, security model) and
+    ChallengeAES.lean (the AES graphs); a Challenge may have at most 1,000 lines.
+  authors:
+    - "Gregory Morse"
+  license: "MIT"
+  responsible_maintainers:
+    - "Gregory Morse"
+
+classification:
+  arxiv: ["cs.CR", "cs.LO"]
+  msc2020: ["68N30", "68R10", "94A60"]
+
+sources:
+  - title: "Control flow obfuscation with irreducible loops and self-modifying code"
+    authors:
+      - "Gregory Morse"
+      - "Midya Alqaradaghi"
+      - "Tamas Kozsik"
+    id: "doi:10.5486/PMD.2022.Suppl.5"
+    type: "paper"
+    location: "Publ. Math. Debrecen 100 (Supplementum) (2022) 617-637, https://doi.org/10.5486/PMD.2022.Suppl.5"
+    relationship: "adapts"
+    note: >-
+      The formalizer is the first author of the source. The Lean statements follow the paper's definitions and theorems
+      with the corrections listed in lean/errata/ERRATA.md; the security statements of Section 5.1 are formalized
+      relative to the explicit structural assumptions of lean/THREAT_MODEL.md, which the paper does not state.
+    license: "unknown"
+    author_endorsement: "participated"
+  - title: "Folklore confirmed: reducible flow graphs are exponentially larger"
+    authors:
+      - "Larry Carter"
+      - "Jeanne Ferrante"
+      - "Clark Thomborson"
+    type: "paper"
+    location: "POPL 2003, pp. 106-114"
+    relationship: "background"
+    note: "Background for the node-splitting discussion of the source (erratum P17); the development does not formalize its theorems (lean/GAPS.md G33)."
+    license: "unknown"
+    author_endorsement: "not-contacted"
+  - title: "A linear-time algorithm for testing the truth of certain quantified boolean formulas"
+    authors:
+      - "Bengt Aspvall"
+      - "Michael F. Plass"
+      - "Robert E. Tarjan"
+    type: "paper"
+    relationship: "background"
+    note: "The strongly-connected-component method for 2-SAT (Information Processing Letters 8 (1979)); the development proves its own solver correct and does not import this proof."
+    license: "unknown"
+    author_endorsement: "not-contacted"
+  - title: "Nesting of reducible and irreducible loops"
+    authors:
+      - "Paul Havlak"
+    type: "paper"
+    relationship: "background"
+    note: "Loop classification (ACM TOPLAS 19 (1997)) as cited in the source; the development defines irreducibility through its own depth-first-search characterization."
+    license: "unknown"
+    author_endorsement: "not-contacted"
+  - title: "Advanced Encryption Standard (AES), FIPS 197"
+    type: "other"
+    relationship: "background"
+    note: "The AES-128/192/256 encryption function is defined in the development following FIPS 197 and checked against the published test vectors; the Boolean graph is proved correct relative to that definition."
+    license: "unknown"
+    author_endorsement: "n/a"
+
+status:
+  scope: >-
+    Formalized and proved: the SMC 2-SAT solver and the planted generator (SmcTwoSatCorrect); the upper bounds for
+    irreducible loops and multiple-entry edges, the families Kn and Mn attaining them, and the characterization of the
+    extremal graphs among the families Kn, Mn and the lighter variant (IrreducibleExtremal); the path and n-way
+    transformations of Figures 5 and 6 and the general static scheme (TransformCorrect); the Boolean control-flow graphs
+    of AES-128, AES-192 and AES-256 computing the FIPS-197 encryption (CircuitCFGCorrect, separate Challenge
+    ChallengeAES.lean); and the security model of Section 5.1 (SecurityModel) as theorems relative to explicit structural
+    assumptions on the protected program (stamped, forcing, fault-class, final-overwrite and schedule assumptions), each
+    with a necessity witness showing the assumption cannot be dropped. Not formalized: processors, compilers,
+    decompilers and timers are black boxes; timings, tool experiments, the generated x86-64 code, literature statements
+    and the paper's opinions are outside the Lean statement and are evidence at most. The security statements say what
+    follows from the stated assumptions; they do not claim that any real attacker or tool fails. The errata in
+    lean/errata (paper only) record where the published text differs from what is proved.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: []
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["Claude Opus 5.5", "Claude Sonnet 5.5"]
+      framework: "Claude Code"
+      tool_setup: "Claude Code (CLI and VS Code extension) with a plan written by Opus and rounds executed by Sonnet, one round per session; Lean 4.35.0-rc3 without Mathlib; Python audit scripts under validation/; builds under a 1.5 GB aggregate memory cap; GitHub Actions for cold builds and native driver runs."
+      cost:
+        wall_time: "about two weeks of elapsed effort"
+        spend_usd: "subscription-based"
+        hardware: "local Windows machine plus GitHub-hosted runners"
+      prompting_notes: "A written plan (lean/FORMALIZATION_PLAN.md) with settled decisions and per-round handoff notes (lean/ROUNDS.md); gaps tracked in lean/GAPS.md."
+  spend_usd: "subscription-based"
+  notes: >-
+    The statements, the threat model and every decision in the plan were set by the author; the proofs were written
+    mostly by the agents and are checked by the Lean kernel. Mechanical audits (validation/*.py: threat audit, axiom audit,
+    errata audit, coverage audit, Challenge regeneration) run in CI. No independent human review of the statements is claimed.
+
+fidelity:
+  divergences: >-
+    Where the published paper differs from what is proved, the difference is recorded as an erratum in
+    lean/errata/ERRATA.md (items P01-P29, T01, B01), for example the clause count index (P01), Definitions 3 and 4 of
+    Section 5 (P16), the node-splitting paragraph (P17), Figures 5(c) and 6(c) (P18, P19) and the Section 5.1 security
+    claims, which the paper states without a threat model and which are formalized here relative to explicit structural
+    assumptions (P22-P25). Items marked listing or editorial concern code listings and text, not Lean statements. The AES
+    graph is the one the development generates; it is not claimed to be the paper's graph variant (open author question in
+    lean/errata/QUESTIONS.md).
+
+review:
+  status: "self-assessed"
+  reviewers:
+    - "none"
+  notes: >-
+    The author audited the statements against the paper and the errata list; the Lean kernel checks the proofs. Mechanical
+    audits cover forbidden constructs, axioms, assumption shape (structural, never "the attacker fails"), errata quotation
+    against the published PDF, and coverage of every paper item (lean/PAPER_MAP.md). No external mathematical review has
+    been done and no Palomar submission or registration has been made.
+
+alignment:
+  namespace: "SmcIrred"
+  statements:
+    - source: "Section 3, 2-SAT with self-modifying code (Algorithm)"
+      lean: "SmcIrred.Paper.SmcTwoSatCorrect"
+      module: "Challenge"
+      status: "proved"
+      note: "The solver returns a satisfying assignment exactly when one exists; the planted generator produces satisfiable instances with a known solution."
+    - source: "Section 1 and Section 4, irreducible loops and multiple-entry edges (bounds and extremal families Kn, Mn)"
+      lean: "SmcIrred.Paper.IrreducibleExtremal"
+      module: "Challenge"
+      status: "proved"
+      note: "Bounds, attainment by Kn and Mn, and the characterization among the families; corrections recorded as errata."
+    - source: "Section 5, Figures 5 and 6, transformations introducing irreducible loops"
+      lean: "SmcIrred.Paper.TransformCorrect"
+      module: "Challenge"
+      status: "adapted"
+      note: "Path and n-way transformations and the general static scheme, with Definitions 3 and 4 corrected (P16)."
+    - source: "Section 5.1, security of the transformation"
+      lean: "SmcIrred.Paper.SecurityModel"
+      module: "Challenge"
+      status: "adapted"
+      note: "Proved relative to explicit structural assumptions that the paper does not state; each assumption has a necessity witness."
+    - source: "Section 4, Boolean control-flow graphs of AES"
+      lean: "SmcIrred.Paper.CircuitCFGCorrect"
+      module: "ChallengeAES"
+      status: "proved"
+      note: "Separate Challenge (line limit); the generated graphs evaluate to the FIPS-197 encryption for every key and block."
+
+acknowledgements: "The Lean 4 core library and Lake; Claude Code and the Claude models; the Palomar project and the Comparator for the verification pipeline."

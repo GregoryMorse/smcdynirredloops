@@ -2,6 +2,7 @@ module
 
 public import SmcIrred.Lang.Common
 public import SmcIrred.Spec.LangFigs
+public import SmcIrred.Spec.Edges
 
 public section
 
@@ -9,22 +10,8 @@ namespace SmcIrred.Lang
 
 /-! Minimal edge counts (C73). -/
 
-/-- The path `0 → 1 → … → n-1`. -/
-@[expose] def pathG (n : Nat) : Digraph where
-  n := n
-  succ k := if k + 1 < n then [k + 1] else []
-
-/-- Add the edge `x → y` (listed last at `x`). -/
-@[expose] def addEdge (g : Digraph) (x y : Nat) : Digraph where
-  n := g.n
-  succ k := if k = x then g.succ k ++ [y] else g.succ k
-
 /-- Number of edges (distinct successor pairs). -/
 @[expose] def numEdges (g : Digraph) : Nat := (List.range g.n).foldl (fun s v => s + g.outDeg v) 0
-
-/-- No vertex heads an irreducible loop of the depth-first jungle of the code order. -/
-@[expose] def NoIrr (g : Digraph) : Prop :=
-  ∀ w, w < g.n → ¬ g.Irreducible (dfsRun g 0 2) w
 
 instance (g : Digraph) : Decidable (NoIrr g) := by unfold NoIrr; infer_instance
 

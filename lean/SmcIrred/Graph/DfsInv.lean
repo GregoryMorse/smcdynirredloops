@@ -1,6 +1,6 @@
 module
 
-public import SmcIrred.Graph.RunDFS
+public import SmcIrred.Spec.RunDFS
 
 public section
 

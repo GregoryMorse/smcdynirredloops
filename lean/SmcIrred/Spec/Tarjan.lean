@@ -73,4 +73,9 @@ lowlink to the parent `par`. -/
 /-- The components in emission order. -/
 @[expose] def tarjanSccs (g : Digraph) : List (List Nat) := (tarjan g).out
 
+/-- The number of in-range edges of the vertices `0 … k-1`. -/
+@[expose] def tEdges (g : Digraph) : Nat → Nat
+  | 0 => 0
+  | k + 1 => tEdges g k + (tsuccs g k).length
+
 end SmcIrred

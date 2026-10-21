@@ -1,5 +1,5 @@
 """Build and run the native 2-SAT harness (plan R8 item 2) with MSVC: python validation/native_twosat.py [--archs x64 x86]
-[--vm]. Needs validation/data/twosat_vectors.txt (regenerate: python validation/lean_scratch.py validation/TwoSatVectors.lean).
+[--vm]. Needs validation/data/twosat_vectors.txt (regenerate: python validation/lean_scratch.py validation/TwoSatVectors.leanscript).
 Writes validation/rounds/R8_native.json. Mechanical evidence about the compiled product code on this machine only."""
 import argparse, json, subprocess, sys, time
 from pathlib import Path

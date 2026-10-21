@@ -2,6 +2,7 @@ module
 
 public import SmcIrred.Prims.Gates
 public import SmcIrred.Spec.Virt
+public import SmcIrred.Spec.Eval
 public import SmcIrred.Circuit.Order
 
 public section
@@ -9,29 +10,6 @@ public section
 namespace SmcIrred
 
 /-! ### The local rule of a vertex (call-free, table-free kinds) and the evaluation of a generator state -/
-
-@[expose] def nodeVal (k : Kind) (vs : List Bool) (t : Bool) : Bool :=
-  let a := (vs.filter id).length + (if t then 1 else 0)
-  let l := vs.length + (if t then 1 else 0)
-  match k with
-  | .flow => decide (l ≠ 0 ∧ a = l)
-  | .any => decide (l ≠ 0 ∧ a ≠ 0)
-  | .add => decide (a % 2 = 1)
-  | .addneg => decide (a % 2 = 0)
-  | _ => false
-
-@[expose] def stepE (inp : Nat → Bool) (vs : List Bool) (nd : Kind × List Nat) : List Bool :=
-  vs ++ [nodeVal nd.1 (nd.2.map fun u => vs.getD u false) (inp vs.length)]
-
-@[expose] def evalNodes (inp : Nat → Bool) (nodes : List (Kind × List Nat)) : List Bool :=
-  nodes.foldl (stepE inp) []
-
-@[expose] def Wire.ev (vs : List Bool) : Wire → Bool
-  | .cst b => b
-  | .nd i => vs.getD i false
-
-/-- The value of a wire in the state `gb` under the active inputs `inp`. -/
-@[expose] def wev (gb : GB) (inp : Nat → Bool) (w : Wire) : Bool := w.ev (evalNodes inp gb.nodes)
 
 @[expose] def Wire.ok (n : Nat) : Wire → Prop
   | .cst _ => True

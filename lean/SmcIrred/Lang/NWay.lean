@@ -8,11 +8,6 @@ namespace SmcIrred.Lang
 
 /-! Two-way and n-way conditionals (C76): the same device works for any number of branches. -/
 
-/-- An `n`-way conditional: vertex `0` is the condition, `1 … k` the branches, `k + 1` the join. -/
-@[expose] def nwayG (k : Nat) : Digraph where
-  n := k + 2
-  succ v := if v = 0 then (List.range k).map (· + 1) else if v ≤ k then [k + 1] else []
-
 /-- The `n`-way conditional is reducible; the single edge from the join back into the first branch makes an
 irreducible loop (the other branches enter the join from outside it), for `2 ≤ k ≤ 6` (two-way to six-way). -/
 theorem nway_one_edge : ∀ k, 2 ≤ k → k ≤ 6 →

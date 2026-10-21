@@ -6,7 +6,7 @@ import SmcIrred.Spec.LNF
 import SmcIrred.Spec.Extremal
 import SmcIrred.Graph.Decide
 import SmcIrred.Graph.Classify
-import SmcIrred.Graph.RunDFS
+import SmcIrred.Spec.RunDFS
 import SmcIrred.Graph.DfsValid
 import SmcIrred.Graph.Fig4
 import SmcIrred.LNF.Path

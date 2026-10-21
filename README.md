@@ -116,6 +116,22 @@ powershell -ExecutionPolicy Bypass -File native\conan_setup.ps1
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for alternative GMP setup options (environment variable or local `deps/` folder).
 
+## Lean formalization
+
+`lean/` contains a Lean 4 (v4.35.0-rc3, no Mathlib, no dependencies) verification of the mathematics, algorithms and
+security statements of the paper: the self-modifying-code 2-SAT solver and the planted generator, the extremal numbers of
+irreducible loops and multiple-entry edges, the transformations of Figures 5 and 6, the Boolean control-flow graphs of AES,
+and the security statements of Section 5.1 relative to an explicit structural threat model. Timings, tool experiments, the
+generated machine code and the paper's opinions are not part of the Lean statements. The development was written with AI
+assistance (Claude Opus 5.5 planning, Claude Sonnet 5.5 execution, Claude Code); the review is self-assessed.
+
+* Statements: `lean/Challenge.lean` and `lean/ChallengeAES.lean` (generated from `lean/SmcIrred/Spec/`), proved by
+  `lean/Solution.lean` and `lean/SolutionAES.lean`; what they say and do not say: `lean/PALOMAR_SEMANTICS.md`.
+* Corrections to the published paper: `lean/errata/ERRATA.md`; code fixes: `lean/CODE_FIXES.md`; open items: `lean/GAPS.md`.
+* Build: `cd lean && lake build SmcIrred Challenge Solution ChallengeAES SolutionAES` (the CI workflow `proof.yml` runs it
+  with an axiom audit; only `propext`, `Quot.sound` and `Classical.choice` are used).
+* Palomar: the development has not been submitted to or registered with Palomar (`lean/PALOMAR_SUBMISSION.md`).
+
 ## Repository conventions
 
 - **`python/`** is the canonical source. Generated C files are derived outputs.

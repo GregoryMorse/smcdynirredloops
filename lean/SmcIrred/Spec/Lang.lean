@@ -166,4 +166,17 @@ inductive Stmt where
 /-- The generator outputs read by some instruction of the code. -/
 @[expose] def codeReads (code : List Instr) : List Nat := code.flatMap Instr.reads
 
+/-- The statements of the transformation language without `goto`, `ifGoto` and labels (structured programs). -/
+@[expose] def Structured : Stmt → Prop
+  | .skip => True
+  | .blk _ => True
+  | .seq s t => Structured s ∧ Structured t
+  | .ite1 _ s => Structured s
+  | .ite _ s t => Structured s ∧ Structured t
+  | .while _ s => Structured s
+  | .doWhile s _ => Structured s
+  | .goto _ => False
+  | .ifGoto _ _ => False
+  | .lab _ _ => False
+
 end SmcIrred.Lang

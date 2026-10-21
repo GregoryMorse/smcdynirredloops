@@ -12,18 +12,6 @@ namespace SmcIrred.Lang
 placed at address `p`, written from the statement (one constructor per instruction, plus the steps of the children);
 `SStep_iff` proves that it is the successor relation of the flat code (`StepI`) at the addresses of `s`. -/
 
-@[expose] def Structured : Stmt → Prop
-  | .skip => True
-  | .blk _ => True
-  | .seq s t => Structured s ∧ Structured t
-  | .ite1 _ s => Structured s
-  | .ite _ s t => Structured s ∧ Structured t
-  | .while _ s => Structured s
-  | .doWhile s _ => Structured s
-  | .goto _ => False
-  | .ifGoto _ _ => False
-  | .lab _ _ => False
-
 /-- The successor relation of flat code at one address (the program counter after the instruction). -/
 @[expose] def StepI (code : List Instr) (a c : Nat) : Prop :=
   match code.getD a .halt with

@@ -1,5 +1,6 @@
 """Axiom audit: for each given module (default: all locally buildable SmcIrred modules),
-import it and check every SmcIrred/PalomarSIL constant uses only the standard axioms.
+import it and check every SmcIrred/PalomarSIL/Solution constant uses only the standard axioms. The default adds Solution;
+SolutionAES declares the same name `PalomarSIL.mathematical_result`, so audit it alone: python validation/axiom_audit.py SolutionAES.
 Usage: python validation/axiom_audit.py [Module ...]"""
 import os, subprocess, sys
 from pathlib import Path
@@ -17,7 +18,7 @@ def okAx : List Name := [`propext, `Quot.sound, `Classical.choice]
   for (name, _) in env.constants.map₁.toList do
     if let some idx := env.getModuleIdxFor? name then
       let root := (env.header.moduleNames[idx.toNat]!).getRoot
-      if root == `SmcIrred || root == `PalomarSIL then
+      if root == `SmcIrred || root == `PalomarSIL || root == `Solution || root == `SolutionAES then
         n := n + 1
         let axs ← collectAxioms name
         for a in axs do
@@ -27,7 +28,7 @@ def okAx : List Name := [`propext, `Quot.sound, `Classical.choice]
 """
 def main():
     mods = sys.argv[1:] or [str(p.relative_to(B.LEAN).with_suffix("")).replace(os.sep, ".")
-                            for p in sorted((B.LEAN / "SmcIrred").rglob("*.lean"))]
+                            for p in sorted((B.LEAN / "SmcIrred").rglob("*.lean"))] + ["Solution"]
     mods = [m for m in mods if not B.needs_mathlib(m)]
     B.main_build = None
     tmp = B.ROOT / "validation/.build"; tmp.mkdir(parents=True, exist_ok=True)

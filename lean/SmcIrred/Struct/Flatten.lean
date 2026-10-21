@@ -9,9 +9,6 @@ namespace SmcIrred.Struct
 
 variable {g : Digraph} {lab : Nat → List Nat} {ch : Nat → Nat}
 
-/-- Well-formed graph: all successors are vertices. -/
-@[expose] def WFg (g : Digraph) : Prop := ∀ v, v < g.n → ∀ w, w ∈ g.succ v → w < g.n
-
 theorem nextState_lt (hwf : WFg g) {v : Nat} (hv : v < g.n) (k : Nat) (hne : g.succ v ≠ []) :
     nextState g ch v k < g.n := by
   unfold nextState

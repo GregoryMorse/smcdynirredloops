@@ -1,6 +1,6 @@
 name = "smcdynirredloops"
 version = "0.1.0"
-defaultTargets = ["SmcIrred"]
+defaultTargets = ["SmcIrred", "Challenge", "Solution", "ChallengeAES", "SolutionAES"]
 weakLeanArgs = ["-M", "768", "-j", "1"]
 
 [leanOptions]
@@ -8,3 +8,19 @@ autoImplicit = false
 
 [[lean_lib]]
 name = "SmcIrred"
+
+[[lean_lib]]
+name = "Challenge"
+roots = ["Challenge"]
+
+[[lean_lib]]
+name = "Solution"
+roots = ["Solution"]
+
+[[lean_lib]]
+name = "ChallengeAES"
+roots = ["ChallengeAES"]
+
+[[lean_lib]]
+name = "SolutionAES"
+roots = ["SolutionAES"]

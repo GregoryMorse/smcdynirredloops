@@ -41,7 +41,7 @@ handoff: done / next / open obligations / hazards / evidence file).
 | R21 | Code fixes (not errata) and native acceptance | must | DONE 2026-10-20 (L01-L11, D03 done; D01, D02 are R24/R25) |
 | R22 | Errata list (paper only) | must | DONE 2026-10-18 (author review requested) |
 | R23 | Coverage and fidelity audit | must | DONE 2026-10-20 (coverage, threat and errata audits pass; D1 wording is limited by the `partial` and `non-claim` rows listed in PAPER_MAP, which R24 copies into the Palomar notes) |
-| R24 | Palomar package, CI, handoff (user submits and registers) | must | TODO |
+| R24 | Palomar package, CI, handoff (user submits and registers) | must | DONE 2026-10-21 locally (Paper, Challenge x2, Solution x2, comparator x2, formalization.yaml, docs, audits); CI run and the official `palomar-full.yml` check pending the user's go-ahead (G13) |
 | R25 | Tag (after registration); corrected manuscript deferred by the user (errata list only for now) | must | TODO |
 
 ## Handoff notes
@@ -272,3 +272,9 @@ handoff: done / next / open obligations / hazards / evidence file).
 ## R19b close and partial rows (2026-10-21)
 - R19b: the protected variant exists (`native/protected.c`, built and run by `cmake.yml`, `R19b_native.json`), Lean models `aes_protected`, `modexp_protected`; P13 now states the published scope; README, CHANGELOG, D03 updated.
 - PAPER_MAP: the 11 `partial` rows are `checked` with their literature, opinion and cost-bound remainders stated as non-claims; no row is `partial`.
+
+## R24 handoff (2026-10-21)
+
+- Done: `Spec/Paper.lean` (five Props) and `Paper.lean` (proofs, first build), `make_challenge.py` (reachability pruning, open-namespace fix), `Challenge.lean` (985 lines) and `ChallengeAES.lean` (626 lines) compile with the single intended `sorry`; `Solution.lean`, `SolutionAES.lean`, `comparator.json`, `comparator-aes.json`, lakefile libraries; `formalization.yaml` (validated against the pinned v0.4 schema and taxonomies); `PALOMAR_SEMANTICS.md`, `LICENSE_AUDIT.md`, `PALOMAR_SUBMISSION.md`, README Lean section (D01); CI `linux.sh` (Challenge/Solution builds, `make_challenge --check`, coverage, threat), axiom audit extended to the Solutions (0 violations for both).
+- Open: G13 (dispatch of `palomar-full.yml` needs the user's go-ahead), G42 (editorial gates, authorization attestation: user), R25 (tag name, venue; D02).
+- Next: the user decides on the dispatch and submits; R25 after the registration.

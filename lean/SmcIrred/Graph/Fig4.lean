@@ -2,7 +2,7 @@ module
 
 public import SmcIrred.Graph.Classify
 public import SmcIrred.Graph.Decide
-public import SmcIrred.Graph.RunDFS
+public import SmcIrred.Spec.RunDFS
 
 public section
 

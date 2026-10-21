@@ -5,7 +5,7 @@ public import SmcIrred.Spec.LNF
 public import SmcIrred.Spec.Extremal
 public import SmcIrred.Graph.Decide
 public import SmcIrred.Graph.Classify
-public import SmcIrred.Graph.RunDFS
+public import SmcIrred.Spec.RunDFS
 public import SmcIrred.Graph.DfsValid
 public import SmcIrred.Graph.Fig4
 public import SmcIrred.LNF.Path
@@ -209,6 +209,8 @@ public import SmcIrred.Threat.Immutable
 public import SmcIrred.Threat.Structuring
 public import SmcIrred.Threat.NotIO
 public import SmcIrred.Threat.DCA
+public import SmcIrred.Spec.Paper
+public import SmcIrred.Paper
 public import SmcIrred.Threat.Necessity
 public import SmcIrred.Spec.DynBridge
 public import SmcIrred.Dynamic.Bridge

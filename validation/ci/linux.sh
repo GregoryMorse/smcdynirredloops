@@ -8,8 +8,12 @@ cd "$(dirname "$0")/../.."
 ROOT="$PWD"
 cd lean
 lean --version
-lake build SmcIrred   # R24 adds Challenge and Solution 2>&1 | tee "$ROOT/lake-build.log"
+lake build SmcIrred Challenge Solution ChallengeAES SolutionAES 2>&1 | tee "$ROOT/lake-build.log"
 cd "$ROOT"
 python3 validation/ci/axioms.py
-# later rounds append: check_tables, make_challenge, audit_errata, coverage_audit, threat_audit
+# generated-file and audit checks (R24): Challenge files regenerate byte-for-byte, coverage and threat audits
+# (audit_errata.py and check_tables.py read the published PDF / manuscript TeX, which are never committed: local only)
+python3 validation/make_challenge.py --check
+python3 validation/coverage_audit.py
+python3 validation/threat_audit.py
 echo "linux-proof: OK"

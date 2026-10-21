@@ -181,8 +181,6 @@ theorem nway_reducible {k : Nat} : (nwayG k).Reducible 0 := by
   · omega
   · omega
 
-@[expose] def nwayE (k : Nat) : Digraph := addEdge (nwayG k) (k + 1) 1
-
 theorem edge_nwayE {k a b : Nat} : (nwayE k).edge a b ↔ (nwayG k).edge a b ∨ (a = k + 1 ∧ b = 1) := by
   unfold Digraph.edge nwayE addEdge
   simp only [nwayG]

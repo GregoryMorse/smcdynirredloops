@@ -17,11 +17,6 @@ size; popping moves work from the stack to the counter and leaves the potential 
   | 0 => 0
   | k + 1 => tPot g num k + (if num k = 0 then 0 else 2 + (tsuccs g k).length)
 
-/-- The number of in-range edges of the vertices `0 … k-1`. -/
-@[expose] def tEdges (g : Digraph) : Nat → Nat
-  | 0 => 0
-  | k + 1 => tEdges g k + (tsuccs g k).length
-
 theorem popTo_length (v : Nat) : ∀ l : List Nat, (popTo v l).1.length + (popTo v l).2.length = l.length := by
   intro l
   induction l with

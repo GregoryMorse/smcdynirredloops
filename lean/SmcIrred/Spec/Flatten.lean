@@ -30,4 +30,7 @@ inductive FRun (g : Digraph) (lab : Nat → List Nat) (ch : Nat → Nat) : Nat �
   | step {s k : Nat} {t : List Nat} : s ≠ g.n →
       FRun g lab ch (nextState g ch s k) (k + 1) t → FRun g lab ch s k (lab s ++ t)
 
+/-- Well-formed graph: all successors are vertices. -/
+@[expose] def WFg (g : Digraph) : Prop := ∀ v, v < g.n → ∀ w, w ∈ g.succ v → w < g.n
+
 end SmcIrred.Struct
