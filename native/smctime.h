@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #ifdef _WIN32
 #include <windows.h>
+#include <malloc.h>
 static double smc_now(void)
 {
 	LARGE_INTEGER f, c;
