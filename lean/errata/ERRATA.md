@@ -205,12 +205,12 @@ Rows 128 and 256 both show 9.141ms (x86) and 7.640ms (x86-64); row 32 shows 851m
 **After:**
 
 ```tex
-Row 32: replace 851ms and 707ms by 851us and 707us (units). Row 256: the C gmp cells repeat the row-128 cells; they should read about 44ms (x86) and 37ms (x86-64), the row-128 values scaled by the ratio 4.8 measured for the same code (an estimate; the exact cells need the machine of the other rows).
+Row 32: replace 851ms and 707ms by 851us and 707us (units). Row 256: the C gmp cells repeat the row-128 cells; they should read about 42ms (x86) and 35ms (x86-64), the row-128 values scaled by the ratio about 4.5 measured for the same code (an estimate; the exact cells need the machine of the other rows).
 ```
 
 **Reason:** The 256-bit cells duplicate the 128-bit cells, which is implausible, and the 32-bit cells exceed the 64-bit cells (the unit is microseconds, not milliseconds).
 
-**Evidence:** Re-measurement of the repository's native/rsa.c (GMP decryption, 1000 iterations, GitHub windows-2022 runner, MSVC Release x64, GMP 6.2.1-4; validation/data/driver_timing.json, evidence class M, not proof): 0.50, 0.75, 2.41 and 11.6 ms for 32, 64, 128 and 256 bits, increasing in the bit length with row 256 about 4.8 times row 128, so the repeated 256-bit cells and the 32-bit cells above the 64-bit cells are wrong. The hosted runner is not the author's machine, so the 256-bit cells are not derivable from it. Author decision 2026-10-17: re-measure first, then apply the minimal correction.
+**Evidence:** Re-measurement of the repository's native/rsa.c (GMP decryption, 1000 iterations, GitHub windows-2022 runner, MSVC Release x64, GMP 6.2.1-4; evidence class M, not proof): two runs (39494633072: 0.50, 0.75, 2.41 and 11.6 ms; 39549194822, the one in validation/data/driver_timing.json: 0.58, 0.87, 2.34 and 10.6 ms) for 32, 64, 128 and 256 bits, increasing in the bit length with row 256 about 4.8 and 4.5 times row 128, so the repeated 256-bit cells and the 32-bit cells above the 64-bit cells are wrong. The hosted runner is not the author's machine, so the 256-bit cells are not derivable from it. Author decision 2026-10-17: re-measure first, then apply the minimal correction.
 
 **Source:** published PDF p. 629
 

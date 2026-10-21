@@ -10,7 +10,7 @@ states its Lean verification, the Palomar entry and the tag.
 (state and handoff notes: `lean/ROUNDS.md`). Decisions in plan §2 are settled; ask the user before
 deviating. Do not browse sibling repositories beyond the paths the plan names.
 
-**Current round: R24 done locally, awaiting the user** (R0–R23 and all sub-rounds done by 2026-10-21; remaining: the user's go-ahead to dispatch `palomar-full.yml` (G13), the user's submission and registration, R25 tag). Update this line at each round close.
+**Current round: R24 done, awaiting the user** (R0–R24 and all sub-rounds done by 2026-10-21, no open gap; remaining: the user submits to Palomar and registers, then R25 tag). Update this line at each round close.
 
 ## Hard rules
 

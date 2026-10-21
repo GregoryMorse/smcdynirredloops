@@ -278,3 +278,8 @@ handoff: done / next / open obligations / hazards / evidence file).
 - Done: `Spec/Paper.lean` (five Props) and `Paper.lean` (proofs, first build), `make_challenge.py` (reachability pruning, open-namespace fix), `Challenge.lean` (985 lines) and `ChallengeAES.lean` (626 lines) compile with the single intended `sorry`; `Solution.lean`, `SolutionAES.lean`, `comparator.json`, `comparator-aes.json`, lakefile libraries; `formalization.yaml` (validated against the pinned v0.4 schema and taxonomies); `PALOMAR_SEMANTICS.md`, `LICENSE_AUDIT.md`, `PALOMAR_SUBMISSION.md`, README Lean section (D01); CI `linux.sh` (Challenge/Solution builds, `make_challenge --check`, coverage, threat), axiom audit extended to the Solutions (0 violations for both).
 - Open: G13 (dispatch of `palomar-full.yml` needs the user's go-ahead), G42 (editorial gates, authorization attestation: user), R25 (tag name, venue; D02).
 - Next: the user decides on the dispatch and submits; R25 after the registration.
+
+## R24 follow-up (2026-10-21)
+
+- Author rulings applied: fix every real error however minor and count items freely (T01-T17, B01-B05 split; policy updated), P06/P30 (circuit-synthesis hardness), P28, P31 (NAF/MOF), P10 with an estimated row 256, P25 stays (threat model), P11 stays an erratum (the printed tables are those of the key 0x12: a random key gives other graph sizes, so the code stays), C05/C82 sources read (no erratum), L09 done.
+- All gaps closed (G13, G42, G43 included). Next: the user submits Palomar and registers; R25 (tag name, venue; D02).
