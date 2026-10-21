@@ -1,0 +1,17 @@
+{
+ "round": "R24",
+ "status": "done locally; official palomar-full.yml check unverified (G13, user's go-ahead)",
+ "commit": "d2445329f468b164daaf50ccd06e104bbb56d481",
+ "commands": [
+  "python validation/build_modules.py SmcIrred.Spec.Paper SmcIrred.Paper Solution SolutionAES Challenge ChallengeAES",
+  "python validation/make_challenge.py --check",
+  "python validation/axiom_audit.py ; python validation/axiom_audit.py SolutionAES",
+  "python validation/palomar/validate_metadata.py",
+  "python palomar_preflight.py . --project-dir lean --comparator lean/comparator.json --metadata lean/formalization.yaml"
+ ],
+ "evidence": "GitHub Actions proof.yml run 39527923172 (linux-proof, linux-native, windows-native on windows-2022 and windows-2025: success), cmake.yml run 39527923067 (success), ci.yml run 39527923181 (success) on the commit above",
+ "preflight": "0 errors, 1 warning (Challenge size 985 lines, 51937 bytes), 12 unverified items (authoritative checks)",
+ "registry": "data.palomar-registry.org registration-identities query for lean/comparator.json and lean/comparator-aes.json: HTTP 404 (no existing registration)",
+ "open": ["G13", "G42"],
+ "sorry": 0
+}
