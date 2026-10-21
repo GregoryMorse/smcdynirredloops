@@ -31,8 +31,7 @@ jobs:
           python python/rsa.py
           python python/aes.py
           python python/ecdsab.py
-          # the straight-line graph variant of AES-128 has no emitter (L09); the driver links a stub with the same symbol
-          Set-Content -Path generated/aesgraph.c -Value 'void AES_128_obf_encrypt(unsigned char* out, unsigned char* in) {}'
+          # python/aes.py also emits generated/aesgraph.c (the straight-line graph variant of AES-128, L09)
           Get-ChildItem generated | Select-Object Name, Length
       - name: GMP 6.2.1-4 (ShiftMediaProject prebuilt for VS2022, hash-pinned)
         shell: pwsh

@@ -14,9 +14,9 @@ errata (the repository has no tagged release and the paper links only the reposi
    internal inconsistency, or a primary source. `confidence: inferred` states in `evidence` what the replacement
    wording rests on. Anything else is `ask-author` and is not applied until answered. `optional` items are real but
    minor; the author decides whether they appear.
-4. Typos are one grouped item (T01), reference corrections one grouped item (B01). Every item is self-contained.
+4. Every real mistake is fixed however minor (author, 2026-10-21); how items are counted is unimportant, so each independent mistake is its own item: one typo per T item (T01-T17), one reference per B item (B01-B05). Every item is self-contained.
 5. Evidence (native runs, regenerated counts, brute-force checks) is never called proof; only a Lean declaration is.
-6. The list is minimal but complete: every real mistake is recorded, trivia are grouped.
+6. The list is complete: every real mistake is recorded. The wording of each correction stays minimal, except where a missing threat model or a conflated claim needs a fuller statement (P25, P06).
 7. The dissertation is out of scope. This list is self-contained; the dissertation-wide list is built separately.
 8. `edits.json` is the single source. Fields: `id`, `page` (journal page), `location`, `kind`
    (`replace|clarify|group`), `before` (published wording), `before_pdf` (`[{page, text}]`, found on that page of the

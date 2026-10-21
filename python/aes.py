@@ -1033,7 +1033,7 @@ _OUTDIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', 'gen
 import virt
 def save_aes_virtual(v, bits):
   op, g, inpmap, outp, subg = v
-  virt.virt_to_c(_os.path.join(_OUTDIR, "aes" + str(bits)), "AES_" + str(bits), op, g, 10+1, inpmap, outp, subg)
+  virt.virt_to_c(_os.path.join(_OUTDIR, "aes" + str(bits)), "AES_" + str(bits), op, g, 10+1, inpmap, outp, subg, graph_c=_os.path.join(_OUTDIR, "aesgraph.c") if bits == 128 else None)
 def run_aes_virtual(inp, v, ksched=None):
   op, g, inpmap, outp, subg = v
   inp = int.from_bytes(inp[0:16 if ksched is None else ksched // 8], 'little')

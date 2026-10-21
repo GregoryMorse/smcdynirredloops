@@ -660,41 +660,75 @@ def graph_to_virt_c_opt(fname, funcname, op, g, pred, deporder, inpmap, outp, su
     f.write(("\trun_vm(" + str(base) + ", " + str(len(g)) + ", &e[" + str(len(edgetable)+len(subgraphtable)*5+len(subgmaptable)*7) + "], d, e, &e[" + str(len(edgetable)) + "], &e[" + str(len(edgetable)+len(subgraphtable)*5) + "], " + str(len(nodetable)) + ");\n").encode('ascii'))
     f.write(("\tread_output(out, " + str(len(outp)//BITSZ//8) + ", &e[" + str(edgeoutmap) + "], d);\n").encode('ascii'))
     f.write("}\n".encode('ascii'))
-def graph_to_c(fname, funcname, op, g, pred, deporder, inpmap, outp, subg):
-  mp = {}; ct = 0; inp = set(inpmap)
+def _gc_pushes(g, mp, x):
+  """C statements that accept node x: set its flag and count one more accepted predecessor at every successor."""
+  return "A[%d]=1;" % mp[x] + "".join("D[%d]++;" % mp[y] for y in g[x])
+def _gc_graph(f, pre, op, g, pred, deporder, inpmap, entry, sid, chunk=1000):
+  """Straight-line C for one graph (a rewrite of the interpreter `do_run_virtual`, a single pass in dependency order): D[n]
+  counts the accepted predecessors of node n, A[n] says that n is accepted; FLOW (AND), ANY (OR), ADD (XOR) and ADDNEG (XNOR)
+  nodes test D, a reusable-unit node (SUBG_OP) calls the straight-line function of its subgraph with the accepted flags of its
+  input nodes and accepts the outputs the subgraph accepts. Writes the node tables, the chunk functions and the head of the
+  entry function (header `entry`, flags cleared); the caller loads the inputs, calls the chunks and reads the outputs."""
+  assert BITSZ == 1
+  mp = {x: i for i, x in enumerate(deporder)}
   for x in g:
-    mp[x] = ct; ct += 1
-  with open(fname + "graph.c", "w") as f:
-    f.write("void load_input(unsigned char* in, unsigned long* inpmap, unsigned char* d);\n")
-    f.write("void read_output(unsigned char* out, unsigned long* outp, unsigned char* d);\n")
-    f.write("void " + funcname + "_obf_encrypt(unsigned char* out, unsigned char* in)\n{\n")
-    f.write("\tunsigned long inpmap[] = { " + ",".join(str(mp[z]) for z in inpmap) + " };\n")
-    f.write("\tunsigned long outp[] = { " + ",".join(str(mp[z]) for z in outp) + " };\n")
-    f.write("\tunsigned char d[" + str(len(g)) + "] = {};\n")
-    f.write("\tload_input(in, inpmap, d);\n")
-    for i, x in enumerate(deporder):
-      if i != 0: f.write("l" + str(x) + ":\n")
-      nx = deporder[i+1] if i != len(deporder) - 1 else 0
-      if op[x] == FLOW_OP:
-        f.write("\tif (d[" + str(mp[x]) + "]!=" + str(1 if x in inp else len(pred[x])) + ") goto l" + str(nx) + ";\n")
-      elif op[x] == ANY_OP:
-        f.write("\tif (!d[" + str(mp[x]) + "]) goto l" + str(nx) + ";\n")
-      elif op[x] == ADD_OP:
-        f.write("\tif (!(d[" + str(mp[x]) + "]&1)) goto l" + str(nx) + ";\n")
-      elif op[x] == ADDNEG_OP:
-        f.write("\tif (d[" + str(mp[x]) + "]&1) goto l" + str(nx) + ";\n")
-      for y in g[x]:
-        f.write("\td[" + str(mp[y]) + "]++;\n")
-    f.write("l" + str(0) + ":\n")
-    f.write("\tread_output(out, outp, d);\n")
-    f.write("}\n")
-def virt_to_c(fname, funcname, op, g, rounds, inpmap, outmap=None, subg=None):
+    assert len(set(g[x])) == len(g[x]), "parallel edges: the counting form needs a simple graph"
+  n = len(mp)
+  f.write("static unsigned short %sD[%d]; static unsigned char %sA[%d];\n" % (pre, n, pre, n))
+  stmts = []
+  for x in deporder:
+    o = op[x]; i = mp[x]; k = len(pred[x])
+    acc = _gc_pushes(g, mp, x)
+    if type(o) is tuple:
+      assert o[0] == SUBG_OP and o[4] == 0, "only non-repeated reusable units are emitted"
+      body = "{unsigned char in_[%d]={%s},out_[%d]; m_s%d(in_,out_);" % (len(o[2]), ",".join(("A[%d]" % mp[y]) if y in mp else "0" for y in o[2]), len(o[3]), sid[o[1]])
+      body += "".join("if(out_[%d]){%s}" % (j, _gc_pushes(g, mp, y)) for j, y in enumerate(o[3]) if y in mp) + "}" #nodes the reduction removed are not accepted and have no successors
+      stmts.append("if(D[%d]==1){%s}" % (i, body))
+    elif o == FLOW_OP:
+      if k != 0 and x not in inpmap: stmts.append("if(D[%d]==%d){%s}" % (i, k, acc))
+    elif o == ANY_OP:
+      if k != 0: stmts.append("if(D[%d]){%s}" % (i, acc))
+    elif o == ADD_OP: stmts.append("if(D[%d]&1){%s}" % (i, acc))
+    elif o == ADDNEG_OP: stmts.append("if(!(D[%d]&1)){%s}" % (i, acc))
+    else: raise NotImplementedError("operation " + str(o))
+  for c in range(0, len(stmts), chunk):
+    f.write("static void %sc%d(void)\n{\n#define D %sD\n#define A %sA\n" % (pre, c // chunk, pre, pre))
+    f.write("\n".join(stmts[c:c + chunk]) + "\n#undef D\n#undef A\n}\n")
+  f.write(entry + "\n{\n#define D %sD\n#define A %sA\n\tint j;\n" % (pre, pre))
+  f.write("\tfor (j = 0; j < %d; j++) { D[j] = 0; A[j] = 0; }\n" % n)
+  return mp, (len(stmts) + chunk - 1) // chunk
+def graph_to_c(fname, funcname, op, g, pred, deporder, inpmap, outp, subg):
+  """The straight-line (goto-free, VM-free) graph variant `<funcname>_obf_encrypt(out, in)` (Tables 1-2, 'Graph Encryption');
+  in and out are little-endian blocks whose bit i is input node inpmap[i] and output node outp[i]."""
+  assert BITSZ == 1
+  with open(fname, "w") as f:
+    f.write("/* generated by python/virt.py graph_to_c; do not edit */\n#include <string.h>\n")
+    sid = {key: n for n, key in enumerate(subg)} #reusable units are keyed by (function, bits, arguments)
+    for key, idx in sid.items():
+      sg, sop, sinp, sout = subg[key][0], subg[key][1], subg[key][2], subg[key][3]
+      spred = graph.succ_to_pred(sg)
+      mp, nch = _gc_graph(f, "m_s%d_" % idx, sop, sg, spred, graph.topo_kahn(sg, randomize=True), set(sinp),
+                          "static void m_s%d(const unsigned char* in_, unsigned char* out_)" % idx, sid)
+      for j, x in enumerate(sinp):
+        f.write("\tif (in_[%d]) {%s}\n" % (j, _gc_pushes(sg, mp, x)))
+      f.write("".join("\tm_s%d_c%d();\n" % (idx, c) for c in range(nch)))
+      f.write("".join("\tout_[%d] = A[%d];\n" % (j, mp[x]) for j, x in enumerate(sout)))
+      f.write("#undef D\n#undef A\n}\n")
+    mp, nch = _gc_graph(f, "m_", op, g, pred, deporder, set(inpmap),
+                        "void " + funcname + "_obf_encrypt(unsigned char* out, unsigned char* in)", sid)
+    for i, x in enumerate(inpmap):
+      f.write("\tif ((in[%d] >> %d) & 1) {%s}\n" % (i >> 3, i & 7, _gc_pushes(g, mp, x)))
+    f.write("".join("\tm_c%d();\n" % c for c in range(nch)))
+    f.write("\tmemset(out, 0, %d);\n" % (len(outp) // 8))
+    f.write("".join("\tif (A[%d]) out[%d] |= %d;\n" % (mp[x], i >> 3, 1 << (i & 7)) for i, x in enumerate(outp)))
+    f.write("#undef D\n#undef A\n}\n")
+def virt_to_c(fname, funcname, op, g, rounds, inpmap, outmap=None, subg=None, graph_c=None):
   #emit C code
   reduce_all(op, g, inpmap, outmap, subg)
   pred = graph.succ_to_pred(g)
   #deporder, levels = graph.topo_kahn_levels(g)
   deporder = graph.topo_kahn(g, randomize=True)
-  #graph_to_c(fname, funcname, op, g, pred, deporder, inpmap, outmap, subg)
+  if graph_c: graph_to_c(graph_c, funcname, op, g, pred, deporder, inpmap, outmap, subg) #L09: the straight-line graph variant
   graph_to_virt_c_opt(fname, funcname, op, g, pred, deporder, inpmap, outmap, subg, isstr=False)
   graph_to_virt_c_opt(fname, funcname, op, g, pred, deporder, inpmap, outmap, subg)
 def reduce_all(op, g, inpmap, outmap, subg=None):

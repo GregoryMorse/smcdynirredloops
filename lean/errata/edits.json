@@ -133,31 +133,28 @@
    "id": "P06",
    "page": 624,
    "location": "Section 4 (p. 624) and Section 4.1 (p. 625)",
-   "kind": "clarify",
-   "before": "using logic synthesis to construct an optimal circuit is NP-hard based on the circuit SAT problem; Although the optimal one is NP-hard",
+   "kind": "replace",
+   "before": "using logic synthesis to construct an optimal circuit is NP-hard based on the circuit SAT problem",
    "before_pdf": [
     {
      "page": 624,
      "text": "using logic synthesis to construct an optimal circuit is NP-hard based on the circuit SAT problem"
-    },
-    {
-     "page": 625,
-     "text": "Although the optimal one is NP-hard"
     }
    ],
    "before_tex": [
-    "using logic synthesis to construct an optimal circuit is NP-hard based on the circuit SAT problem",
-    "Although the optimal one is NP-hard"
+    "using logic synthesis to construct an optimal circuit is NP-hard based on the circuit SAT problem"
    ],
-   "after": "Construct a minimum-size circuit for a given truth table is the Minimum Circuit Size Problem, whose NP-hardness is open (minimizing DNF formulas is NP-hard, and minimizing circuits for multi-output functions is NP-hard under randomized reductions); minimizing a given circuit is coNP-hard by reduction from circuit satisfiability. State which is meant and cite it.",
-   "after_tex": null,
-   "reason": "Circuit satisfiability does not by itself give NP-hardness of optimal synthesis from a truth table, and for a single-output truth table the question is a well-known open problem.",
-   "class": "editorial",
-   "status": "ask-author",
-   "confidence": "inferred",
-   "evidence": "Ilango, Loff, Oliveira, NP-hardness of circuit minimization for multi-output functions, CCC 2020 (abstract: single-output NP-hardness open for general circuits, known for DNFs); Kabanets and Cai 2000 (MCSP). Wording left to the author.",
+   "after": "constructing a smallest circuit for a given truth table is the Minimum Circuit Size Problem (MCSP) (Kabanets and Cai, STOC 2000): it is in NP, but whether it is NP-hard is a well-known open problem (it is NP-hard for DNF formulas (Allender, Hellerstein, McCabe, Pitassi and Saks, SIAM J. Comput. 38 (2008)) and, under randomized reductions, for circuits with several outputs (Ilango, Loff and Oliveira, CCC 2020)). Circuit satisfiability, which is NP-complete, only asks whether a given circuit has an input that makes it output 1 and does not by itself give the hardness of finding an optimal circuit; minimizing a given circuit (finding an equivalent circuit of at most a given size) is coNP-hard, since the circuits that compute the constant 0 function are exactly the unsatisfiable ones, which a one-gate circuit replaces",
+   "after_tex": [
+    "constructing a smallest circuit for a given truth table is the Minimum Circuit Size Problem (MCSP) (Kabanets and Cai, STOC 2000): it is in NP, but whether it is NP-hard is a well-known open problem (it is NP-hard for DNF formulas (Allender, Hellerstein, McCabe, Pitassi and Saks, SIAM J. Comput. 38 (2008)) and, under randomized reductions, for circuits with several outputs (Ilango, Loff and Oliveira, CCC 2020)). Circuit satisfiability, which is NP-complete, only asks whether a given circuit has an input that makes it output 1 and does not by itself give the hardness of finding an optimal circuit; minimizing a given circuit (finding an equivalent circuit of at most a given size) is coNP-hard, since the circuits that compute the constant 0 function are exactly the unsatisfiable ones, which a one-gate circuit replaces"
+   ],
+   "reason": "Three distinct problems are conflated: circuit satisfiability (NP-complete), minimizing a given circuit (coNP-hard) and constructing a smallest circuit from a truth table (MCSP, whose NP-hardness is open for single-output general circuits).",
+   "class": "formal",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Kabanets and Cai, Circuit minimization problem, STOC 2000 (MCSP in NP, hardness open, partial hardness evidence); Allender, Hellerstein, McCabe, Pitassi and Saks, Minimizing disjunctive normal form formulas and AC0 circuits given a truth table, SIAM J. Comput. 38(1) 2008 (NP-hardness of DNF minimization from a truth table, Masek 1979); Ilango, Loff and Oliveira, NP-hardness of circuit minimization for multi-output functions, CCC 2020 (https://drops.dagstuhl.de/opus/volltexte/2020/12574/). The coNP-hardness of minimizing a given circuit is the reduction stated in the replacement text.",
    "lean_refs": [],
-   "source": "published PDF pp. 624-625; https://drops.dagstuhl.de/opus/volltexte/2020/12574/"
+   "source": "published PDF p. 624"
   },
   {
    "id": "P07",
@@ -265,12 +262,12 @@
     "& x86 & 9.141ms & 196.69s",
     "& x86 & 9.141ms & 1171.36s"
    ],
-   "after": "Row 32: replace 851ms and 707ms by 851us and 707us (units). Row 256: the C gmp cells repeat the row-128 cells; replace them by values measured on the machine of the other rows (supplied by the author).",
+   "after": "Row 32: replace 851ms and 707ms by 851us and 707us (units). Row 256: the C gmp cells repeat the row-128 cells; they should read about 44ms (x86) and 37ms (x86-64), the row-128 values scaled by the ratio 4.8 measured for the same code (an estimate; the exact cells need the machine of the other rows).",
    "after_tex": null,
    "reason": "The 256-bit cells duplicate the 128-bit cells, which is implausible, and the 32-bit cells exceed the 64-bit cells (the unit is microseconds, not milliseconds).",
    "class": "mechanical",
-   "status": "ask-author",
-   "confidence": "certain",
+   "status": "confirmed",
+   "confidence": "inferred",
    "evidence": "Re-measurement of the repository's native/rsa.c (GMP decryption, 1000 iterations, GitHub windows-2022 runner, MSVC Release x64, GMP 6.2.1-4; validation/data/driver_timing.json, evidence class M, not proof): 0.50, 0.75, 2.41 and 11.6 ms for 32, 64, 128 and 256 bits, increasing in the bit length with row 256 about 4.8 times row 128, so the repeated 256-bit cells and the 32-bit cells above the 64-bit cells are wrong. The hosted runner is not the author's machine, so the 256-bit cells are not derivable from it. Author decision 2026-10-17: re-measure first, then apply the minimal correction.",
    "lean_refs": [],
    "source": "published PDF p. 629"
@@ -279,24 +276,28 @@
    "id": "P11",
    "page": 627,
    "location": "Section 4.3 and Tables 1-2",
-   "kind": "clarify",
-   "before": "AES encryption with a fixed randomly generated key; node and edge counts of Tables 1-2",
+   "kind": "replace",
+   "before": "AES encryption with a fixed randomly generated key",
    "before_pdf": [
     {
      "page": 627,
      "text": "a fixed randomly generated key"
     }
    ],
-   "before_tex": "AES encryption with a fixed randomly generated key",
-   "after": "State the key used (the repository generates AES graphs with the key bytes 0x12...). Regeneration (R16) gives the printed Nodes, Edges and Exec. N; Exec. E depends on the random dependency order (AES-256: 541018 to 541694 over runs), so it is not fixed by the key.",
-   "after_tex": null,
-   "reason": "Provenance of the measured graph and counts; to be settled by regenerating the graphs (R16).",
+   "before_tex": [
+    "AES encryption with a fixed randomly generated key"
+   ],
+   "after": "AES encryption with the fixed key whose bytes are all 0x12",
+   "after_tex": [
+    "AES encryption with the fixed key whose bytes are all 0x12"
+   ],
+   "reason": "The Nodes, Edges and Exec. N of Tables 1-2 are those of the graph built for the constant key 0x12...12, not for a randomly generated key; the AES graph size depends on the key bits.",
    "class": "mechanical",
-   "status": "ask-author",
-   "confidence": "inferred",
-   "evidence": "python/aes.py gen_aes uses key = b'\\x12' * (bits // 8); regeneration (R16, validation/data/table_regen.json, evidence class M, not proof) reproduces Nodes, Edges and Exec. N of Tables 1-2.",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Regeneration with python/aes.py (evidence class M, not proof; validation/data/table_regen.json): the key 0x12 in every byte reproduces the printed Nodes, Edges and Exec. N of all three AES sizes exactly (51127/222683, 61364/267320, 71568/311924 static); a randomly generated 256-bit key (drawn once, 2026-10-21) gives other totals (AES-192 61379/267335, AES-256 71645/312001), so the printed tables were not produced with a random key. Exec. E (executed edges) also depends on the random dependency order and is one run's value.",
    "lean_refs": [],
-   "source": "published PDF p. 627; python/aes.py"
+   "source": "published PDF p. 627; python/aes.py gen_aes"
   },
   {
    "id": "P12",
@@ -717,9 +718,9 @@
    "after_tex": "due to the super-quadratic (polynomial) growth of multiplication as the bit size gets to realistic cryptographic sizes",
    "reason": "The number of nodes of a Boolean multiplication circuit is polynomial in the bit size (schoolbook n^2, Karatsuba n^1.58), not exponential.",
    "class": "formal",
-   "status": "ask-author",
+   "status": "confirmed",
    "confidence": "inferred",
-   "evidence": "Node counts of the repository generators in R14; the paper's own Table 2 grows polynomially.",
+   "evidence": "Node counts of the repository generators in R14; the paper's own Table 2 grows polynomially. Author confirmed 2026-10-21.",
    "lean_refs": [],
    "source": "published PDF p. 627"
   },
@@ -759,87 +760,590 @@
   {
    "id": "T01",
    "page": 619,
-   "location": "Typographical group",
-   "kind": "group",
-   "before": "p. 619: need not effect the implication graph; p. 619: |C_i|<=2; p. 626: Schonhage-Strassen; p. 626: elliptical curve digitial signature algorithm; p. 626: multliplication; p. 626: a performance penality; p. 626: there performance will; p. 634: reprsented as CFGs; p. 634: suspectible to such tools; p. 630: gratuitious computations; p. 632: transfered to the first node; p. 631: if prefering to avoid; p. 630: structured programing; p. 629: a language whose syntax allows them is exceedingly rare; p. 628: \\textbf{|xor\\_to\\_virtual|}; p. 633: if (!c): goto labelB;",
+   "location": "Typographical, p. 619",
+   "kind": "replace",
+   "before": "need not effect the implication graph",
    "before_pdf": [
     {
      "page": 619,
-     "text": "need not effect"
+     "text": "need not effect the implication graph"
     }
    ],
    "before_tex": [
-    "need not effect the implication graph",
-    "|C_i|<=2",
-    "Schonhage-Strassen",
-    "elliptical curve digitial signature algorithm",
-    "multliplication",
-    "a performance penality",
-    "there performance will",
-    "reprsented as CFGs",
-    "suspectible to such tools",
-    "gratuitious computations",
-    "transfered to the first node",
-    "if prefering to avoid",
-    "structured programing",
-    "a language whose syntax allows them is exceedingly rare",
-    "\\textbf{|xor\\_to\\_virtual|}",
-    "if (!c): goto labelB;"
+    "need not effect the implication graph"
    ],
-   "after": "need not effect the implication graph -> need not affect the implication graph; |C_i|<=2 -> |C_i| \\le 2; Schonhage-Strassen -> Sch\\\"onhage-Strassen; elliptical curve digitial signature algorithm -> elliptic curve digital signature algorithm; multliplication -> multiplication; a performance penality -> a performance penalty; there performance will -> their performance will; reprsented as CFGs -> represented as CFGs; suspectible to such tools -> susceptible to such tools; gratuitious computations -> gratuitous computations; transfered to the first node -> transferred to the first node; if prefering to avoid -> if preferring to avoid; structured programing -> structured programming; a language whose syntax allows them is exceedingly rare -> a language whose syntax allows them, is exceedingly rare; \\textbf{|xor\\_to\\_virtual|} -> \\textbf{\\lstinline|xor\\_to\\_virtual|}; if (!c): goto labelB; -> if (!c) goto labelB;; (published running head: loopsand) -> irreducible loops and self-modifying code",
+   "after": "need not affect the implication graph",
    "after_tex": [
-    "need not affect the implication graph",
-    "|C_i| \\le 2",
-    "Sch\\\"onhage-Strassen",
-    "elliptic curve digital signature algorithm",
-    "multiplication",
-    "a performance penalty",
-    "their performance will",
-    "represented as CFGs",
-    "susceptible to such tools",
-    "gratuitous computations",
-    "transferred to the first node",
-    "if preferring to avoid",
-    "structured programming",
-    "a language whose syntax allows them, is exceedingly rare",
-    "\\textbf{\\lstinline|xor\\_to\\_virtual|}",
-    "if (!c) goto labelB;",
-    "irreducible loops and self-modifying code"
+    "need not affect the implication graph"
    ],
-   "reason": "Spelling, symbol and code-listing typos; the odd-page running head reads 'irreducible loopsand self-modifying code' (publisher typesetting).",
+   "reason": "Typographical error.",
    "class": "typographical",
    "status": "confirmed",
    "confidence": "certain",
    "evidence": "Read-through of the manuscript TeX and the published PDF.",
    "lean_refs": [],
-   "source": "manuscript TeX; published PDF"
+   "source": "manuscript TeX; published PDF p. 619"
+  },
+  {
+   "id": "T02",
+   "page": 619,
+   "location": "Typographical, p. 619",
+   "kind": "replace",
+   "before": "|C_i|<=2",
+   "before_pdf": [],
+   "before_tex": [
+    "|C_i|<=2"
+   ],
+   "after": "|C_i| \\le 2",
+   "after_tex": [
+    "|C_i| \\le 2"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF. The rendered PDF text of this passage is not extractable verbatim (typeset math or listing).",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 619"
+  },
+  {
+   "id": "T03",
+   "page": 626,
+   "location": "Typographical, p. 626",
+   "kind": "replace",
+   "before": "Schonhage-Strassen",
+   "before_pdf": [
+    {
+     "page": 626,
+     "text": "Schonhage-Strassen"
+    }
+   ],
+   "before_tex": [
+    "Schonhage-Strassen"
+   ],
+   "after": "Sch\\\"onhage-Strassen",
+   "after_tex": [
+    "Sch\\\"onhage-Strassen"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 626"
+  },
+  {
+   "id": "T04",
+   "page": 626,
+   "location": "Typographical, p. 626",
+   "kind": "replace",
+   "before": "elliptical curve digitial signature algorithm",
+   "before_pdf": [
+    {
+     "page": 626,
+     "text": "elliptical curve digitial signature algorithm"
+    }
+   ],
+   "before_tex": [
+    "elliptical curve digitial signature algorithm"
+   ],
+   "after": "elliptic curve digital signature algorithm",
+   "after_tex": [
+    "elliptic curve digital signature algorithm"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 626"
+  },
+  {
+   "id": "T05",
+   "page": 626,
+   "location": "Typographical, p. 626",
+   "kind": "replace",
+   "before": "multliplication",
+   "before_pdf": [
+    {
+     "page": 626,
+     "text": "multliplication"
+    }
+   ],
+   "before_tex": [
+    "multliplication"
+   ],
+   "after": "multiplication",
+   "after_tex": [
+    "multiplication"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 626"
+  },
+  {
+   "id": "T06",
+   "page": 626,
+   "location": "Typographical, p. 626",
+   "kind": "replace",
+   "before": "a performance penality",
+   "before_pdf": [
+    {
+     "page": 626,
+     "text": "a performance penality"
+    }
+   ],
+   "before_tex": [
+    "a performance penality"
+   ],
+   "after": "a performance penalty",
+   "after_tex": [
+    "a performance penalty"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 626"
+  },
+  {
+   "id": "T07",
+   "page": 626,
+   "location": "Typographical, p. 626",
+   "kind": "replace",
+   "before": "there performance will",
+   "before_pdf": [
+    {
+     "page": 626,
+     "text": "there performance will"
+    }
+   ],
+   "before_tex": [
+    "there performance will"
+   ],
+   "after": "their performance will",
+   "after_tex": [
+    "their performance will"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 626"
+  },
+  {
+   "id": "T08",
+   "page": 634,
+   "location": "Typographical, p. 634",
+   "kind": "replace",
+   "before": "reprsented as CFGs",
+   "before_pdf": [
+    {
+     "page": 634,
+     "text": "reprsented as CFGs"
+    }
+   ],
+   "before_tex": [
+    "reprsented as CFGs"
+   ],
+   "after": "represented as CFGs",
+   "after_tex": [
+    "represented as CFGs"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 634"
+  },
+  {
+   "id": "T09",
+   "page": 634,
+   "location": "Typographical, p. 634",
+   "kind": "replace",
+   "before": "suspectible to such tools",
+   "before_pdf": [
+    {
+     "page": 634,
+     "text": "suspectible to such tools"
+    }
+   ],
+   "before_tex": [
+    "suspectible to such tools"
+   ],
+   "after": "susceptible to such tools",
+   "after_tex": [
+    "susceptible to such tools"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 634"
+  },
+  {
+   "id": "T10",
+   "page": 630,
+   "location": "Typographical, p. 630",
+   "kind": "replace",
+   "before": "gratuitious computations",
+   "before_pdf": [
+    {
+     "page": 630,
+     "text": "gratuitious computations"
+    }
+   ],
+   "before_tex": [
+    "gratuitious computations"
+   ],
+   "after": "gratuitous computations",
+   "after_tex": [
+    "gratuitous computations"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 630"
+  },
+  {
+   "id": "T11",
+   "page": 632,
+   "location": "Typographical, p. 632",
+   "kind": "replace",
+   "before": "transfered to the first node",
+   "before_pdf": [
+    {
+     "page": 632,
+     "text": "transfered to the first node"
+    }
+   ],
+   "before_tex": [
+    "transfered to the first node"
+   ],
+   "after": "transferred to the first node",
+   "after_tex": [
+    "transferred to the first node"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 632"
+  },
+  {
+   "id": "T12",
+   "page": 631,
+   "location": "Typographical, p. 631",
+   "kind": "replace",
+   "before": "if prefering to avoid",
+   "before_pdf": [
+    {
+     "page": 631,
+     "text": "if prefering to avoid"
+    }
+   ],
+   "before_tex": [
+    "if prefering to avoid"
+   ],
+   "after": "if preferring to avoid",
+   "after_tex": [
+    "if preferring to avoid"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 631"
+  },
+  {
+   "id": "T13",
+   "page": 630,
+   "location": "Typographical, p. 630",
+   "kind": "replace",
+   "before": "structured programing",
+   "before_pdf": [
+    {
+     "page": 630,
+     "text": "structured programing"
+    }
+   ],
+   "before_tex": [
+    "structured programing"
+   ],
+   "after": "structured programming",
+   "after_tex": [
+    "structured programming"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 630"
+  },
+  {
+   "id": "T14",
+   "page": 629,
+   "location": "Typographical, p. 629",
+   "kind": "replace",
+   "before": "a language whose syntax allows them is exceedingly rare",
+   "before_pdf": [
+    {
+     "page": 629,
+     "text": "a language whose syntax allows them is exceedingly rare"
+    }
+   ],
+   "before_tex": [
+    "a language whose syntax allows them is exceedingly rare"
+   ],
+   "after": "a language whose syntax allows them, is exceedingly rare",
+   "after_tex": [
+    "a language whose syntax allows them, is exceedingly rare"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 629"
+  },
+  {
+   "id": "T15",
+   "page": 628,
+   "location": "Typographical, p. 628",
+   "kind": "replace",
+   "before": "\\textbf{|xor\\_to\\_virtual|}",
+   "before_pdf": [],
+   "before_tex": [
+    "\\textbf{|xor\\_to\\_virtual|}"
+   ],
+   "after": "\\textbf{\\lstinline|xor\\_to\\_virtual|}",
+   "after_tex": [
+    "\\textbf{\\lstinline|xor\\_to\\_virtual|}"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF. The rendered PDF text of this passage is not extractable verbatim (typeset math or listing).",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 628"
+  },
+  {
+   "id": "T16",
+   "page": 633,
+   "location": "Typographical, p. 633",
+   "kind": "replace",
+   "before": "if (!c): goto labelB;",
+   "before_pdf": [
+    {
+     "page": 633,
+     "text": "if (!c): goto labelB;"
+    }
+   ],
+   "before_tex": [
+    "if (!c): goto labelB;"
+   ],
+   "after": "if (!c) goto labelB;",
+   "after_tex": [
+    "if (!c) goto labelB;"
+   ],
+   "reason": "Typographical error.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Read-through of the manuscript TeX and the published PDF.",
+   "lean_refs": [],
+   "source": "manuscript TeX; published PDF p. 633"
+  },
+  {
+   "id": "T17",
+   "page": 619,
+   "location": "Odd-page running head",
+   "kind": "replace",
+   "before": "irreducible loopsand self-modifying code",
+   "before_pdf": [],
+   "before_tex": null,
+   "after": "irreducible loops and self-modifying code",
+   "after_tex": null,
+   "reason": "The odd-page running head lacks a space ('loopsand'); publisher typesetting.",
+   "class": "typographical",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Published PDF running head.",
+   "lean_refs": [],
+   "source": "published PDF"
   },
   {
    "id": "B01",
    "page": 636,
-   "location": "References",
-   "kind": "group",
-   "before": "[21]: IEEE Transactions on Computers 137 (1988); [26]: W. Tao, M. Jian, Z. Wei and C. Yu; [8]: L. Buttyán and M. Horváth; [19]: Annales Universitatis Scientarum Budapestinensis; [10]: Inform’atica",
-   "before_pdf": [
-    {
-     "page": 636,
-     "text": "IEEE Transactions on Computers 137 (1988)"
-    },
-    {
-     "page": 637,
-     "text": "W. Tao, M. Jian, Z. Wei and C. Yu"
-    }
-   ],
+   "location": "References, [21]",
+   "kind": "replace",
+   "before": "[21]: IEEE Transactions on Computers 137 (1988)",
+   "before_pdf": [],
    "before_tex": null,
-   "after": "[21]: IEEE Transactions on Computers 37 (1988); [26]: T. Wei, J. Mao, W. Zou and Y. Chen; [8]: M. Horváth and L. Buttyán; [19]: Annales Universitatis Scientiarum Budapestinensis; [10]: Informática",
+   "after": "[21]: IEEE Transactions on Computers 37 (1988)",
    "after_tex": null,
-   "reason": "Reference errors found by comparing every entry with its DOI or publisher page: [21]: Parhami 1988: vol. 37, no. 11, pp. 1470-1476, DOI 10.1109/12.8722 (the manuscript bib has volume 37) | [26]: given and family names swapped in the published list; the manuscript bib has Wei, Tao and Mao, Jian and Zou, Wei and Chen, Yu | [8]: ePrint 2015/412 lists M. Horváth first | [19]: Latin plural of scientia | [10]: the accent is typeset as an apostrophe",
+   "reason": "Parhami 1988: vol. 37, no. 11, pp. 1470-1476, DOI 10.1109/12.8722 (the manuscript bib has volume 37)",
    "class": "bibliographic",
    "status": "confirmed",
    "confidence": "certain",
    "evidence": "Parhami, IEEE TC 37(11) 1988; Wei, Mao, Zou, Chen, SAS 2007 (Springer LNCS 4634, 170-183); ePrint 2015/412 author order.",
    "lean_refs": [],
    "source": "published PDF pp. 635-637; manuscript biblio.bib"
+  },
+  {
+   "id": "B02",
+   "page": 636,
+   "location": "References, [26]",
+   "kind": "replace",
+   "before": "[26]: W. Tao, M. Jian, Z. Wei and C. Yu",
+   "before_pdf": [],
+   "before_tex": null,
+   "after": "[26]: T. Wei, J. Mao, W. Zou and Y. Chen",
+   "after_tex": null,
+   "reason": "given and family names swapped in the published list; the manuscript bib has Wei, Tao and Mao, Jian and Zou, Wei and Chen, Yu",
+   "class": "bibliographic",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Parhami, IEEE TC 37(11) 1988; Wei, Mao, Zou, Chen, SAS 2007 (Springer LNCS 4634, 170-183); ePrint 2015/412 author order.",
+   "lean_refs": [],
+   "source": "published PDF pp. 635-637; manuscript biblio.bib"
+  },
+  {
+   "id": "B03",
+   "page": 636,
+   "location": "References, [8]",
+   "kind": "replace",
+   "before": "[8]: L. Buttyán and M. Horváth",
+   "before_pdf": [],
+   "before_tex": null,
+   "after": "[8]: M. Horváth and L. Buttyán",
+   "after_tex": null,
+   "reason": "ePrint 2015/412 lists M. Horváth first",
+   "class": "bibliographic",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Parhami, IEEE TC 37(11) 1988; Wei, Mao, Zou, Chen, SAS 2007 (Springer LNCS 4634, 170-183); ePrint 2015/412 author order.",
+   "lean_refs": [],
+   "source": "published PDF pp. 635-637; manuscript biblio.bib"
+  },
+  {
+   "id": "B04",
+   "page": 636,
+   "location": "References, [19]",
+   "kind": "replace",
+   "before": "[19]: Annales Universitatis Scientarum Budapestinensis",
+   "before_pdf": [],
+   "before_tex": null,
+   "after": "[19]: Annales Universitatis Scientiarum Budapestinensis",
+   "after_tex": null,
+   "reason": "Latin plural of scientia",
+   "class": "bibliographic",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Parhami, IEEE TC 37(11) 1988; Wei, Mao, Zou, Chen, SAS 2007 (Springer LNCS 4634, 170-183); ePrint 2015/412 author order.",
+   "lean_refs": [],
+   "source": "published PDF pp. 635-637; manuscript biblio.bib"
+  },
+  {
+   "id": "B05",
+   "page": 636,
+   "location": "References, [10]",
+   "kind": "replace",
+   "before": "[10]: Inform’atica",
+   "before_pdf": [],
+   "before_tex": null,
+   "after": "[10]: Informática",
+   "after_tex": null,
+   "reason": "the accent is typeset as an apostrophe",
+   "class": "bibliographic",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Parhami, IEEE TC 37(11) 1988; Wei, Mao, Zou, Chen, SAS 2007 (Springer LNCS 4634, 170-183); ePrint 2015/412 author order.",
+   "lean_refs": [],
+   "source": "published PDF pp. 635-637; manuscript biblio.bib"
+  },
+  {
+   "id": "P30",
+   "page": 625,
+   "location": "Section 4.1, paragraph 1",
+   "kind": "replace",
+   "before": "Although the optimal one is NP-hard",
+   "before_pdf": [
+    {
+     "page": 625,
+     "text": "Although the optimal one is NP-hard"
+    }
+   ],
+   "before_tex": [
+    "Although the optimal one is NP-hard"
+   ],
+   "after": "Although finding a smallest circuit is not known to be tractable (and minimizing a given circuit is coNP-hard, see Section 4)",
+   "after_tex": [
+    "Although finding a smallest circuit is not known to be tractable (and minimizing a given circuit is coNP-hard, see Section 4)"
+   ],
+   "reason": "Same conflation as P06: \"the optimal one is NP-hard\" is not established for synthesis from a truth table.",
+   "class": "formal",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "See P06.",
+   "lean_refs": [],
+   "source": "published PDF p. 625"
+  },
+  {
+   "id": "P31",
+   "page": 627,
+   "location": "Section 4.2, paragraph 2",
+   "kind": "replace",
+   "before": "non-adjacent form (NAF) and mutual opposite form (MOF) and their windowed forms which reduce the hamming weight of the exponent",
+   "before_pdf": [
+    {
+     "page": 627,
+     "text": "mutual opposite form (MOF)"
+    }
+   ],
+   "before_tex": [
+    "non-adjacent form (NAF) and mutual opposite form (MOF) and their windowed forms which reduce the hamming weight of the exponent"
+   ],
+   "after": "non-adjacent form (NAF) and its windowed form which reduce the hamming weight of the exponent, and the mutual opposite form (MOF) which does not in general reduce it",
+   "after_tex": [
+    "non-adjacent form (NAF) and its windowed form which reduce the hamming weight of the exponent, and the mutual opposite form (MOF) which does not in general reduce it"
+   ],
+   "reason": "The MOF does not in general reduce the Hamming weight (5 = 101 in binary has weight 2 and MOF [-1,1,-1,1] of weight 4); only the NAF and its windowed form never exceed the binary weight.",
+   "class": "formal",
+   "status": "confirmed",
+   "confidence": "certain",
+   "evidence": "Lean: Arith.mof_not_lighter (the example 5), Arith.mofTotal_closed (the MOF weights summed over all n-bit strings), Arith.wnaf_wt_le_popc (windowed NAF never heavier than binary). The paper defines no windowed MOF.",
+   "lean_refs": [
+    "SmcIrred.Arith.mof_not_lighter",
+    "SmcIrred.Arith.mofTotal_closed",
+    "SmcIrred.Arith.wnaf_wt_le_popc"
+   ],
+   "source": "published PDF p. 627"
   }
  ]
 }

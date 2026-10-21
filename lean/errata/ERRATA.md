@@ -108,25 +108,25 @@ s_i = a_i xor b_i xor c_i
 
 **Lean:** `SmcIrred.published_add_fails`, `SmcIrred.addBit_post`, `SmcIrred.ripple_add`
 
-## P06 — Section 4 (p. 624) and Section 4.1 (p. 625) (p. 624; editorial, open; inferred)
+## P06 — Section 4 (p. 624) and Section 4.1 (p. 625) (p. 624; Lean; certain)
 
 **Before:**
 
 ```tex
-using logic synthesis to construct an optimal circuit is NP-hard based on the circuit SAT problem; Although the optimal one is NP-hard
+using logic synthesis to construct an optimal circuit is NP-hard based on the circuit SAT problem
 ```
 
 **After:**
 
 ```tex
-Construct a minimum-size circuit for a given truth table is the Minimum Circuit Size Problem, whose NP-hardness is open (minimizing DNF formulas is NP-hard, and minimizing circuits for multi-output functions is NP-hard under randomized reductions); minimizing a given circuit is coNP-hard by reduction from circuit satisfiability. State which is meant and cite it.
+constructing a smallest circuit for a given truth table is the Minimum Circuit Size Problem (MCSP) (Kabanets and Cai, STOC 2000): it is in NP, but whether it is NP-hard is a well-known open problem (it is NP-hard for DNF formulas (Allender, Hellerstein, McCabe, Pitassi and Saks, SIAM J. Comput. 38 (2008)) and, under randomized reductions, for circuits with several outputs (Ilango, Loff and Oliveira, CCC 2020)). Circuit satisfiability, which is NP-complete, only asks whether a given circuit has an input that makes it output 1 and does not by itself give the hardness of finding an optimal circuit; minimizing a given circuit (finding an equivalent circuit of at most a given size) is coNP-hard, since the circuits that compute the constant 0 function are exactly the unsatisfiable ones, which a one-gate circuit replaces
 ```
 
-**Reason:** Circuit satisfiability does not by itself give NP-hardness of optimal synthesis from a truth table, and for a single-output truth table the question is a well-known open problem.
+**Reason:** Three distinct problems are conflated: circuit satisfiability (NP-complete), minimizing a given circuit (coNP-hard) and constructing a smallest circuit from a truth table (MCSP, whose NP-hardness is open for single-output general circuits).
 
-**Evidence:** Ilango, Loff, Oliveira, NP-hardness of circuit minimization for multi-output functions, CCC 2020 (abstract: single-output NP-hardness open for general circuits, known for DNFs); Kabanets and Cai 2000 (MCSP). Wording left to the author.
+**Evidence:** Kabanets and Cai, Circuit minimization problem, STOC 2000 (MCSP in NP, hardness open, partial hardness evidence); Allender, Hellerstein, McCabe, Pitassi and Saks, Minimizing disjunctive normal form formulas and AC0 circuits given a truth table, SIAM J. Comput. 38(1) 2008 (NP-hardness of DNF minimization from a truth table, Masek 1979); Ilango, Loff and Oliveira, NP-hardness of circuit minimization for multi-output functions, CCC 2020 (https://drops.dagstuhl.de/opus/volltexte/2020/12574/). The coNP-hardness of minimizing a given circuit is the reduction stated in the replacement text.
 
-**Source:** published PDF pp. 624-625; https://drops.dagstuhl.de/opus/volltexte/2020/12574/
+**Source:** published PDF p. 624
 
 ## P07 — Section 4.1, paragraph 1 (p. 625; Lean; certain)
 
@@ -194,7 +194,7 @@ increase the potential of the representation by a factor of the order of 32 or 6
 
 **Lean:** `SmcIrred.Arith.words_exact`, `SmcIrred.Arith.word_products`, `SmcIrred.Arith.words_cover`, `SmcIrred.Arith.word_gain_not_exponential`
 
-## P10 — Table 2, column C gmp (p. 629; listing, open; certain)
+## P10 — Table 2, column C gmp (p. 629; listing; inferred)
 
 **Before:**
 
@@ -205,7 +205,7 @@ Rows 128 and 256 both show 9.141ms (x86) and 7.640ms (x86-64); row 32 shows 851m
 **After:**
 
 ```tex
-Row 32: replace 851ms and 707ms by 851us and 707us (units). Row 256: the C gmp cells repeat the row-128 cells; replace them by values measured on the machine of the other rows (supplied by the author).
+Row 32: replace 851ms and 707ms by 851us and 707us (units). Row 256: the C gmp cells repeat the row-128 cells; they should read about 44ms (x86) and 37ms (x86-64), the row-128 values scaled by the ratio 4.8 measured for the same code (an estimate; the exact cells need the machine of the other rows).
 ```
 
 **Reason:** The 256-bit cells duplicate the 128-bit cells, which is implausible, and the 32-bit cells exceed the 64-bit cells (the unit is microseconds, not milliseconds).
@@ -214,25 +214,25 @@ Row 32: replace 851ms and 707ms by 851us and 707us (units). Row 256: the C gmp c
 
 **Source:** published PDF p. 629
 
-## P11 — Section 4.3 and Tables 1-2 (p. 627; listing, open; inferred)
+## P11 — Section 4.3 and Tables 1-2 (p. 627; listing; certain)
 
 **Before:**
 
 ```tex
-AES encryption with a fixed randomly generated key; node and edge counts of Tables 1-2
+AES encryption with a fixed randomly generated key
 ```
 
 **After:**
 
 ```tex
-State the key used (the repository generates AES graphs with the key bytes 0x12...). Regeneration (R16) gives the printed Nodes, Edges and Exec. N; Exec. E depends on the random dependency order (AES-256: 541018 to 541694 over runs), so it is not fixed by the key.
+AES encryption with the fixed key whose bytes are all 0x12
 ```
 
-**Reason:** Provenance of the measured graph and counts; to be settled by regenerating the graphs (R16).
+**Reason:** The Nodes, Edges and Exec. N of Tables 1-2 are those of the graph built for the constant key 0x12...12, not for a randomly generated key; the AES graph size depends on the key bits.
 
-**Evidence:** python/aes.py gen_aes uses key = b'\x12' * (bits // 8); regeneration (R16, validation/data/table_regen.json, evidence class M, not proof) reproduces Nodes, Edges and Exec. N of Tables 1-2.
+**Evidence:** Regeneration with python/aes.py (evidence class M, not proof; validation/data/table_regen.json): the key 0x12 in every byte reproduces the printed Nodes, Edges and Exec. N of all three AES sizes exactly (51127/222683, 61364/267320, 71568/311924 static); a randomly generated 256-bit key (drawn once, 2026-10-21) gives other totals (AES-192 61379/267335, AES-256 71645/312001), so the printed tables were not produced with a random key. Exec. E (executed edges) also depends on the random dependency order and is one run's value.
 
-**Source:** published PDF p. 627; python/aes.py
+**Source:** published PDF p. 627; python/aes.py gen_aes
 
 ## P12 — Section 1, paragraph 4 (p. 618; editorial; certain)
 
@@ -572,7 +572,7 @@ State the exact node counts of the two listed generators (Lean R11) or mark the 
 
 **Source:** published PDF p. 628
 
-## P28 — Section 4.2, paragraph 3 (p. 627; Lean, open; inferred)
+## P28 — Section 4.2, paragraph 3 (p. 627; Lean; inferred)
 
 **Before:**
 
@@ -588,7 +588,7 @@ due to the super-quadratic (polynomial) growth of multiplication as the bit size
 
 **Reason:** The number of nodes of a Boolean multiplication circuit is polynomial in the bit size (schoolbook n^2, Karatsuba n^1.58), not exponential.
 
-**Evidence:** Node counts of the repository generators in R14; the paper's own Table 2 grows polynomially.
+**Evidence:** Node counts of the repository generators in R14; the paper's own Table 2 grows polynomially. Author confirmed 2026-10-21.
 
 **Source:** published PDF p. 627
 
@@ -612,43 +612,485 @@ will be beyond the scope of any state-of-the-art static analysis tools that trea
 
 **Source:** published PDF pp. 618, 634
 
-## T01 — Typographical group (p. 619; typographical; certain)
+## T01 — Typographical, p. 619 (p. 619; typographical; certain)
 
 **Before:**
 
 ```tex
-p. 619: need not effect the implication graph; p. 619: |C_i|<=2; p. 626: Schonhage-Strassen; p. 626: elliptical curve digitial signature algorithm; p. 626: multliplication; p. 626: a performance penality; p. 626: there performance will; p. 634: reprsented as CFGs; p. 634: suspectible to such tools; p. 630: gratuitious computations; p. 632: transfered to the first node; p. 631: if prefering to avoid; p. 630: structured programing; p. 629: a language whose syntax allows them is exceedingly rare; p. 628: \textbf{|xor\_to\_virtual|}; p. 633: if (!c): goto labelB;
+need not effect the implication graph
 ```
 
 **After:**
 
 ```tex
-need not effect the implication graph -> need not affect the implication graph; |C_i|<=2 -> |C_i| \le 2; Schonhage-Strassen -> Sch\"onhage-Strassen; elliptical curve digitial signature algorithm -> elliptic curve digital signature algorithm; multliplication -> multiplication; a performance penality -> a performance penalty; there performance will -> their performance will; reprsented as CFGs -> represented as CFGs; suspectible to such tools -> susceptible to such tools; gratuitious computations -> gratuitous computations; transfered to the first node -> transferred to the first node; if prefering to avoid -> if preferring to avoid; structured programing -> structured programming; a language whose syntax allows them is exceedingly rare -> a language whose syntax allows them, is exceedingly rare; \textbf{|xor\_to\_virtual|} -> \textbf{\lstinline|xor\_to\_virtual|}; if (!c): goto labelB; -> if (!c) goto labelB;; (published running head: loopsand) -> irreducible loops and self-modifying code
+need not affect the implication graph
 ```
 
-**Reason:** Spelling, symbol and code-listing typos; the odd-page running head reads 'irreducible loopsand self-modifying code' (publisher typesetting).
+**Reason:** Typographical error.
 
 **Evidence:** Read-through of the manuscript TeX and the published PDF.
 
-**Source:** manuscript TeX; published PDF
+**Source:** manuscript TeX; published PDF p. 619
 
-## B01 — References (p. 636; bibliographic; certain)
+## T02 — Typographical, p. 619 (p. 619; typographical; certain)
 
 **Before:**
 
 ```tex
-[21]: IEEE Transactions on Computers 137 (1988); [26]: W. Tao, M. Jian, Z. Wei and C. Yu; [8]: L. Buttyán and M. Horváth; [19]: Annales Universitatis Scientarum Budapestinensis; [10]: Inform’atica
+|C_i|<=2
 ```
 
 **After:**
 
 ```tex
-[21]: IEEE Transactions on Computers 37 (1988); [26]: T. Wei, J. Mao, W. Zou and Y. Chen; [8]: M. Horváth and L. Buttyán; [19]: Annales Universitatis Scientiarum Budapestinensis; [10]: Informática
+|C_i| \le 2
 ```
 
-**Reason:** Reference errors found by comparing every entry with its DOI or publisher page: [21]: Parhami 1988: vol. 37, no. 11, pp. 1470-1476, DOI 10.1109/12.8722 (the manuscript bib has volume 37) | [26]: given and family names swapped in the published list; the manuscript bib has Wei, Tao and Mao, Jian and Zou, Wei and Chen, Yu | [8]: ePrint 2015/412 lists M. Horváth first | [19]: Latin plural of scientia | [10]: the accent is typeset as an apostrophe
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF. The rendered PDF text of this passage is not extractable verbatim (typeset math or listing).
+
+**Source:** manuscript TeX; published PDF p. 619
+
+## T03 — Typographical, p. 626 (p. 626; typographical; certain)
+
+**Before:**
+
+```tex
+Schonhage-Strassen
+```
+
+**After:**
+
+```tex
+Sch\"onhage-Strassen
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 626
+
+## T04 — Typographical, p. 626 (p. 626; typographical; certain)
+
+**Before:**
+
+```tex
+elliptical curve digitial signature algorithm
+```
+
+**After:**
+
+```tex
+elliptic curve digital signature algorithm
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 626
+
+## T05 — Typographical, p. 626 (p. 626; typographical; certain)
+
+**Before:**
+
+```tex
+multliplication
+```
+
+**After:**
+
+```tex
+multiplication
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 626
+
+## T06 — Typographical, p. 626 (p. 626; typographical; certain)
+
+**Before:**
+
+```tex
+a performance penality
+```
+
+**After:**
+
+```tex
+a performance penalty
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 626
+
+## T07 — Typographical, p. 626 (p. 626; typographical; certain)
+
+**Before:**
+
+```tex
+there performance will
+```
+
+**After:**
+
+```tex
+their performance will
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 626
+
+## T08 — Typographical, p. 634 (p. 634; typographical; certain)
+
+**Before:**
+
+```tex
+reprsented as CFGs
+```
+
+**After:**
+
+```tex
+represented as CFGs
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 634
+
+## T09 — Typographical, p. 634 (p. 634; typographical; certain)
+
+**Before:**
+
+```tex
+suspectible to such tools
+```
+
+**After:**
+
+```tex
+susceptible to such tools
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 634
+
+## T10 — Typographical, p. 630 (p. 630; typographical; certain)
+
+**Before:**
+
+```tex
+gratuitious computations
+```
+
+**After:**
+
+```tex
+gratuitous computations
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 630
+
+## T11 — Typographical, p. 632 (p. 632; typographical; certain)
+
+**Before:**
+
+```tex
+transfered to the first node
+```
+
+**After:**
+
+```tex
+transferred to the first node
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 632
+
+## T12 — Typographical, p. 631 (p. 631; typographical; certain)
+
+**Before:**
+
+```tex
+if prefering to avoid
+```
+
+**After:**
+
+```tex
+if preferring to avoid
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 631
+
+## T13 — Typographical, p. 630 (p. 630; typographical; certain)
+
+**Before:**
+
+```tex
+structured programing
+```
+
+**After:**
+
+```tex
+structured programming
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 630
+
+## T14 — Typographical, p. 629 (p. 629; typographical; certain)
+
+**Before:**
+
+```tex
+a language whose syntax allows them is exceedingly rare
+```
+
+**After:**
+
+```tex
+a language whose syntax allows them, is exceedingly rare
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 629
+
+## T15 — Typographical, p. 628 (p. 628; typographical; certain)
+
+**Before:**
+
+```tex
+\textbf{|xor\_to\_virtual|}
+```
+
+**After:**
+
+```tex
+\textbf{\lstinline|xor\_to\_virtual|}
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF. The rendered PDF text of this passage is not extractable verbatim (typeset math or listing).
+
+**Source:** manuscript TeX; published PDF p. 628
+
+## T16 — Typographical, p. 633 (p. 633; typographical; certain)
+
+**Before:**
+
+```tex
+if (!c): goto labelB;
+```
+
+**After:**
+
+```tex
+if (!c) goto labelB;
+```
+
+**Reason:** Typographical error.
+
+**Evidence:** Read-through of the manuscript TeX and the published PDF.
+
+**Source:** manuscript TeX; published PDF p. 633
+
+## T17 — Odd-page running head (p. 619; typographical; certain)
+
+**Before:**
+
+```tex
+irreducible loopsand self-modifying code
+```
+
+**After:**
+
+```tex
+irreducible loops and self-modifying code
+```
+
+**Reason:** The odd-page running head lacks a space ('loopsand'); publisher typesetting.
+
+**Evidence:** Published PDF running head.
+
+**Source:** published PDF
+
+## B01 — References, [21] (p. 636; bibliographic; certain)
+
+**Before:**
+
+```tex
+[21]: IEEE Transactions on Computers 137 (1988)
+```
+
+**After:**
+
+```tex
+[21]: IEEE Transactions on Computers 37 (1988)
+```
+
+**Reason:** Parhami 1988: vol. 37, no. 11, pp. 1470-1476, DOI 10.1109/12.8722 (the manuscript bib has volume 37)
 
 **Evidence:** Parhami, IEEE TC 37(11) 1988; Wei, Mao, Zou, Chen, SAS 2007 (Springer LNCS 4634, 170-183); ePrint 2015/412 author order.
 
 **Source:** published PDF pp. 635-637; manuscript biblio.bib
+
+## B02 — References, [26] (p. 636; bibliographic; certain)
+
+**Before:**
+
+```tex
+[26]: W. Tao, M. Jian, Z. Wei and C. Yu
+```
+
+**After:**
+
+```tex
+[26]: T. Wei, J. Mao, W. Zou and Y. Chen
+```
+
+**Reason:** given and family names swapped in the published list; the manuscript bib has Wei, Tao and Mao, Jian and Zou, Wei and Chen, Yu
+
+**Evidence:** Parhami, IEEE TC 37(11) 1988; Wei, Mao, Zou, Chen, SAS 2007 (Springer LNCS 4634, 170-183); ePrint 2015/412 author order.
+
+**Source:** published PDF pp. 635-637; manuscript biblio.bib
+
+## B03 — References, [8] (p. 636; bibliographic; certain)
+
+**Before:**
+
+```tex
+[8]: L. Buttyán and M. Horváth
+```
+
+**After:**
+
+```tex
+[8]: M. Horváth and L. Buttyán
+```
+
+**Reason:** ePrint 2015/412 lists M. Horváth first
+
+**Evidence:** Parhami, IEEE TC 37(11) 1988; Wei, Mao, Zou, Chen, SAS 2007 (Springer LNCS 4634, 170-183); ePrint 2015/412 author order.
+
+**Source:** published PDF pp. 635-637; manuscript biblio.bib
+
+## B04 — References, [19] (p. 636; bibliographic; certain)
+
+**Before:**
+
+```tex
+[19]: Annales Universitatis Scientarum Budapestinensis
+```
+
+**After:**
+
+```tex
+[19]: Annales Universitatis Scientiarum Budapestinensis
+```
+
+**Reason:** Latin plural of scientia
+
+**Evidence:** Parhami, IEEE TC 37(11) 1988; Wei, Mao, Zou, Chen, SAS 2007 (Springer LNCS 4634, 170-183); ePrint 2015/412 author order.
+
+**Source:** published PDF pp. 635-637; manuscript biblio.bib
+
+## B05 — References, [10] (p. 636; bibliographic; certain)
+
+**Before:**
+
+```tex
+[10]: Inform’atica
+```
+
+**After:**
+
+```tex
+[10]: Informática
+```
+
+**Reason:** the accent is typeset as an apostrophe
+
+**Evidence:** Parhami, IEEE TC 37(11) 1988; Wei, Mao, Zou, Chen, SAS 2007 (Springer LNCS 4634, 170-183); ePrint 2015/412 author order.
+
+**Source:** published PDF pp. 635-637; manuscript biblio.bib
+
+## P30 — Section 4.1, paragraph 1 (p. 625; Lean; certain)
+
+**Before:**
+
+```tex
+Although the optimal one is NP-hard
+```
+
+**After:**
+
+```tex
+Although finding a smallest circuit is not known to be tractable (and minimizing a given circuit is coNP-hard, see Section 4)
+```
+
+**Reason:** Same conflation as P06: "the optimal one is NP-hard" is not established for synthesis from a truth table.
+
+**Evidence:** See P06.
+
+**Source:** published PDF p. 625
+
+## P31 — Section 4.2, paragraph 2 (p. 627; Lean; certain)
+
+**Before:**
+
+```tex
+non-adjacent form (NAF) and mutual opposite form (MOF) and their windowed forms which reduce the hamming weight of the exponent
+```
+
+**After:**
+
+```tex
+non-adjacent form (NAF) and its windowed form which reduce the hamming weight of the exponent, and the mutual opposite form (MOF) which does not in general reduce it
+```
+
+**Reason:** The MOF does not in general reduce the Hamming weight (5 = 101 in binary has weight 2 and MOF [-1,1,-1,1] of weight 4); only the NAF and its windowed form never exceed the binary weight.
+
+**Evidence:** Lean: Arith.mof_not_lighter (the example 5), Arith.mofTotal_closed (the MOF weights summed over all n-bit strings), Arith.wnaf_wt_le_popc (windowed NAF never heavier than binary). The paper defines no windowed MOF.
+
+**Source:** published PDF p. 627
+
+**Lean:** `SmcIrred.Arith.mof_not_lighter`, `SmcIrred.Arith.mofTotal_closed`, `SmcIrred.Arith.wnaf_wt_le_popc`
 
