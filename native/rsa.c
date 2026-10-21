@@ -11,6 +11,7 @@
 #include "smctime.h"
 
 #include <stdio.h>
+#include <string.h>
 
 typedef const unsigned int L;
 //extern unsigned char scrtchrsa256[];
@@ -472,7 +473,7 @@ typedef struct rsabitfuncs {
 	const char* n;
 	const char* e;
 	const char* d;
-	const int(*f[3])(unsigned char*, unsigned char*);
+	int (*f[3])(unsigned char*, unsigned char*);
 } rsabitfuncs;
 
 const char* rsasignstrs[] = { "GMP Signature", "Graph Signature", "Graph VM Signature" };

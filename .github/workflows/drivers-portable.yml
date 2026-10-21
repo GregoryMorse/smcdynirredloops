@@ -38,6 +38,7 @@ jobs:
       - name: Configure and build
         run: |
           cmake -S . -B build/cmake -DSMC_BUILD_DRIVERS=ON -DCMAKE_BUILD_TYPE=Release
+          set -o pipefail
           cmake --build build/cmake --config Release -j 2 2>&1 | tee build-drivers.log
       - name: Run the drivers
         run: |

@@ -1,5 +1,6 @@
 #include "smctime.h"
 #include <stdint.h>
+#include <string.h>
 #include "stdio.h"
 
 typedef const unsigned int L;
