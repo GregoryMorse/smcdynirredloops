@@ -88,3 +88,4 @@ output/pdf/manuscript-2022.pdf
 # Local GMP prebuilt (see native/gmp.props)
 native/deps/
 validation/palomar/policy/
+.private
