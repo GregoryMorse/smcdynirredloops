@@ -27,7 +27,9 @@ bounds) is the capability structures themselves. Necessity witnesses: below.
 
 ## 3. Theorems proved in R20a
 * T1 `Threat.correct`: under S1–S3 the image executes exactly the blocks of the original (both condition values), and the
-  final values of the dynamic schedule are the circuit's values.
+  final values of the dynamic schedule are the circuit's values. `Obfuscates` relates the four fixed programs of Figures 5 and 6
+  (T1 and T2 are results about those four, not about arbitrary structured programs; `TransformCorrect` states the equivalence
+  of the transformations for arbitrary structured programs).
 * T2 `imm_fails`, `imm_determines_iff`, `imm_unsound` (witness design satisfying S1–S3, blueprint true, run-time false),
   `static_reading_wrong` (behavioural difference for the four programs).
 * T3 `recover`, `smcsem_determines`: an `SmcSem` analyzer reports the intended values; the Tarjan run on the implication graph
@@ -43,7 +45,7 @@ bounds) is the capability structures themselves. Necessity witnesses: below.
   schedules give the same (vertex, final value) pairs; repeated executions are visible by address.
 * T7 `not_size_indist`, `scheme_overhead`: not an indistinguishability obfuscator for the vertex count; no VBB claim.
 * Necessity: `nec_forcing`, `nec_stamped`, `nec_false_cells` (run misbehaves), `nec_extra_respects` (solver returns nothing),
-  `nec_schedule`, `nec_topo` (no ordered schedule exists in a cyclic circuit). `extra_wf` is not an assumption: it is a field of `Design` (a formula over its n variables), so it needs no witness.
+  `nec_schedule`, `nec_topo` (no ordered schedule exists in a cyclic circuit), `ncirc_not_topo`, `ncirc_ordered`, `ncirc_bad` (an acyclic circuit that is not numbered topologically: it has an ordered schedule, yet the final value of vertex 0 differs from `valOf`, so dropping only `schedule_topo` makes the conclusion fail). `extra_wf` is not an assumption: it is a field of `Design` (a formula over its n variables), so it needs no witness.
 * `Threat.solver_succeeds`: under S1 the solver returns a solution.
 
 ## 3c. Non-claims (G36)

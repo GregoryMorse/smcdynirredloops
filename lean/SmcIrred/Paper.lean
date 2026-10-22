@@ -4,6 +4,7 @@ public import SmcIrred.Spec.Paper
 public import SmcIrred.Smc.Solve
 public import SmcIrred.Tarjan.Solver
 public import SmcIrred.Gen.Planted
+public import SmcIrred.Gen.Construct
 public import SmcIrred.Extremal.MinOther
 public import SmcIrred.Extremal.MnCount
 public import SmcIrred.Extremal.KnAny
@@ -25,7 +26,9 @@ open SmcIrred.Lang SmcIrred.Dyn SmcIrred.Threat SmcIrred.Struct
 /-- `SmcTwoSatCorrect`: `Smc.smcSolve_spec`, `twoSatSolve_spec`, `planted_smc`. -/
 theorem smcTwoSatCorrect : SmcTwoSatCorrect :=
   ⟨fun f hw hne => smcSolve_spec f hw hne, fun f hw hne => twoSatSolve_spec f hw hne,
-    fun _ _ _ _ _ hp hx hwx => planted_smc hp hx hwx⟩
+    fun _ _ _ _ _ hp hx hwx => planted_smc hp hx hwx,
+    fun _ _ _ _ _ hs hc => ⟨genForest_planted hs hc, fun e he => ⟨genExtra_respects e he, genExtra_wf e he⟩,
+      planted_smc (genForest_planted hs hc) (fun e he => genExtra_respects e he) (fun e he => genExtra_wf e he)⟩⟩
 
 /-- `IrreducibleExtremal`: `irrCount_le`, `meeCount_le`, `Kn_irrCount`, `Mn_irrCount`, `maxMEE_others`, `MnLite_others`. -/
 theorem irreducibleExtremal : IrreducibleExtremal :=
@@ -33,7 +36,7 @@ theorem irreducibleExtremal : IrreducibleExtremal :=
     fun n hn => ⟨Kn_valid (by omega), Kn_irrCount hn, Kn_meeCount n⟩,
     fun n hn => ⟨Mn_valid (by omega), Mn_irrCount hn, Mn_meeCount n⟩,
     fun _ _ _ hc hv hn hmax => maxMEE_others hc hv hn hmax,
-    fun _ hn => MnLite_others hn⟩
+    fun n hn => ⟨MnLite_valid (by omega), by rw [MnLite_meeCount_eq]; exact Kn_meeCount n, MnLite_others hn⟩⟩
 
 /-- `TransformCorrect`: `path_one_edge_reducible_all`, `nway_one_edge_all`, `static_scheme_general`, `static_scheme_general6`. -/
 theorem transformCorrect : TransformCorrect :=
@@ -58,6 +61,7 @@ theorem securityModel : SecurityModel :=
     fun c hT _ _ ha hb σ σ' => dca_final_obs c hT ha hb σ σ',
     fun O hlo hhi => not_size_indist O hlo hhi,
     ⟨dStamp, nec_stamped⟩, ⟨dForce, nec_forcing⟩, ⟨dFalse, nec_false_cells⟩, ⟨dExtra, nec_extra_respects⟩,
-    ⟨wcirc, wcirc_topo, execs [1, 0], wcirc_bad_not_ordered, 1, wcirc_bad_order⟩, ⟨ccirc, nec_topo⟩⟩
+    ⟨wcirc, wcirc_topo, execs [1, 0], wcirc_bad_not_ordered, 1, wcirc_bad_order⟩, ⟨ccirc, nec_topo⟩,
+    ⟨ncirc, ncirc_not_topo, execs [1, 0], ncirc_ordered, 0, by decide, ncirc_bad⟩⟩
 
 end SmcIrred.Paper

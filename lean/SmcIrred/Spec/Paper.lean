@@ -22,8 +22,9 @@ result families; the paper's claims that are not in them (timings, tool experime
 not part of the statement and are listed as non-claims in `lean/PAPER_MAP.md`.
 
 * `SmcTwoSatCorrect`: the self-modifying-code solver is a correct 2-SAT solver (it reports unsatisfiability exactly when
-  the formula is unsatisfiable and otherwise returns a satisfying assignment), and the planted generator of Section 3.1
-  yields formulas whose solutions take the intended values on the required variables.
+  the formula is unsatisfiable and otherwise returns a satisfying assignment); for the implications of a planted forest
+  (and for the output of the generator `genForest`/`genExtra` of Section 3.1, whatever its random choices) the solver
+  succeeds and its solution takes the intended values on the required variables.
 * `IrreducibleExtremal`: for every control-flow graph on `n` vertices and every valid depth-first jungle there are at most
   `n − 2` irreducible loops and at most `(n − 1)(n − 2) / 2` multiple-entry edges; both bounds are attained by the complete
   graph `K_n` and by the reduced graph `M_n`, and a graph with the maximal number of multiple-entry edges has at least
@@ -36,8 +37,8 @@ not part of the statement and are listed as non-claims in `lean/PAPER_MAP.md`.
 * `CircuitCFGCorrect`: the Boolean control-flow graph generated for AES-128, AES-192 and AES-256 evaluates, for every key and
   block, to the encryption of the FIPS-197 specification.
 * `SecurityModel`: relative to the explicit threat model of `lean/THREAT_MODEL.md` (structural assumptions on the design;
-  adversary classes given as capability structures), correctness of the obfuscated image (T1), unsoundness of analyzers that
-  read the cells from the static code bytes (T2), the limit of analyzers that implement the machine semantics (T3), the
+  adversary classes given as capability structures), correctness of the obfuscated image (T1) and unsoundness of analyzers that
+  read the cells from the static code bytes (T2), both for the four fixed programs of Figures 5 and 6, the limit of analyzers that implement the machine semantics (T3), the
   structuring costs (T4), faults (T5), differential computation analysis on aligned traces (T6) and the absence of
   indistinguishability for the vertex count (T7), with a witness for the necessity of each assumption. No claim is made
   about any real tool, processor or compiler. -/
@@ -45,9 +46,11 @@ not part of the statement and are listed as non-claims in `lean/PAPER_MAP.md`.
 /-- **The self-modifying-code 2-SAT solver** (Section 3). For a well-formed formula without empty clauses: the solver of
 the self-modifying machine (`smcSolve`) returns nothing exactly when the formula is unsatisfiable and otherwise the set of
 true literal nodes of a satisfying assignment; the reference solver `twoSatSolve` (Tarjan components and the
-Aspvall–Plass–Tarjan rule) is correct likewise; and for a formula built by the planted generator (a forest of implications
-respecting the intended assignment `σ`, with a forcing path for every required variable, plus further respecting
-implications) the solver succeeds and agrees with `σ` on the required variables. -/
+Aspvall–Plass–Tarjan rule) is correct likewise; for a formula built from a planted forest (implications respecting the
+intended assignment `σ`, with a forcing path for every required variable, plus further respecting implications) the solver
+succeeds and agrees with `σ` on the required variables; and the planted generator as an algorithm (`genForest`: a forcing chain
+through arbitrary intermediate variables for each required variable; `genExtra`: the candidate implications that respect `σ`)
+produces such a forest for every choice of those variables and candidates, with the same conclusion. -/
 @[expose] def SmcTwoSatCorrect : Prop :=
   (∀ f : TwoSat, f.Wf → (∀ c ∈ f.clauses, c ≠ []) →
     (smcSolve f = none ↔ ∀ a, ¬ f.Sat a) ∧ (∀ sol, smcSolve f = some sol → f.Sat (fun x => decide (2 * x ∈ sol)))) ∧
@@ -55,13 +58,19 @@ implications) the solver succeeds and agrees with `σ` on the required variables
     (twoSatSolve f = none ↔ ∀ a, ¬ f.Sat a) ∧ (∀ a, twoSatSolve f = some a → f.Sat a)) ∧
   (∀ (n : Nat) (σ : Nat → Bool) (req : Nat → Prop) (forest extra : List (Lit × Lit)),
     Planted n σ req forest → (∀ e ∈ extra, Respecting σ e) → (∀ e ∈ extra, e.1.var < n ∧ e.2.var < n) →
-    ∃ sol, smcSolve (impFormula n (forest ++ extra)) = some sol ∧ ∀ x, x < n → req x → decide (2 * x ∈ sol) = σ x)
+    ∃ sol, smcSolve (impFormula n (forest ++ extra)) = some sol ∧ ∀ x, x < n → req x → decide (2 * x ∈ sol) = σ x) ∧
+  (∀ (n : Nat) (σ : Nat → Bool) (req : Nat → Prop) (specs : List (Nat × List Nat)) (cands : List (Lit × Lit)),
+    (∀ s ∈ specs, s.1 < n ∧ ∀ m ∈ s.2, m < n) → (∀ x, x < n → req x → ∃ ms, (x, ms) ∈ specs) →
+    Planted n σ req (genForest σ specs) ∧ (∀ e ∈ genExtra n σ cands, Respecting σ e ∧ e.1.var < n ∧ e.2.var < n) ∧
+    ∃ sol, smcSolve (impFormula n (genForest σ specs ++ genExtra n σ cands)) = some sol ∧
+      ∀ x, x < n → req x → decide (2 * x ∈ sol) = σ x)
 
 /-- **Extremal irreducible loops and multiple-entry edges** (Section 5, Definition 4). Counts are taken over a valid
 depth-first jungle `J` of a control-flow graph with root `r`. (1) At most `n − 2` irreducible loops and at most
 `(n − 1)(n − 2) / 2` multiple-entry edges. (2) The complete graph `K_n` and (3) the reduced graph `M_n` with the chain jungle
 attain both bounds. (4) A graph with the maximal number of multiple-entry edges has at least `2n − 3` further edges, and
-(5) `M_n` without its back edge to the first vertex has exactly that many. -/
+(5) `M_n` without its back edge to the first vertex (`MnLite n`) is valid for the chain jungle, has the maximal number of
+multiple-entry edges and exactly that many further edges. -/
 @[expose] def IrreducibleExtremal : Prop :=
   (∀ (g : Digraph) (r : Nat) (J : Jungle), g.IsCFG r → J.Valid g r → 2 ≤ g.n →
     g.irrCount J ≤ g.n - 2 ∧ 2 * g.meeCount J ≤ (g.n - 1) * (g.n - 2)) ∧
@@ -71,7 +80,8 @@ attain both bounds. (4) A graph with the maximal number of multiple-entry edges 
     2 * (Mn n).meeCount (chainJungle n) = (n - 1) * (n - 2)) ∧
   (∀ (g : Digraph) (r : Nat) (J : Jungle), g.IsCFG r → J.Valid g r → 2 ≤ g.n →
     2 * g.meeCount J = (g.n - 1) * (g.n - 2) → g.meeCount J + (2 * g.n - 3) ≤ g.edgeCount) ∧
-  (∀ n : Nat, 2 ≤ n → (MnLite n).edgeCount = (Kn n).meeCount (chainJungle n) + (2 * n - 3))
+  (∀ n : Nat, 2 ≤ n → (chainJungle n).Valid (MnLite n) 0 ∧ 2 * (MnLite n).meeCount (chainJungle n) = (n - 1) * (n - 2) ∧
+    (MnLite n).edgeCount = (Kn n).meeCount (chainJungle n) + (2 * n - 3))
 
 /-- **The irreducible-loop transformations** (Section 5). (1) One edge added to a path never creates an irreducible loop
 (for the depth-first order of the code). (2) An `n`-way conditional (`n ≥ 2`) has none, and one edge from the join back into
@@ -127,14 +137,19 @@ block. -/
 /-- **The security model** (Section 5.1, `lean/THREAT_MODEL.md`). Every statement is about the explicit model: a design `d`
 (image, original program, planted data, circuit and schedule) satisfying the structural assumptions `Assumptions d` (planted
 and stamped formula, false cells, dependency-respecting schedule), and analyzers given by their capability. T1: the image
-executes exactly the blocks of the original and the schedule's final values are the circuit's. T2: an analyzer that reads the
-cells from the static code bytes fails to determine some design. T3: an analyzer that implements the machine semantics
+executes exactly the blocks of the original and the schedule's final values are the circuit's; the original and its
+transformation range over the four fixed programs of Figures 5 and 6 (`Obfuscates`), not over arbitrary structured programs
+(for those, `TransformCorrect` states the equivalence of the transformation itself). T2: an analyzer that reads the cells from
+the static code bytes fails to determine some design, likewise for those four programs. T3: an analyzer that implements the machine semantics
 reports the intended values, at a work bound in the clean Tarjan cost model. T4: one state variable resolves any flattening
 and the multiple-entry edges of `K_n` number `(n − 1)(n − 2) / 2`. T5: a fault that is not in the final execution of a
 vertex leaves every final value unchanged, one in the final execution overwrites it. T6: address-aligned traces determine the
 same (vertex, final value) pairs for every dependency-respecting schedule. T7: no obfuscator whose output size is within
 four vertices of its input's is size-indistinguishable. Necessity: for each assumption, a design (or circuit) violating
-only it for which the conclusion fails. -/
+only it for which the conclusion fails; for the dependency-respecting schedule and the topological numbering, a circuit
+numbered topologically for which a schedule not in order changes a final value, a circuit with a dependency cycle (no ordered
+schedule exists) and an acyclic circuit not numbered topologically that has an ordered schedule whose final value differs from
+`valOf`. -/
 @[expose] def SecurityModel : Prop :=
   (∀ d : Design, Assumptions d → Obfuscates d.orig d.img.prog →
     (∀ c, d.img.run c = trace d.orig c true) ∧
@@ -174,6 +189,8 @@ only it for which the conclusion fails. -/
     smcSolve d.img.formula = none) ∧
   (∃ c : DCirc Bool, c.Topo ∧ ∃ acts : List (Act Bool), ¬ FinalOrdered c acts ∧
     ∃ v, runA c (fun _ => false) acts v ≠ valOf c (fun _ => false) v) ∧
-  (∃ c : DCirc Bool, ¬ c.Topo ∧ ∀ acts : List (Act Bool), ¬ FinalOrdered c acts)
+  (∃ c : DCirc Bool, ¬ c.Topo ∧ ∀ acts : List (Act Bool), ¬ FinalOrdered c acts) ∧
+  (∃ c : DCirc Bool, ¬ c.Topo ∧ ∃ acts : List (Act Bool), FinalOrdered c acts ∧
+    ∃ v, v < c.n ∧ runA c (fun _ => false) acts v ≠ valOf c (fun _ => false) v)
 
 end SmcIrred.Paper

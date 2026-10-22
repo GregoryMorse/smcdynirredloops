@@ -6,7 +6,7 @@ project:
   description: >-
     Lean 4 development (no Mathlib) of the mathematics, algorithms and security statements of Morse, Alqaradaghi and
     Kozsik, "Control flow obfuscation with irreducible loops and self-modifying code": a self-modifying-code solver for
-    2-SAT and its planted instance generator, the extremal numbers of irreducible loops and multiple-entry edges (the
+    2-SAT and the planted instance generator as an algorithm, the extremal numbers of irreducible loops and multiple-entry edges (the
     families Kn and Mn), the irreducible-loop transformations of Figures 5 and 6, the Boolean control-flow graphs of AES,
     and the security statements of Section 5.1 relative to an explicit structural threat model. Two Challenges are
     submitted from one development: Challenge.lean (solver, extremal numbers, transformations, security model) and
@@ -75,14 +75,18 @@ sources:
 
 status:
   scope: >-
-    Formalized and proved: the SMC 2-SAT solver and the planted generator (SmcTwoSatCorrect); the upper bounds for
-    irreducible loops and multiple-entry edges, the families Kn and Mn attaining them, and the characterization of the
-    extremal graphs among the families Kn, Mn and the lighter variant (IrreducibleExtremal); the path and n-way
-    transformations of Figures 5 and 6 and the general static scheme (TransformCorrect); the Boolean control-flow graphs
+    Formalized and proved: the SMC 2-SAT solver, and the planted generator as an algorithm (a forcing chain for each
+    required variable and the kept respecting implications, for every choice of its random parameters) whose output the
+    solver solves with the intended values (SmcTwoSatCorrect); the upper bounds for irreducible loops and multiple-entry
+    edges, the families Kn and Mn attaining them, and the bound of at least 2n-3 further edges for a graph with the maximal
+    number of multiple-entry edges, attained by M_n without its back edge (IrreducibleExtremal; no classification of all
+    extremal graphs is claimed); the path and n-way transformations of Figures 5 and 6 and the general static scheme for
+    arbitrary structured programs (TransformCorrect); the Boolean control-flow graphs
     of AES-128, AES-192 and AES-256 computing the FIPS-197 encryption (CircuitCFGCorrect, separate Challenge
     ChallengeAES.lean); and the security model of Section 5.1 (SecurityModel) as theorems relative to explicit structural
     assumptions on the protected program (stamped, forcing, fault-class, final-overwrite and schedule assumptions), each
-    with a necessity witness showing the assumption cannot be dropped. Not formalized: processors, compilers,
+    with a necessity witness showing the assumption cannot be dropped; its correctness (T1) and unsoundness-of-static-reading
+    (T2) results are about the four fixed programs of Figures 5 and 6, not about arbitrary structured programs. Not formalized: processors, compilers,
     decompilers and timers are black boxes; timings, tool experiments, the generated x86-64 code, literature statements
     and the paper's opinions are outside the Lean statement and are evidence at most. The security statements say what
     follows from the stated assumptions; they do not claim that any real attacker or tool fails. The errata in
@@ -126,7 +130,7 @@ review:
     The author audited the statements against the paper and the errata list; the Lean kernel checks the proofs. Mechanical
     audits cover forbidden constructs, axioms, assumption shape (structural, never "the attacker fails"), errata quotation
     against the published PDF, and coverage of every paper item (lean/PAPER_MAP.md). No external mathematical review has
-    been done and no Palomar submission or registration has been made.
+    been done; the repository has been submitted to Palomar for automated review and nothing has been registered.
 
 alignment:
   namespace: "SmcIrred"
@@ -135,12 +139,12 @@ alignment:
       lean: "SmcIrred.Paper.SmcTwoSatCorrect"
       module: "Challenge"
       status: "proved"
-      note: "The solver returns a satisfying assignment exactly when one exists; the planted generator produces satisfiable instances with a known solution."
+      note: "The solver returns a satisfying assignment exactly when one exists; for the output of the planted generator (a forcing chain for each required variable through arbitrary intermediate variables, plus the kept respecting implications) the solver succeeds with the intended values on the required variables."
     - source: "Section 1 and Section 4, irreducible loops and multiple-entry edges (bounds and extremal families Kn, Mn)"
       lean: "SmcIrred.Paper.IrreducibleExtremal"
       module: "Challenge"
       status: "proved"
-      note: "Bounds, attainment by Kn and Mn, and the characterization among the families; corrections recorded as errata."
+      note: "Bounds, attainment by Kn and Mn, and the 2n-3 lower bound on the further edges of a graph with the maximal number of multiple-entry edges, attained by M_n without its back edge; no classification of all extremal graphs; corrections recorded as errata."
     - source: "Section 5, Figures 5 and 6, transformations introducing irreducible loops"
       lean: "SmcIrred.Paper.TransformCorrect"
       module: "Challenge"
@@ -150,7 +154,7 @@ alignment:
       lean: "SmcIrred.Paper.SecurityModel"
       module: "Challenge"
       status: "adapted"
-      note: "Proved relative to explicit structural assumptions that the paper does not state; each assumption has a necessity witness."
+      note: "Proved relative to explicit structural assumptions that the paper does not state; each assumption has a necessity witness. T1 and T2 are about the four fixed programs of Figures 5 and 6, not arbitrary structured programs (TransformCorrect covers those for the transformation itself)."
     - source: "Section 4, Boolean control-flow graphs of AES"
       lean: "SmcIrred.Paper.CircuitCFGCorrect"
       module: "ChallengeAES"

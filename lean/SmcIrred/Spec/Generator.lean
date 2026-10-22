@@ -27,4 +27,24 @@ structure Planted (n : Nat) (σ : Nat → Bool) (req : Nat → Prop) (forest : L
   respect : ∀ e ∈ forest, Respecting σ e
   forcing : ∀ x, x < n → req x → ImpPath forest ⟨x, !σ x⟩ ⟨x, σ x⟩
 
+/-! The generator as an algorithm (`native/protected.c`): the forest is built by giving every required variable `x` a forcing
+chain `(x, ¬σ x) ⇒ (m₁, σ m₁) ⇒ … ⇒ (x, σ x)` through intermediate variables `mᵢ` (chosen by a pseudo-random generator, a black
+box here: they are parameters), and the random implications that respect `σ` are kept. -/
+
+/-- The chain from the literal `cur` through the variables `ms` (each reached at its `σ`-true literal) to `(x, σ x)`. -/
+@[expose] def chainFrom (σ : Nat → Bool) : Lit → List Nat → Nat → List (Lit × Lit)
+  | cur, [], x => [(cur, ⟨x, σ x⟩)]
+  | cur, m :: ms, x => (cur, ⟨m, σ m⟩) :: chainFrom σ ⟨m, σ m⟩ ms x
+
+/-- The forcing chain of the required variable `x`. -/
+@[expose] def chain (σ : Nat → Bool) (x : Nat) (ms : List Nat) : List (Lit × Lit) := chainFrom σ ⟨x, !σ x⟩ ms x
+
+/-- The forest of the chains of the specification `(x, intermediate variables)`. -/
+@[expose] def genForest (σ : Nat → Bool) (specs : List (Nat × List Nat)) : List (Lit × Lit) :=
+  specs.flatMap fun s => chain σ s.1 s.2
+
+/-- The random implications kept by the generator: those that respect `σ` and stay among the `n` variables. -/
+@[expose] def genExtra (n : Nat) (σ : Nat → Bool) (cands : List (Lit × Lit)) : List (Lit × Lit) :=
+  cands.filter fun e => !(σ e.1.var == e.1.pos && σ e.2.var != e.2.pos) && decide (e.1.var < n) && decide (e.2.var < n)
+
 end SmcIrred

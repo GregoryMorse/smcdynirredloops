@@ -154,4 +154,28 @@ theorem nec_topo : ¬ ccirc.Topo ∧ ∀ acts : List (Act Bool), ¬ FinalOrdered
     · exact hq0 1 (by simp [ccirc]) _ hy rfl
     · exact hq1 0 (by simp [ccirc]) _ hx rfl
 
+/-- A circuit that is not numbered topologically although it is acyclic: vertex `0` copies vertex `1`, which is the constant
+`true`. -/
+@[expose] def ncirc : DCirc Bool where
+  n := 2
+  ps v := if v = 0 then [1] else []
+  f v l := if v = 0 then l.headD false else true
+
+/-- Necessity of the topological numbering of the circuit, with the other assumptions kept: `ncirc` has a schedule whose final
+executions are in dependency order (`FinalOrdered`), yet the final value of vertex `0` differs from `valOf`, which executes the
+vertices in numbering order. -/
+theorem ncirc_not_topo : ¬ ncirc.Topo := by
+  intro h
+  have := h 0 (by decide) 1 (by simp [ncirc])
+  omega
+
+theorem ncirc_ordered : FinalOrdered ncirc (execs [1, 0] : List (Act Bool)) := by
+  intro v hv
+  have : v = 0 ∨ v = 1 := by simp [ncirc] at hv; omega
+  rcases this with rfl | rfl
+  · exact ⟨[(1, none)], [], rfl, by simp, by intro u _ a ha; simp at ha⟩
+  · exact ⟨[], [(0, none)], rfl, by simp [execs], by intro u hu; simp [ncirc] at hu⟩
+
+theorem ncirc_bad : runA ncirc (fun _ => false) (execs [1, 0]) 0 ≠ valOf ncirc (fun _ => false) 0 := by decide +kernel
+
 end SmcIrred.Threat
