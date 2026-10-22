@@ -832,9 +832,7 @@ namespace SmcIrred.Struct
 
 /-- The successor chosen at the `k`-th selection from the vertex `v` (the exit state if there is none). -/
 @[expose] def nextState (g : Digraph) (ch : Nat → Nat) (v k : Nat) : Nat :=
-  match g.succ v with
-  | [] => g.n
-  | l => l.getD (ch k % l.length) g.n
+  (g.succ v).getD (ch k % (g.succ v).length) g.n
 
 /-- The CFG semantics: the blocks executed (labels `lab v`) along the run from `v` at selection index `k`. -/
 inductive Walk (g : Digraph) (lab : Nat → List Nat) (ch : Nat → Nat) : Nat → Nat → List Nat → Prop

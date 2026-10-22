@@ -14,8 +14,7 @@ theorem nextState_lt (hwf : WFg g) {v : Nat} (hv : v < g.n) (k : Nat) (hne : g.s
   unfold nextState
   rcases hs : g.succ v with _ | ⟨a, l⟩
   · exact absurd hs hne
-  · simp only
-    have hlt : ch k % (a :: l).length < (a :: l).length := Nat.mod_lt _ (by simp)
+  · have hlt : ch k % (a :: l).length < (a :: l).length := Nat.mod_lt _ (by simp)
     have hmem : (a :: l).getD (ch k % (a :: l).length) g.n ∈ g.succ v := by
       have e : (a :: l).getD (ch k % (a :: l).length) g.n = (a :: l)[ch k % (a :: l).length] := by
         rw [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem hlt]; rfl
