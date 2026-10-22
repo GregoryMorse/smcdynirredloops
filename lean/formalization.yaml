@@ -2,7 +2,7 @@
 version: "v0.4"
 
 project:
-  name: "smcdynirredloops: Lean verification of control flow obfuscation with irreducible loops and self-modifying code"
+  name: "Control flow obfuscation with irreducible loops and self-modifying code"
   description: >-
     Lean 4 development (no Mathlib) of the mathematics, algorithms and security statements of Morse, Alqaradaghi and
     Kozsik, "Control flow obfuscation with irreducible loops and self-modifying code": a self-modifying-code solver for
