@@ -13,7 +13,7 @@ The user submits and registers; the assistant never does. The commit is the push
 | Formalization metadata | `lean/formalization.yaml` |
 | Existing Palomar ID | blank (new result) unless the registry identity query says otherwise |
 | Relationship | the user's truthful attestation: responsible author/maintainer (the formalizer is the paper's first author) |
-| Preliminary-check override | not used; the official workflow is `.github/workflows/palomar-full.yml` (`mode: full`, pinned to PalomarSubmission `d4e41c1d5b0d114c4859e6e5831dc6d3ad1d0d44`, `request_id: smcirred1`), dispatched by the user |
+| Preliminary-check override | not used; the official workflow is `.github/workflows/palomar-full.yml` (`mode: full`, pinned to PalomarSubmission `d4e41c1d5b0d114c4859e6e5831dc6d3ad1d0d44`, `request_id: smcirred0001`), dispatched by the user |
 
 ## Notes for the submission form (public-safe)
 
