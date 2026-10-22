@@ -83,7 +83,7 @@ inductive Kind
   | call (sid : Nat) (ins outs : List Nat) (reps : Nat)
 
 end SmcIrred
--- ===== SmcIrred.Spec.Virt =====
+-- ===== SmcIrred.Spec.GraphGen =====
 namespace SmcIrred
 
 inductive Wire
@@ -254,7 +254,6 @@ decreasing_by omega
   | b :: bs => (if b then 1 else 0) + 2 * bv bs
 
 end SmcIrred
--- ===== SmcIrred.Spec.VirtSel =====
 namespace SmcIrred
 
 /-- The scan of `multi_selection_to_virtual`: the early return (`some`), the surviving terms and the state. -/
@@ -294,7 +293,6 @@ namespace SmcIrred
   colsV (fun gb col => selV gb d.1 col) d.2 (tab.map constBits)
 
 end SmcIrred
--- ===== SmcIrred.Spec.BvDsl =====
 namespace SmcIrred
 
 /-- The bits of a natural number in `m` positions, least significant first. -/
@@ -343,7 +341,6 @@ inductive BvExp where
   | gb, .tbl idx tab => tableLookupV (idx.comp gb).2 (idx.comp gb).1 tab
 
 end SmcIrred
--- ===== SmcIrred.Spec.AES =====
 namespace SmcIrred.AES
 
 /-- Multiplication by `x` in GF(2^8) modulo 0x11B (`aes.py: xtime`). -/
@@ -466,6 +463,7 @@ variable {α : Type} (A : Alg α)
   expandN A Nk (4 * (Nr + 1) - Nk)
     ((List.range Nk).map fun j => (List.range 4).map fun r => key.getD (4 * j + r) A.zero)
 
+end KeyExp
 @[expose] def roundKey (rk : List (List Nat)) (r : Nat) : List Nat :=
   (List.range 4).flatMap fun c => rk.getD (4 * r + c) []
 
@@ -487,9 +485,7 @@ variable {α : Type} (A : Alg α)
 
 @[expose] def aes256 (key : Nat) : List (List Nat) := keyExp natAlg 8 14 (beBytes key 32)
 
-end KeyExp
 end SmcIrred.AES
--- ===== SmcIrred.Spec.AESProg =====
 namespace SmcIrred.AES
 
 open SmcIrred
@@ -566,7 +562,6 @@ bytes `a_j` and `t = a_0 ^ a_1 ^ a_2 ^ a_3`. -/
   aesCircuit Nr rk i.2 i.1
 
 end SmcIrred.AES
--- ===== SmcIrred.Spec.Eval =====
 namespace SmcIrred
 
 /-- The local rule of a vertex of kind `k` with predecessor values `vs` and an active input `t`: `flow` needs all active and

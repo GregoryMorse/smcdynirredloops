@@ -68,7 +68,7 @@ def chunks(m):
     lines = text.strip("\n").split("\n")
     out, cur = [], []
     for ln in lines:
-        top = START.match(ln) or re.match(r"^(namespace|end)\b", ln)
+        top = START.match(ln) or re.match(r"^(namespace|section|end)\b", ln)
         if top:
             if cur and re.match(r"^(def|structure|inductive|abbrev|theorem|lemma|instance|@\[|noncomputable)", ln) and \
                     "".join(cur).strip().startswith("/--") and "".join(cur).rstrip().endswith("-/"):
@@ -83,7 +83,7 @@ def chunks(m):
         body = "\n".join(c).rstrip("\n")
         stripped = re.sub(r"^/--.*?-/\s*", "", body, flags=re.S) if body.lstrip().startswith("/--") else body
         mm = KW.match(stripped)
-        kind = mm.group(1) if mm else ("ns" if re.match(r"^(namespace|end)\b", stripped) else "other")
+        kind = mm.group(1) if mm else ("ns" if re.match(r"^(namespace|section|end)\b", stripped) else "other")
         res.append((mm.group(2) if mm else None, kind, body))
     return res
 
@@ -124,22 +124,35 @@ def build(name="Challenge"):
     for m in mods:
         mine = [(i, c) for i, c in enumerate(allc) if c[0] == m]
         if not any(i in keep for i, c in mine): continue
-        ns = [c[3] for i, c in mine if c[2] == "ns" and c[3].startswith("namespace")]
-        ends = [c[3] for i, c in mine if c[2] == "ns" and c[3].startswith("end")]
         parts.append(f"-- ===== {m} =====")
-        parts += ns
-        parts.append("")
+        # namespace blocks: a block is emitted when it holds a kept declaration; a module may have several blocks
+        starts, stack = {}, []
         for pos, (i, c) in enumerate(mine):
+            if c[2] == "ns":
+                if c[3].startswith(("namespace", "section")): stack.append(pos)
+                else: starts[pos] = stack.pop()
+        block_end = {st: en for en, st in starts.items()}
+        kept_block = {st: any(mine[q][0] in keep for q in range(st, en)) for st, en in block_end.items()}
+        inside = []
+        for pos, (i, c) in enumerate(mine):
+            if c[2] == "ns":
+                if c[3].startswith(("namespace", "section")):
+                    inside.append(pos)
+                    if kept_block[pos]: parts.append(c[3]); parts.append("")
+                else:
+                    st = inside.pop()
+                    if kept_block[st]: parts.append(c[3])
+                continue
+            if inside and not kept_block[inside[-1]]: continue
             if i in keep:
                 parts.append(c[3] + "\n")
             elif c[2] == "other" and re.match(r"^(open|set_option|variable)\b", c[3]):
                 # `open X in` and `set_option ... in` belong to the declaration after them; other opens, set_options and
-                # variables are kept for every module that contributes a declaration
+                # variables are kept for every block that contributes a declaration
                 if c[3].rstrip().endswith(" in"):
                     if pos + 1 < len(mine) and mine[pos + 1][0] in keep: parts.append(c[3] + "\n")
                 else:
                     parts.append(c[3] + "\n")
-        parts += ends
     parts.append(foot)
     out = "\n".join(parts)
     # an `open` of a namespace that pruning left empty is an error: keep only the namespaces the output declares

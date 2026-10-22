@@ -72,19 +72,6 @@ inductive Stmt where
   | .ifGoto _ _ => 1
   | .lab _ s => s.size
 
-/-- Addresses of the labels of a statement placed at address `p`. -/
-@[expose] def labelsOf : Nat → Stmt → List (Nat × Nat)
-  | _, .skip => []
-  | _, .blk _ => []
-  | p, .seq s t => labelsOf p s ++ labelsOf (p + s.size) t
-  | p, .ite1 _ s => labelsOf (p + 1) s
-  | p, .ite _ s t => labelsOf (p + 1) s ++ labelsOf (p + 2 + s.size) t
-  | p, .while _ s => labelsOf (p + 1) s
-  | p, .doWhile s _ => labelsOf p s
-  | _, .goto _ => []
-  | _, .ifGoto _ _ => []
-  | p, .lab l s => (l, p) :: labelsOf p s
-
 @[expose] def lookupLabel (labs : List (Nat × Nat)) (l : Nat) : Nat :=
   match labs.find? (fun q => q.1 == l) with
   | some q => q.2
@@ -103,6 +90,19 @@ inductive Stmt where
   | _, .goto l => [.jmp (lookupLabel labs l)]
   | _, .ifGoto k l => [.jmpIf k (lookupLabel labs l)]
   | p, .lab _ s => comp labs p s
+
+/-- Addresses of the labels of a statement placed at address `p`. -/
+@[expose] def labelsOf : Nat → Stmt → List (Nat × Nat)
+  | _, .skip => []
+  | _, .blk _ => []
+  | p, .seq s t => labelsOf p s ++ labelsOf (p + s.size) t
+  | p, .ite1 _ s => labelsOf (p + 1) s
+  | p, .ite _ s t => labelsOf (p + 1) s ++ labelsOf (p + 2 + s.size) t
+  | p, .while _ s => labelsOf (p + 1) s
+  | p, .doWhile s _ => labelsOf p s
+  | _, .goto _ => []
+  | _, .ifGoto _ _ => []
+  | p, .lab l s => (l, p) :: labelsOf p s
 
 /-- The flat code of a program: its instructions followed by `halt`. -/
 @[expose] def compile (s : Stmt) : List Instr := comp (labelsOf 0 s) 0 s ++ [.halt]
