@@ -29,7 +29,15 @@ lists (`eraseDups`; the order of a set is not significant for any statement made
 inductive Wire
   | cst (b : Bool)
   | nd (i : Nat)
-  deriving DecidableEq
+
+/-- Decidable equality, written out (a derived instance carries the name of its module in a private helper, which differs between
+the development and the single-file Challenge). -/
+@[expose] instance instDecidableEqWire : DecidableEq Wire := fun a b =>
+  match a, b with
+  | .cst x, .cst y => if h : x = y then isTrue (by subst h; rfl) else isFalse (by intro e; cases e; exact h rfl)
+  | .nd i, .nd j => if h : i = j then isTrue (by subst h; rfl) else isFalse (by intro e; cases e; exact h rfl)
+  | .cst _, .nd _ => isFalse (by intro e; cases e)
+  | .nd _, .cst _ => isFalse (by intro e; cases e)
 
 @[expose] def Wire.isc : Wire → Bool
   | .cst _ => true

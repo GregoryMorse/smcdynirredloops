@@ -116,6 +116,9 @@ def build(name="Challenge"):
         seen_last = {allc[i][1].split(".")[-1] for i in keep if allc[i][1]}
         for idx, (m, n, k, b) in enumerate(allc):
             if idx in keep or not n: continue
+            # a hand-written `DecidableEq T` instance travels with the kept type `T` (a derived one is part of the type's chunk)
+            if n.startswith("instDecidableEq") and n[len("instDecidableEq"):] in seen_last:
+                keep.add(idx); changed = True; continue
             ps = n.split(".")
             if ps[-1] not in seen_words: continue
             if len(ps) > 1 and not (ps[-2] in seen_words or ps[-2] in seen_last): continue
