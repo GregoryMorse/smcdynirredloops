@@ -89,6 +89,18 @@ theorem fig5cS_eq : fig5cS = protC (.out 1) blkA blkB := rfl
 
 theorem fig6cS_eq : fig6cS = protC6 .c (.out 1) blkA blkB := rfl
 
+/-- A condition that does not read the toggled variable: its value does not depend on it and it leaves it unchanged. -/
+@[expose] def PureC (sol : Nat → Bool) (env : Bool) (k : Cond) : Prop := ∃ b, ∀ v, k.eval sol env v = (b, v)
+
+@[expose] def PureS (sol : Nat → Bool) (env : Bool) : Stmt → Prop
+  | .skip | .blk _ | .goto _ | .ifGoto _ _ => True
+  | .seq s t => PureS sol env s ∧ PureS sol env t
+  | .ite1 k s => PureC sol env k ∧ PureS sol env s
+  | .ite k s t => PureC sol env k ∧ PureS sol env s ∧ PureS sol env t
+  | .while k s => PureC sol env k ∧ PureS sol env s
+  | .doWhile s k => PureS sol env s ∧ PureC sol env k
+  | .lab _ s => PureS sol env s
+
 /-! ### The graphs as drawn (published Figures 5 and 6)
 
 The invisible entry nodes of the drawings (`i0`, `i00`: one outside edge into `A` or `B`) are one entry vertex `0`;

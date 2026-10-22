@@ -8,55 +8,67 @@ namespace SmcIrred.Threat
 
 open Lang Dyn
 
-/-- The image with the program of Figure 5(b) and a given formula. -/
-@[expose] def imgOf (f : TwoSat) : Image := ⟨fig5bS, f, fun _ => true⟩
+/-- The image with the program of Figure 5(c) and a given formula. -/
+@[expose] def imgOf (f : TwoSat) : Image := ⟨fig5cS, f, fun _ => true⟩
 
-theorem run_wrong_of_true {f : TwoSat} (h1 : rtVal (imgOf f) 1 = true) (h2 : rtVal (imgOf f) 2 = true) :
-    (imgOf f).run true ≠ trace fig5a true true := by
-  show traceS (rtVal (imgOf f)) fig5bS true true ≠ _
-  rw [traceS_congr (sol' := fun _ => true) fig5bS ?_ true true]
-  · decide
-  · intro i hi
-    have : codeReads (compile fig5bS) = [1, 2] := reads_fig5bS
-    rw [this] at hi
-    simp only [List.mem_cons, List.not_mem_nil, or_false] at hi
-    rcases hi with rfl | rfl
-    · exact h1
-    · exact h2
+theorem ob5c : Obfuscates fig5a fig5cS := .c5 trivial trivial fun _ => ⟨trivial, trivial⟩
 
-theorem hw5 : Assumptions (witness fig5a fig5bS) :=
-  witness_assumptions (orig := fig5a) (prog := fig5bS) (by rw [reads_fig5bS]; simp)
+/-- An image whose run-time values make the program halt with another trace than the original does behaves differently. -/
+theorem not_behaves {img : Image} {orig : Stmt} {c : Bool} {r r' : List Nat × Bool}
+    (h1 : exec 100 (compile img.prog) (fun _ => true) c 0 true [] = some r')
+    (h2 : exec 100 (compile orig) (fun _ => false) c 0 true [] = some r) (hne : r ≠ r')
+    (hs : ∀ i ∈ codeReads (compile img.prog), rtVal img i = (fun _ => true) i) : ¬ img.Behaves orig := by
+  intro hB
+  obtain ⟨f, hf⟩ := (hB c r).2 ⟨100, h2⟩
+  rw [exec_congr hs c f 0 true []] at hf
+  exact hne (exec_det f 100 0 true [] hf h1)
+
+theorem exec_fig5cS_true : exec 100 (compile fig5cS) (fun _ => true) true 0 true [] = some ([1, 0, 1], true) := by decide
+
+theorem exec_fig5a : exec 100 (compile fig5a) (fun _ => false) true 0 true [] = some ([0, 1], true) := by decide
+
+theorem not_behaves_of_true {f : TwoSat} (h1 : rtVal (imgOf f) 1 = true) : ¬ (imgOf f).Behaves fig5a := by
+  refine not_behaves (c := true) (r := ([0, 1], true)) (r' := ([1, 0, 1], true)) exec_fig5cS_true exec_fig5a (by decide) ?_
+  intro i hi
+  change i ∈ codeReads (compile fig5cS) at hi
+  rw [reads_fig5cS] at hi
+  simp only [List.mem_cons, List.not_mem_nil, or_false] at hi
+  subst hi
+  exact h1
+
+theorem hw5 : Assumptions (witness fig5a fig5cS) :=
+  witness_assumptions (orig := fig5a) (prog := fig5cS) (by rw [reads_fig5cS]; simp)
 
 /-- No forest. -/
-@[expose] def dForce : Design := { witness fig5a fig5bS with forest := [], img := imgOf (impFormula 3 []) }
+@[expose] def dForce : Design := { witness fig5a fig5cS with forest := [], img := imgOf (impFormula 3 []) }
 
 /-- Necessity of the forcing paths of S1 (`planted.forcing`): with no forest every other field of `Assumptions` holds and the
 solver gives the free variables the value true, so the image misbehaves. -/
 theorem nec_forcing :
-    dForce.img.prog = fig5bS ∧ (∀ e ∈ dForce.forest, e.1.var < dForce.n ∧ e.2.var < dForce.n) ∧
+    Obfuscates dForce.orig dForce.img.prog ∧ (∀ e ∈ dForce.forest, e.1.var < dForce.n ∧ e.2.var < dForce.n) ∧
       (∀ e ∈ dForce.forest, Respecting dForce.σ e) ∧ (∀ e ∈ dForce.extra, Respecting dForce.σ e) ∧
       (∀ e ∈ dForce.extra, e.1.var < dForce.n ∧ e.2.var < dForce.n) ∧
       dForce.img.formula = impFormula dForce.n (dForce.forest ++ dForce.extra) ∧
       (∀ k ∈ dForce.img.cells, k < dForce.n ∧ dForce.req k ∧ dForce.σ k = false) ∧
-      dForce.circ.Topo ∧ FinalOrdered dForce.circ dForce.acts ∧ dForce.img.run true ≠ trace fig5a true true :=
-  ⟨rfl, by simp [dForce], by simp [dForce], hw5.extra_respects, dForce.extra_wf, by simp [dForce, imgOf, witness],
+      dForce.circ.Topo ∧ FinalOrdered dForce.circ dForce.acts ∧ ¬ dForce.img.Behaves dForce.orig :=
+  ⟨ob5c, by simp [dForce], by simp [dForce], hw5.extra_respects, dForce.extra_wf, by simp [dForce, imgOf, witness],
     hw5.cells_planted, hw5.schedule_topo, hw5.schedule_ordered,
-    run_wrong_of_true (f := impFormula 3 []) (by decide) (by decide)⟩
+    not_behaves_of_true (f := impFormula 3 []) (by decide)⟩
 
 /-- The image carries a different formula. -/
-@[expose] def dStamp : Design := { witness fig5a fig5bS with img := imgOf (impFormula 3 []) }
+@[expose] def dStamp : Design := { witness fig5a fig5cS with img := imgOf (impFormula 3 []) }
 
 /-- Necessity of stamping (`stamped`): the planted data are the witness's, but the image carries a different formula. -/
 theorem nec_stamped :
-    dStamp.img.prog = fig5bS ∧ Planted dStamp.n dStamp.σ dStamp.req dStamp.forest ∧
+    Obfuscates dStamp.orig dStamp.img.prog ∧ Planted dStamp.n dStamp.σ dStamp.req dStamp.forest ∧
       (∀ e ∈ dStamp.extra, Respecting dStamp.σ e) ∧ (∀ e ∈ dStamp.extra, e.1.var < dStamp.n ∧ e.2.var < dStamp.n) ∧
       (∀ k ∈ dStamp.img.cells, k < dStamp.n ∧ dStamp.req k ∧ dStamp.σ k = false) ∧
       dStamp.circ.Topo ∧ FinalOrdered dStamp.circ dStamp.acts ∧
       dStamp.img.formula.clauses ≠ (impFormula dStamp.n (dStamp.forest ++ dStamp.extra)).clauses ∧
-      dStamp.img.run true ≠ trace fig5a true true :=
-  ⟨rfl, hw5.planted, hw5.extra_respects, dStamp.extra_wf, hw5.cells_planted, hw5.schedule_topo, hw5.schedule_ordered,
+      ¬ dStamp.img.Behaves dStamp.orig :=
+  ⟨ob5c, hw5.planted, hw5.extra_respects, dStamp.extra_wf, hw5.cells_planted, hw5.schedule_topo, hw5.schedule_ordered,
     by simp [dStamp, imgOf, witness, impFormula],
-    run_wrong_of_true (f := impFormula 3 []) (by decide) (by decide)⟩
+    not_behaves_of_true (f := impFormula 3 []) (by decide)⟩
 
 @[expose] def forestT : List (Lit × Lit) := [(⟨1, false⟩, ⟨1, true⟩), (⟨2, false⟩, ⟨2, true⟩)]
 
@@ -74,25 +86,25 @@ theorem planted_true : Planted 3 (fun _ => true) (fun x => x = 1 ∨ x = 2) fore
 
 /-- Intended value true. -/
 @[expose] def dFalse : Design :=
-  { witness fig5a fig5bS with σ := (fun _ => true), forest := forestT, img := imgOf (impFormula 3 forestT) }
+  { witness fig5a fig5cS with σ := (fun _ => true), forest := forestT, img := imgOf (impFormula 3 forestT) }
 
 /-- Necessity of the false intended values of the cells (`cells_planted`, third conjunct): with intended value true the
 formula is planted for that assignment and the solver returns it, so the opaque conditions are true and the image misbehaves. -/
 theorem nec_false_cells :
-    dFalse.img.prog = fig5bS ∧ Planted dFalse.n dFalse.σ dFalse.req dFalse.forest ∧
+    Obfuscates dFalse.orig dFalse.img.prog ∧ Planted dFalse.n dFalse.σ dFalse.req dFalse.forest ∧
       (∀ e ∈ dFalse.extra, Respecting dFalse.σ e) ∧ (∀ e ∈ dFalse.extra, e.1.var < dFalse.n ∧ e.2.var < dFalse.n) ∧
       dFalse.img.formula = impFormula dFalse.n (dFalse.forest ++ dFalse.extra) ∧
       (∀ k ∈ dFalse.img.cells, k < dFalse.n ∧ dFalse.req k) ∧ dFalse.circ.Topo ∧ FinalOrdered dFalse.circ dFalse.acts ∧
-      dFalse.img.run true ≠ trace fig5a true true :=
-  ⟨rfl, planted_true, by simp [dFalse, witness], by simp [dFalse, witness], by simp [dFalse, imgOf, witness],
+      ¬ dFalse.img.Behaves dFalse.orig :=
+  ⟨ob5c, planted_true, by simp [dFalse, witness], by simp [dFalse, witness], by simp [dFalse, imgOf, witness],
     fun k hk => ((hw5.cells_planted k hk).imp id (·.1)), hw5.schedule_topo, hw5.schedule_ordered,
-    run_wrong_of_true (f := impFormula 3 forestT) (by decide) (by decide)⟩
+    not_behaves_of_true (f := impFormula 3 forestT) (by decide)⟩
 
 /-- An extra implication that the intended assignment does not respect. -/
 @[expose] def extraBad : List (Lit × Lit) := [(⟨1, false⟩, ⟨1, true⟩)]
 
 @[expose] def dExtra : Design :=
-  { witness fig5a fig5bS with extra := extraBad, extra_wf := by intro e he; simp [extraBad] at he; subst he; decide, img := imgOf (impFormula 3 ((witness fig5a fig5bS).forest ++ extraBad)) }
+  { witness fig5a fig5cS with extra := extraBad, extra_wf := by intro e he; simp [extraBad] at he; subst he; decide, img := imgOf (impFormula 3 ((witness fig5a fig5cS).forest ++ extraBad)) }
 
 /-- Necessity of the extra implications respecting the intended assignment (`extra_respects`): with one that does not, the
 stamped formula is unsatisfiable and the solver returns nothing, so T1's premise that the solver produces the cells fails. -/

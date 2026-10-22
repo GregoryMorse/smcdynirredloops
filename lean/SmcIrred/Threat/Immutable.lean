@@ -76,20 +76,82 @@ theorem reads_fig5cS : codeReads (compile fig5cS) = [1] := by decide
 theorem reads_fig6bS : codeReads (compile fig6bS) = [1] := by decide
 theorem reads_fig6cS : codeReads (compile fig6cS) = [1] := by decide
 
-/-- T2 (the class `Imm` is unsound on the scheme). For each obfuscated program of Figures 5 and 6 there is a design
-satisfying S1–S3 (in which the placeholder bytes of the cells are true, the run-time values false) whose image the class
-`Imm` provably fails to determine, whatever the analyzer does beyond reading the code bytes. -/
+/-- The forcing implications `x ⇒ ¬x` of the cells `cs`. -/
+@[expose] def cellForest (cs : List Nat) : List (Lit × Lit) := cs.map fun k => (⟨k, true⟩, ⟨k, false⟩)
+
+theorem lt_sum_succ : ∀ {cs : List Nat} {k : Nat}, k ∈ cs → k < cs.sum + 1
+  | a :: cs, k, h => by
+    simp only [List.mem_cons] at h
+    simp only [List.sum_cons]
+    rcases h with rfl | h
+    · omega
+    · have := lt_sum_succ h
+      omega
+
+theorem cellForest_planted (cs : List Nat) : Planted (cs.sum + 1) (fun _ => false) (fun x => x ∈ cs) (cellForest cs) where
+  wf := by
+    intro e he
+    simp only [cellForest, List.mem_map] at he
+    obtain ⟨k, hk, rfl⟩ := he
+    exact ⟨lt_sum_succ hk, lt_sum_succ hk⟩
+  respect := by
+    intro e he
+    simp only [cellForest, List.mem_map] at he
+    obtain ⟨k, hk, rfl⟩ := he
+    simp [Respecting, Lit.Holds]
+  forcing := by
+    intro x _ hx
+    exact .step (List.mem_map.2 ⟨x, hx, rfl⟩) (.refl _)
+
+/-- The witness design for any program: the variables are numbered beyond every cell the program reads, the cells are the
+required variables with intended value false and the forest `x ⇒ ¬x`, the blueprint is all true. -/
+@[expose] def witnessG (orig prog : Stmt) : Design where
+  img := ⟨prog, impFormula ((codeReads (compile prog)).sum + 1) (cellForest (codeReads (compile prog))), fun _ => true⟩
+  orig := orig
+  n := (codeReads (compile prog)).sum + 1
+  σ := fun _ => false
+  req := fun x => x ∈ codeReads (compile prog)
+  forest := cellForest (codeReads (compile prog))
+  extra := []
+  extra_wf := by intro e he; simp at he
+  circ := wcirc
+  acts := execs [0, 1]
+
+theorem witnessG_assumptions (orig prog : Stmt) : Assumptions (witnessG orig prog) where
+  planted := cellForest_planted _
+  extra_respects := by intro e he; simp [witnessG] at he
+  stamped := by simp [witnessG]
+  cells_planted := fun k hk => ⟨lt_sum_succ hk, hk, rfl⟩
+  schedule_topo := wcirc_topo
+  schedule_ordered := wcirc_ordered_01
+
+theorem witnessG_cells_diff (orig prog : Stmt) {k : Nat} (hk : k ∈ codeReads (compile prog)) :
+    (witnessG orig prog).img.blueprint k ≠ rtVal (witnessG orig prog).img k := by
+  have hA := witnessG_assumptions orig prog
+  obtain ⟨hn, hr, hs⟩ := hA.cells_planted k hk
+  rw [rtVal_planted hA hn hr]
+  simp [witnessG]
+
+/-- Every program of the static scheme reads the predicate cell `1`. -/
+theorem obf_cell {orig prog : Stmt} (ho : Obfuscates orig prog) : 1 ∈ codeReads (compile prog) := by
+  cases ho with
+  | b5 hS hT =>
+    show 1 ∈ codeReads (compile (prot (.out 1) _ _ (.out 2)))
+    simp [codeReads, compile_prot hS hT, Instr.reads, Cond.reads]
+  | c5 hS hT _ => simp [codeReads, compile_protC hS hT, Instr.reads, Cond.reads]
+  | b6 hS hT =>
+    show 1 ∈ codeReads (compile (prot (.neg _) _ _ (.out 1)))
+    simp [codeReads, compile_prot hS hT, Instr.reads, Cond.reads]
+  | c6 hS hT _ => simp [codeReads, compile_protC6 hS hT, Instr.reads, Cond.reads]
+
+/-- T2 (the class `Imm` is unsound on the scheme). For every obfuscated program of the static scheme (arbitrary goto-free
+blocks, Figures 5 and 6) there is a design satisfying S1–S3 (in which the placeholder bytes of the cells are true, the run-time
+values false) whose image the class `Imm` provably fails to determine, whatever the analyzer does beyond reading the code
+bytes. -/
 theorem imm_unsound {orig prog : Stmt} (ho : Obfuscates orig prog) {A : Analyzer} (hC : ImmCap A) :
-    ∃ d : Design, Assumptions d ∧ d.orig = orig ∧ d.img.prog = prog ∧ ¬ Determines A d.img := by
-  have key : ∀ (hc : ∀ k ∈ codeReads (compile prog), k = 1 ∨ k = 2) (k : Nat), k ∈ codeReads (compile prog) →
-      ∃ d : Design, Assumptions d ∧ d.orig = orig ∧ d.img.prog = prog ∧ ¬ Determines A d.img :=
-    fun hc k hk => ⟨witness orig prog, witness_assumptions hc, rfl, rfl,
-      imm_fails hC _ hk (witness_cells_diff hc hk)⟩
-  cases ho
-  · exact key (by rw [reads_fig5bS]; simp) 1 (by rw [reads_fig5bS]; simp)
-  · exact key (by rw [reads_fig5cS]; simp) 1 (by rw [reads_fig5cS]; simp)
-  · exact key (by rw [reads_fig6bS]; simp) 1 (by rw [reads_fig6bS]; simp)
-  · exact key (by rw [reads_fig6cS]; simp) 1 (by rw [reads_fig6cS]; simp)
+    ∃ d : Design, Assumptions d ∧ d.orig = orig ∧ d.img.prog = prog ∧ ¬ Determines A d.img :=
+  ⟨witnessG orig prog, witnessG_assumptions orig prog, rfl, rfl,
+    imm_fails hC _ (obf_cell ho) (witnessG_cells_diff orig prog (obf_cell ho))⟩
 
 /-- At the level of behaviour: with placeholder bytes all true the static reading of the obfuscated programs is not the
 behaviour of the original program (so a class that trusts the code bytes misreads the control flow). -/

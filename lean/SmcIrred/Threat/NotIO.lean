@@ -19,9 +19,13 @@ theorem fig5a_pad_equiv : Equiv fig5a (padS fig5a 3) := by
 theorem vcount_fig5a : vcount fig5a = 1 := by decide
 theorem vcount_pad : vcount (padS fig5a 3) = 7 := by decide
 
-/-- The vertex overhead of the static scheme of Figures 5 and 6 is between 0 and 4. -/
-theorem scheme_overhead {p q : Stmt} (h : Obfuscates p q) : vcount p ≤ vcount q ∧ vcount q ≤ vcount p + 4 := by
-  cases h <;> decide
+/-- The vertex overhead of the programs of Figures 5 and 6 is between 0 and 4. -/
+theorem scheme_overhead :
+    (vcount fig5a ≤ vcount fig5bS ∧ vcount fig5bS ≤ vcount fig5a + 4) ∧
+    (vcount fig5a ≤ vcount fig5cS ∧ vcount fig5cS ≤ vcount fig5a + 4) ∧
+    (vcount fig6a ≤ vcount fig6bS ∧ vcount fig6bS ≤ vcount fig6a + 4) ∧
+    (vcount fig6a ≤ vcount fig6cS ∧ vcount fig6cS ≤ vcount fig6a + 4) := by
+  decide
 
 /-- T7 (no indistinguishability). An obfuscator whose output has at least as many vertices as its input and at most four more
 (as the static scheme does, `scheme_overhead`) gives equivalent programs obfuscations that differ in the observable number of

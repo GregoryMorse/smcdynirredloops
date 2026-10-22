@@ -58,6 +58,24 @@ theorem exec_congr {code : List Instr} {sol sol' : Nat → Bool} (h : ∀ i ∈ 
       rw [Cond.eval_congr env v k hk]
       exact ih _ _ _
 
+/-- The result of a run does not depend on the fuel once it halts. -/
+theorem exec_det {code : List Instr} {sol : Nat → Bool} {env : Bool} {r r' : List Nat × Bool} :
+    ∀ f f' pc v tr, exec f code sol env pc v tr = some r → exec f' code sol env pc v tr = some r' → r = r' := by
+  intro f
+  induction f with
+  | zero => intro f' pc v tr h; simp [exec] at h
+  | succ f ih =>
+    intro f' pc v tr h h'
+    cases f' with
+    | zero => simp [exec] at h'
+    | succ f' =>
+      unfold exec at h h'
+      cases hi : code.getD pc .halt <;> simp only [hi] at h h'
+      · exact ih _ _ _ _ h h'
+      · exact ih _ _ _ _ h h'
+      · exact ih _ _ _ _ h h'
+      · exact Option.some.inj (h.symm.trans h')
+
 /-- A program whose generator outputs it reads are all false runs as with the constant-false outputs. -/
 theorem traceS_of_reads_false {sol : Nat → Bool} (p : Stmt) (h : ∀ i ∈ codeReads (compile p), sol i = false) (c v : Bool) :
     traceS sol p c v = trace p c v := by

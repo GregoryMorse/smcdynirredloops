@@ -16,20 +16,6 @@ The toggled variable of `while (trueThenFalse)` starts true, is false inside the
 conditions of `S`, `T` do not read it (`PureS`).  With the added entry condition false the protected program has the result
 of the original. -/
 
-@[expose] def PureC (sol : Nat → Bool) (env : Bool) (k : Cond) : Prop := ∃ b, ∀ v, k.eval sol env v = (b, v)
-
-@[expose] def PureS (sol : Nat → Bool) (env : Bool) : Stmt → Prop
-  | .skip => True
-  | .blk _ => True
-  | .seq s t => PureS sol env s ∧ PureS sol env t
-  | .ite1 k s => PureC sol env k ∧ PureS sol env s
-  | .ite k s t => PureC sol env k ∧ PureS sol env s ∧ PureS sol env t
-  | .while k s => PureC sol env k ∧ PureS sol env s
-  | .doWhile s k => PureS sol env s ∧ PureC sol env k
-  | .goto _ => True
-  | .ifGoto _ _ => True
-  | .lab _ s => PureS sol env s
-
 theorem PureC.neg {sol env k} (h : PureC sol env k) : PureC sol env (.neg k) := by
   obtain ⟨b, hb⟩ := h
   exact ⟨!b, fun v => by simp [Cond.eval, hb]⟩

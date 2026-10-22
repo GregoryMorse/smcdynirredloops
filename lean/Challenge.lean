@@ -464,16 +464,6 @@ inductive Stmt where
 end SmcIrred.Lang
 -- ===== SmcIrred.Spec.LangFigs =====
 namespace SmcIrred.Lang
-@[expose] def blkA : Stmt := .blk 0
-
-@[expose] def blkB : Stmt := .blk 1
-
-/-- Figure 5(a): `A; B;`. -/
-@[expose] def fig5a : Stmt := .seq blkA blkB
-
-/-- Figure 6(a): `if (c) A; B;`. -/
-@[expose] def fig6a : Stmt := .seq (.ite1 .c blkA) blkB
-
 /-- The block trace of a program run from a state of the `trueThenFalse` variable with condition constant `c`, when
 the generator outputs are `sol` (the listings below do not read them). -/
 @[expose] def traceS (sol : Nat → Bool) (p : Stmt) (c v : Bool) : Option (List Nat × Bool) :=
@@ -482,24 +472,30 @@ the generator outputs are `sol` (the listings below do not read them). -/
 /-- The block trace of a program that reads no generator output. -/
 @[expose] def trace (p : Stmt) (c v : Bool) : Option (List Nat × Bool) := traceS (fun _ => false) p c v
 
-/-- Figure 5(b) with solver-output conditions. -/
-@[expose] def fig5bS : Stmt := .seq (.ifGoto (.out 1) 9) (.doWhile (.seq blkA (.lab 9 blkB)) (.out 2))
-
-/-- Figure 5(c) with a solver-output condition. -/
-@[expose] def fig5cS : Stmt := .seq (.ifGoto (.out 1) 9) (.while .ttf (.seq blkA (.lab 9 blkB)))
-
-/-- Figure 6(b) with a solver-output condition. -/
-@[expose] def fig6bS : Stmt := .seq (.ifGoto (.neg .c) 9) (.doWhile (.seq blkA (.lab 9 blkB)) (.out 1))
-
-/-- Figure 6(c) with a solver-output condition. -/
-@[expose] def fig6cS : Stmt := .seq (.ifGoto (.out 1) 8) (.seq (.while (.and .c .ttf) (.lab 8 blkA)) blkB)
-
 @[expose] def prot (h : Cond) (S T : Stmt) (k : Cond) : Stmt :=
   .seq (.ifGoto h 9) (.doWhile (.seq S (.lab 9 T)) k)
 
 @[expose] def prot5 (S T : Stmt) : Stmt := prot (.out 1) S T (.out 2)
 
 @[expose] def prot6 (cd : Cond) (S T : Stmt) : Stmt := prot (.neg cd) S T (.out 1)
+
+@[expose] def protC (h : Cond) (S T : Stmt) : Stmt :=
+  .seq (.ifGoto h 9) (.while .ttf (.seq S (.lab 9 T)))
+
+@[expose] def protC6 (cd h : Cond) (S T : Stmt) : Stmt :=
+  .seq (.ifGoto h 8) (.seq (.while (.and cd .ttf) (.lab 8 S)) T)
+
+/-- A condition that does not read the toggled variable: its value does not depend on it and it leaves it unchanged. -/
+@[expose] def PureC (sol : Nat → Bool) (env : Bool) (k : Cond) : Prop := ∃ b, ∀ v, k.eval sol env v = (b, v)
+
+@[expose] def PureS (sol : Nat → Bool) (env : Bool) : Stmt → Prop
+  | .skip | .blk _ | .goto _ | .ifGoto _ _ => True
+  | .seq s t => PureS sol env s ∧ PureS sol env t
+  | .ite1 k s => PureC sol env k ∧ PureS sol env s
+  | .ite k s t => PureC sol env k ∧ PureS sol env s ∧ PureS sol env t
+  | .while k s => PureC sol env k ∧ PureS sol env s
+  | .doWhile s k => PureS sol env s ∧ PureC sol env k
+  | .lab _ s => PureS sol env s
 
 end SmcIrred.Lang
 -- ===== SmcIrred.Spec.Dynamic =====
@@ -554,15 +550,24 @@ structure Image where
 /-- The predicate cells the program reads. -/
 @[expose] def Image.cells (img : Image) : List Nat := codeReads (compile img.prog)
 
-/-- The behaviour of the image: the block trace with the run-time cell values (the toggled variable starts true). -/
-@[expose] def Image.run (img : Image) (c : Bool) : Option (List Nat × Bool) := traceS (rtVal img) img.prog c true
+/-- `p`, run with generator outputs `sol` and condition `c`, halts within some fuel with block trace and toggled value `r`. -/
+@[expose] def Runs (sol : Nat → Bool) (p : Stmt) (c : Bool) (r : List Nat × Bool) : Prop :=
+  ∃ f, exec f (compile p) sol c 0 true [] = some r
 
-/-- The static scheme: the transformed program of an original program (Figures 5 and 6, the solver-output variants). -/
+/-- The image halts with the same block trace and final value as `orig` (reading no generator output), for both conditions. -/
+@[expose] def Image.Behaves (img : Image) (orig : Stmt) : Prop :=
+  ∀ c r, Runs (rtVal img) img.prog c r ↔ Runs (fun _ => false) orig c r
+
+/-- The static scheme for goto-free blocks `S`, `T`: `S; T` and `if (cd) S; T` become the irreducible forms of Figures 5(b), 5(c),
+6(b), 6(c) with conditions read from predicate cells; the toggled-variable forms need conditions that do not read it. -/
 inductive Obfuscates : Stmt → Stmt → Prop
-  | b5 : Obfuscates fig5a fig5bS
-  | c5 : Obfuscates fig5a fig5cS
-  | b6 : Obfuscates fig6a fig6bS
-  | c6 : Obfuscates fig6a fig6cS
+  | b5 {S T : Stmt} : Structured S → Structured T → Obfuscates (.seq S T) (prot5 S T)
+  | c5 {S T : Stmt} : Structured S → Structured T → (∀ c, PureS (fun _ => false) c S ∧ PureS (fun _ => false) c T) →
+      Obfuscates (.seq S T) (protC (.out 1) S T)
+  | b6 {cd : Cond} {S T : Stmt} : Structured S → Structured T → Obfuscates (.seq (.ite1 cd S) T) (prot6 cd S T)
+  | c6 {cd : Cond} {S T : Stmt} : Structured S → Structured T →
+      (∀ c, PureS (fun _ => false) c S ∧ PureS (fun _ => false) c T ∧ PureC (fun _ => false) c cd) →
+      Obfuscates (.seq (.ite1 cd S) T) (protC6 cd (.out 1) S T)
 
 /-- A design: the image, the original program, the planted formula data (variables `n`, intended assignment `σ`, required
 variables `req`, the planted forest and the extra implications) and the dynamic scheme's circuit and schedule. -/
@@ -932,22 +937,20 @@ the single opaque condition `1`. -/
 /-- **The security model** (Section 5.1, `lean/THREAT_MODEL.md`). Every statement is about the explicit model: a design `d`
 (image, original program, planted data, circuit and schedule) satisfying the structural assumptions `Assumptions d` (planted
 and stamped formula, false cells, dependency-respecting schedule), and analyzers given by their capability. T1: the image
-executes exactly the blocks of the original and the schedule's final values are the circuit's; the original and its
-transformation range over the four fixed programs of Figures 5 and 6 (`Obfuscates`), not over arbitrary structured programs
-(for those, `TransformCorrect` states the equivalence of the transformation itself). T2: an analyzer that reads the cells from
-the static code bytes fails to determine some design, likewise for those four programs. T3: an analyzer that implements the machine semantics
-reports the intended values, at a work bound in the clean Tarjan cost model. T4: one state variable resolves any flattening
-and the multiple-entry edges of `K_n` number `(n − 1)(n − 2) / 2`. T5: a fault that is not in the final execution of a
-vertex leaves every final value unchanged, one in the final execution overwrites it. T6: address-aligned traces determine the
-same (vertex, final value) pairs for every dependency-respecting schedule. T7: no obfuscator whose output size is within
-four vertices of its input's is size-indistinguishable. Necessity: for each assumption, a design (or circuit) violating
-only it for which the conclusion fails; for the dependency-respecting schedule and the topological numbering, a circuit
-numbered topologically for which a schedule not in order changes a final value, a circuit with a dependency cycle (no ordered
-schedule exists) and an acyclic circuit not numbered topologically that has an ordered schedule whose final value differs from
-`valOf`. -/
+behaves as the original (`Image.Behaves`) and the schedule's final values are the circuit's, for `S; T` or `if (cd) S; T` with
+arbitrary goto-free blocks and the parameterized Figure 5/6 transformations (`Obfuscates`). T2: an analyzer that reads the cells
+from the static code bytes fails to determine some design, for every such pair. T3: an analyzer that implements the machine
+semantics reports the intended values, at a work bound in the clean Tarjan cost model. T4: one state variable resolves any
+flattening and the multiple-entry edges of `K_n` number `(n − 1)(n − 2) / 2`. T5: a fault outside the final execution of a vertex
+leaves every final value unchanged, one in it overwrites it. T6: address-aligned traces determine the same (vertex, final value)
+pairs for every dependency-respecting schedule. T7: no obfuscator whose output size is within four vertices of its input's is
+size-indistinguishable. Necessity: for each assumption a design (or circuit) violating only it for which the conclusion fails;
+for the schedule and the numbering, a topologically numbered circuit with a schedule not in order that changes a final value, a
+circuit with a dependency cycle (no ordered schedule) and an acyclic circuit not numbered topologically with an ordered schedule
+whose final value differs from `valOf`. -/
 @[expose] def SecurityModel : Prop :=
   (∀ d : Design, Assumptions d → Obfuscates d.orig d.img.prog →
-    (∀ c, d.img.run c = trace d.orig c true) ∧
+    d.img.Behaves d.orig ∧
     (∀ σ0 τ : Nat → Bool, ∀ v, v < d.circ.n → runA d.circ σ0 d.acts v = valOf d.circ τ v)) ∧
   (∀ {orig prog : Stmt}, Obfuscates orig prog → ∀ {A : Analyzer}, ImmCap A →
     ∃ d : Design, Assumptions d ∧ d.orig = orig ∧ d.img.prog = prog ∧ ¬ Determines A d.img) ∧
@@ -966,19 +969,19 @@ schedule exists) and an acyclic circuit not numbered topologically that has an o
   (∀ {α : Type} (c : DCirc α), c.Topo → ∀ {a b : List (Act α)}, FinalOrdered c a → FinalOrdered c b →
     ∀ (σ σ' : Nat → α), finalObs c σ a = finalObs c σ' b) ∧
   (∀ O : Stmt → Stmt, (∀ s, vcount s ≤ vcount (O s)) → (∀ s, vcount (O s) ≤ vcount s + 4) → ¬ SizeIndist O) ∧
-  (∃ d : Design, d.img.prog = fig5bS ∧ Planted d.n d.σ d.req d.forest ∧ (∀ e ∈ d.extra, Respecting d.σ e) ∧
+  (∃ d : Design, Obfuscates d.orig d.img.prog ∧ Planted d.n d.σ d.req d.forest ∧ (∀ e ∈ d.extra, Respecting d.σ e) ∧
     (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧
     (∀ k ∈ d.img.cells, k < d.n ∧ d.req k ∧ d.σ k = false) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧
-    d.img.formula.clauses ≠ (impFormula d.n (d.forest ++ d.extra)).clauses ∧ d.img.run true ≠ trace fig5a true true) ∧
-  (∃ d : Design, d.img.prog = fig5bS ∧ (∀ e ∈ d.forest, e.1.var < d.n ∧ e.2.var < d.n) ∧
+    d.img.formula.clauses ≠ (impFormula d.n (d.forest ++ d.extra)).clauses ∧ ¬ d.img.Behaves d.orig) ∧
+  (∃ d : Design, Obfuscates d.orig d.img.prog ∧ (∀ e ∈ d.forest, e.1.var < d.n ∧ e.2.var < d.n) ∧
     (∀ e ∈ d.forest, Respecting d.σ e) ∧ (∀ e ∈ d.extra, Respecting d.σ e) ∧
     (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧ d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧
     (∀ k ∈ d.img.cells, k < d.n ∧ d.req k ∧ d.σ k = false) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧
-    d.img.run true ≠ trace fig5a true true) ∧
-  (∃ d : Design, d.img.prog = fig5bS ∧ Planted d.n d.σ d.req d.forest ∧ (∀ e ∈ d.extra, Respecting d.σ e) ∧
+    ¬ d.img.Behaves d.orig) ∧
+  (∃ d : Design, Obfuscates d.orig d.img.prog ∧ Planted d.n d.σ d.req d.forest ∧ (∀ e ∈ d.extra, Respecting d.σ e) ∧
     (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧ d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧
     (∀ k ∈ d.img.cells, k < d.n ∧ d.req k) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧
-    d.img.run true ≠ trace fig5a true true) ∧
+    ¬ d.img.Behaves d.orig) ∧
   (∃ d : Design, Planted d.n d.σ d.req d.forest ∧ (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧
     d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧ ¬ (∀ e ∈ d.extra, Respecting d.σ e) ∧
     smcSolve d.img.formula = none) ∧

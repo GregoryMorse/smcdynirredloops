@@ -51,12 +51,24 @@ structure Image where
 @[expose] def Image.staticRun (img : Image) (c : Bool) : Option (List Nat × Bool) :=
   traceS img.blueprint img.prog c true
 
-/-- The static scheme: the transformed program of an original program (Figures 5 and 6, the solver-output variants). -/
+/-- `p`, run with generator outputs `sol` and condition `c`, halts within some fuel with block trace and toggled value `r`. -/
+@[expose] def Runs (sol : Nat → Bool) (p : Stmt) (c : Bool) (r : List Nat × Bool) : Prop :=
+  ∃ f, exec f (compile p) sol c 0 true [] = some r
+
+/-- The image halts with the same block trace and final value as `orig` (reading no generator output), for both conditions. -/
+@[expose] def Image.Behaves (img : Image) (orig : Stmt) : Prop :=
+  ∀ c r, Runs (rtVal img) img.prog c r ↔ Runs (fun _ => false) orig c r
+
+/-- The static scheme for goto-free blocks `S`, `T`: `S; T` and `if (cd) S; T` become the irreducible forms of Figures 5(b), 5(c),
+6(b), 6(c) with conditions read from predicate cells; the toggled-variable forms need conditions that do not read it. -/
 inductive Obfuscates : Stmt → Stmt → Prop
-  | b5 : Obfuscates fig5a fig5bS
-  | c5 : Obfuscates fig5a fig5cS
-  | b6 : Obfuscates fig6a fig6bS
-  | c6 : Obfuscates fig6a fig6cS
+  | b5 {S T : Stmt} : Structured S → Structured T → Obfuscates (.seq S T) (prot5 S T)
+  | c5 {S T : Stmt} : Structured S → Structured T → (∀ c, PureS (fun _ => false) c S ∧ PureS (fun _ => false) c T) →
+      Obfuscates (.seq S T) (protC (.out 1) S T)
+  | b6 {cd : Cond} {S T : Stmt} : Structured S → Structured T → Obfuscates (.seq (.ite1 cd S) T) (prot6 cd S T)
+  | c6 {cd : Cond} {S T : Stmt} : Structured S → Structured T →
+      (∀ c, PureS (fun _ => false) c S ∧ PureS (fun _ => false) c T ∧ PureC (fun _ => false) c cd) →
+      Obfuscates (.seq (.ite1 cd S) T) (protC6 cd (.out 1) S T)
 
 /-- A design: the image, the original program, the planted formula data (variables `n`, intended assignment `σ`, required
 variables `req`, the planted forest and the extra implications) and the dynamic scheme's circuit and schedule. -/

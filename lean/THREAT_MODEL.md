@@ -26,12 +26,13 @@ S1 planted formula (`planted`, `extra_respects`, `stamped`; that the extra impli
 bounds) is the capability structures themselves. Necessity witnesses: below.
 
 ## 3. Theorems proved in R20a
-* T1 `Threat.correct`: under S1–S3 the image executes exactly the blocks of the original (both condition values), and the
-  final values of the dynamic schedule are the circuit's values. `Obfuscates` relates the four fixed programs of Figures 5 and 6
-  (T1 and T2 are results about those four, not about arbitrary structured programs; `TransformCorrect` states the equivalence
-  of the transformations for arbitrary structured programs).
+* T1 `Threat.correct`: under S1–S3 the image behaves as the original (`Image.Behaves`: both condition values, same block trace
+  and final value whatever the fuel), and the final values of the dynamic schedule are the circuit's values. `Obfuscates` relates
+  `S; T` and `if (cd) S; T` to the parameterized Figure 5/6 forms (`prot5`, `protC`, `prot6`, `protC6`) for arbitrary goto-free
+  blocks `S`, `T` (the toggled-variable forms need conditions that do not read the toggled variable, `PureS`). The solver outputs
+  that the blocks themselves read are cells like the others (S2 plants every cell the image reads).
 * T2 `imm_fails`, `imm_determines_iff`, `imm_unsound` (witness design satisfying S1–S3, blueprint true, run-time false),
-  `static_reading_wrong` (behavioural difference for the four programs).
+  `static_reading_wrong` (behavioural difference for the programs of Figures 5 and 6). `imm_unsound` holds for every `Obfuscates` pair: the witness design numbers its variables beyond every cell the program reads and plants all of them.
 * T3 `recover`, `smcsem_determines`: an `SmcSem` analyzer reports the intended values; the Tarjan run on the implication graph
   costs at most `2|V|+|E|` steps in the clean cost model (`tarjan_cost`); this bounds that run, not the work of an arbitrary
   analyzer nor the machine (G27/R8b).
