@@ -171,7 +171,7 @@ theorem protection5 {S T : Stmt} (hS : Structured S) (hT : Structured T) (hS1 : 
         ∃ f, exec f (compile (prot5 S T)) sol env 0 v [] = some r)) := by
   have hred := structured_reducible (show Structured (.seq S T) from ⟨hS, hT⟩)
   refine ⟨hred, fun hv w => reducible_no_irreducible hv hred w, fun hv => prot_irreducible hS hT hS1 _ _ hv,
-    ⟨_, dfsRun_valid (prot_isCFG hS hT (.out 1) (.out 2)) (Nat.le_refl 1)⟩, fun h1 h2 env v r => prot5_equiv hS hT h1 h2 env v r⟩
+    ⟨_, dfsRun_valid (prot_isCFG hS hT (.out 1 true) (.out 2 true)) (Nat.le_refl 1)⟩, fun h1 h2 env v r => prot5_equiv hS hT h1 h2 env v r⟩
 
 /-- The same for Figure 6(b): `if (c) S; T` against `if (!c) goto labelT; do { S; labelT: T; } while (out 1);`. -/
 theorem protection6 {S T : Stmt} (hS : Structured S) (hT : Structured T) (hS1 : 1 ≤ S.size) (cd : Cond) :
@@ -185,7 +185,7 @@ theorem protection6 {S T : Stmt} (hS : Structured S) (hT : Structured T) (hS1 : 
         ∃ f, exec f (compile (prot6 cd S T)) sol env 0 v [] = some r)) := by
   have hred := structured_reducible (show Structured (.seq (.ite1 cd S) T) from ⟨hS, hT⟩)
   refine ⟨hred, fun hv w => reducible_no_irreducible hv hred w, fun hv => prot_irreducible hS hT hS1 _ _ hv,
-    ⟨_, dfsRun_valid (prot_isCFG hS hT (.neg cd) (.out 1)) (Nat.le_refl 1)⟩, fun h1 env v r => prot6_equiv hS hT cd h1 env v r⟩
+    ⟨_, dfsRun_valid (prot_isCFG hS hT (.neg cd) (.out 1 true)) (Nat.le_refl 1)⟩, fun h1 env v r => prot6_equiv hS hT cd h1 env v r⟩
 
 /-- Goto-free programs (the structured statements of the language, no `goto`, `if ... goto` or label) have no irreducible loop
 in any valid depth-first jungle of their block graph (C30, C32): an irreducible loop needs a `goto`. -/

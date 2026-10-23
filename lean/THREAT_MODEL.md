@@ -7,7 +7,7 @@ Nothing here claims that a real tool fails or succeeds; classes of analyzers are
 * Original program: a `Stmt` of the transformation language (`Spec/Lang.lean`); its blocks are abstract (any computation).
 * Obfuscator `Obfuscates`: the static scheme of Figures 5 and 6 (loop and conditional transformations), with the opaque
   conditions read as outputs `Cond.out k` of the self-modifying-code 2-SAT solver (`smcSolve`) on a planted formula.
-* Image: transformed program, stamped formula, blueprint (the static values of the cells given to an analyzer: an independently supplied oracle, not derived from a modeled initial code image or stamping transition; T2 is a claim about analyzers that trust such values).
+* Image: transformed program, stamped formula. The static value of a cell an `ImmCap` analyzer reads (`Image.blueprint`) is not a separate field: it is read mechanically out of the program's own compiled code (`codeStatic`), the initial code image before the self-modifying write that `rtVal` models. T2 is a claim about analyzers that trust that static reading.
 * Run-time value of a predicate cell: `rtVal img k`. Behaviour: `Image.run`. Static reading: `Image.staticRun`.
 
 ## 2. Adversary classes, goals, assumptions

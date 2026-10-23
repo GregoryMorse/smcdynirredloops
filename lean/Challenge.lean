@@ -254,15 +254,18 @@ inductive Cond where
   | falseC : Cond
   | ttf : Cond
   | c : Cond
-  | out : Nat → Cond
+  /-- Reads predicate cell `k` at run time; the second field is the value written into the code's bytes for this site
+  before any self-modifying write (the placeholder read by a class that trusts the static code, `ImmCap`). -/
+  | out : Nat → Bool → Cond
   | neg : Cond → Cond
   | and : Cond → Cond → Cond
-/-- Value and new state of the variable read by `ttf`. -/
+/-- Value and new state of the variable read by `ttf`. The placeholder of `out` plays no role at run time: the running
+machine always reads the predicate cell, after self-modification has written the solver's output into it. -/
 @[expose] def Cond.eval (sol : Nat → Bool) (env : Bool) : Cond → Bool → Bool × Bool
   | .falseC, v => (false, v)
   | .ttf, v => (v, !v)
   | .c, v => (env, v)
-  | .out k, v => (sol k, v)
+  | .out k _, v => (sol k, v)
   | .neg k, v => ((!(k.eval sol env v).1), (k.eval sol env v).2)
   | .and k l, v => if (k.eval sol env v).1 then l.eval sol env (k.eval sol env v).2 else (false, (k.eval sol env v).2)
 /-- Flat code. -/
@@ -365,7 +368,7 @@ inductive Stmt where
   succ := blockSucc code
 /-- The generator outputs read by a condition. -/
 @[expose] def Cond.reads : Cond → List Nat
-  | .out k => [k]
+  | .out k _ => [k]
   | .neg k => k.reads
   | .and a b => a.reads ++ b.reads
   | _ => []
@@ -374,6 +377,18 @@ inductive Stmt where
   | _ => []
 /-- The generator outputs read by some instruction of the code. -/
 @[expose] def codeReads (code : List Instr) : List Nat := code.flatMap Instr.reads
+/-- The placeholder written into the code for predicate cell `k` by this condition, if it tests `k` directly or through
+`neg`/`and` (the self-modifying write has not happened yet; this is the value an `ImmCap` analyzer reads). `none` if the
+condition does not test `k`. -/
+@[expose] def Cond.staticVal (k : Nat) : Cond → Option Bool
+  | .out j b => if j = k then some b else none
+  | .neg d => d.staticVal k
+  | .and a b => a.staticVal k <|> b.staticVal k
+  | _ => none
+/-- The placeholder value of predicate cell `k` in the static bytes of compiled code: the first `jmpIf` condition that
+tests it (scanning the code in order), or `false` if none does. -/
+@[expose] def codeStatic (code : List Instr) (k : Nat) : Bool :=
+  (code.filterMap fun i => match i with | .jmpIf c _ => c.staticVal k | _ => none).headD false
 /-- The statements of the transformation language without `goto`, `ifGoto` and labels (structured programs). -/
 @[expose] def Structured : Stmt → Prop
   | .skip => True
@@ -391,8 +406,8 @@ end SmcIrred.Lang
 namespace SmcIrred.Lang
 @[expose] def prot (h : Cond) (S T : Stmt) (k : Cond) : Stmt :=
   .seq (.ifGoto h 9) (.doWhile (.seq S (.lab 9 T)) k)
-@[expose] def prot5 (S T : Stmt) : Stmt := prot (.out 1) S T (.out 2)
-@[expose] def prot6 (cd : Cond) (S T : Stmt) : Stmt := prot (.neg cd) S T (.out 1)
+@[expose] def prot5 (S T : Stmt) : Stmt := prot (.out 1 true) S T (.out 2 true)
+@[expose] def prot6 (cd : Cond) (S T : Stmt) : Stmt := prot (.neg cd) S T (.out 1 true)
 @[expose] def protC (h : Cond) (S T : Stmt) : Stmt :=
   .seq (.ifGoto h 9) (.while .ttf (.seq S (.lab 9 T)))
 @[expose] def protC6 (cd h : Cond) (S T : Stmt) : Stmt :=
@@ -437,19 +452,23 @@ end SmcIrred.Dyn
 namespace SmcIrred.Threat
 open Lang Dyn
 
-/-- An obfuscated image. -/
+/-- An obfuscated image: the transformed program and the stamped formula. There is no separate "static value" field — an
+`ImmCap` analyzer's reading (`Image.blueprint`) is computed from `prog`'s own compiled code (`codeStatic`), the initial
+code image before the self-modifying write that `rtVal` models. -/
 structure Image where
   prog : Stmt
   formula : TwoSat
-  /-- The static values of the predicate cells handed to an analyzer: an independent input, not computed from the code. -/
-  blueprint : Nat → Bool
-/-- The value of predicate cell `k` at run time: the output of the self-modifying-code solver on the stamped formula. -/
+/-- The value of predicate cell `k` at run time: the output of the self-modifying-code solver on the stamped formula —
+the value the self-modifying write leaves in the cell before `prog` is executed. -/
 @[expose] def rtVal (img : Image) (k : Nat) : Bool :=
   match smcSolve img.formula with
   | some sol => decide (2 * k ∈ sol)
   | none => false
 /-- The predicate cells the program reads. -/
 @[expose] def Image.cells (img : Image) : List Nat := codeReads (compile img.prog)
+/-- The placeholder value of predicate cell `k` as it stands in `prog`'s own compiled code, before any self-modifying
+write: the value an `ImmCap` analyzer, reading only the static bytes, reports for that cell. -/
+@[expose] def Image.blueprint (img : Image) (k : Nat) : Bool := codeStatic (compile img.prog) k
 /-- `p`, run with generator outputs `sol` and condition `c`, halts within some fuel with block trace and toggled value `r`. -/
 @[expose] def Runs (sol : Nat → Bool) (p : Stmt) (c : Bool) (r : List Nat × Bool) : Prop :=
   ∃ f, exec f (compile p) sol c 0 true [] = some r
@@ -457,15 +476,22 @@ structure Image where
 @[expose] def Image.Behaves (img : Image) (orig : Stmt) : Prop :=
   ∀ c r, Runs (rtVal img) img.prog c r ↔ Runs (fun _ => false) orig c r
 /-- The static scheme for goto-free blocks `S`, `T`: `S; T` and `if (cd) S; T` become the irreducible forms of Figures 5(b), 5(c),
-6(b), 6(c) with conditions read from predicate cells; the toggled-variable forms need conditions that do not read it. -/
+6(b), 6(c) with conditions read from predicate cells, each a fresh `out k true` (the generator's placeholder is `true`,
+reflecting the compiled bytes before the self-modifying write); the toggled-variable forms need conditions that do not
+read it. `b6`'s side condition (`1 ∉ codeReads (compile (.seq (.ite1 cd S) T))`) says the generator assigns a cell number
+the original program does not already read: without it, `S`, `T` or `cd` could themselves test cell `1` with a different
+placeholder, making the static value of the obfuscator's own injected predicate ambiguous (it sits last in `prot6 cd S T`'s
+compiled code, after `S` and `T`); the other three schemes inject their predicate first, so no such hypothesis is needed
+there. -/
 inductive Obfuscates : Stmt → Stmt → Prop
   | b5 {S T : Stmt} : Structured S → Structured T → Obfuscates (.seq S T) (prot5 S T)
   | c5 {S T : Stmt} : Structured S → Structured T → (∀ c, PureS (fun _ => false) c S ∧ PureS (fun _ => false) c T) →
-      Obfuscates (.seq S T) (protC (.out 1) S T)
-  | b6 {cd : Cond} {S T : Stmt} : Structured S → Structured T → Obfuscates (.seq (.ite1 cd S) T) (prot6 cd S T)
+      Obfuscates (.seq S T) (protC (.out 1 true) S T)
+  | b6 {cd : Cond} {S T : Stmt} : Structured S → Structured T →
+      1 ∉ codeReads (compile (.seq (.ite1 cd S) T)) → Obfuscates (.seq (.ite1 cd S) T) (prot6 cd S T)
   | c6 {cd : Cond} {S T : Stmt} : Structured S → Structured T →
       (∀ c, PureS (fun _ => false) c S ∧ PureS (fun _ => false) c T ∧ PureC (fun _ => false) c cd) →
-      Obfuscates (.seq (.ite1 cd S) T) (protC6 cd (.out 1) S T)
+      Obfuscates (.seq (.ite1 cd S) T) (protC6 cd (.out 1 true) S T)
 /-- A design: the image, the original program, the planted formula data (variables `n`, intended assignment `σ`, required
 variables `req`, the planted forest and the extra implications) and the dynamic scheme's circuit and schedule. -/
 structure Design where
@@ -495,7 +521,8 @@ structure Assumptions (d : Design) : Prop where
 /-- An analyzer reports a predicted value for every predicate cell of an image. -/
 structure Analyzer where
   predict : Image → Nat → Bool
-/-- Capability of the class `Imm`: the analyzer reports the supplied static value (`blueprint`) of every cell. -/
+/-- Capability of the class `Imm`: the analyzer reports the placeholder found in the program's own static code
+(`blueprint`, computed from `prog`'s compiled bytes, not an independent input) for every cell. -/
 structure ImmCap (A : Analyzer) : Prop where
   static_read : ∀ img k, A.predict img k = img.blueprint k
 /-- Capability of the class `SmcSem`: the analyzer implements stamping and the machine semantics, so its report is the
@@ -787,8 +814,9 @@ and stamped formula, cells that are required variables with false intended value
 topologically numbered circuit), and analyzers given by their capability.
 T1: the image behaves as the original (`Image.Behaves`) and the schedule's final values are the circuit's, for `S; T` or
 `if (cd) S; T` with arbitrary goto-free blocks and the parameterized Figure 5/6 transformations (`Obfuscates`).
-T2: an analyzer that reports the independently supplied static values of the cells (`blueprint`, an input of the model, not
-derived from a modeled code image or stamping transition) fails to determine some design, for every such pair.
+T2: an analyzer that reports the placeholder value a predicate cell has in the program's own compiled code before the
+self-modifying write (`Image.blueprint`, computed mechanically from `prog` by `codeStatic`, not an independent input)
+fails to determine some design, for every such pair.
 T3: the solver succeeds on the stamped formula, an analyzer that implements the machine semantics reports the intended values,
 and the reference Tarjan run on the stamped formula's graph (`recoverWork`) takes at most `2|V| + |E|` ticks in the clean cost
 model (the analyzer's own work is not modeled).

@@ -9,7 +9,7 @@ namespace SmcIrred.Threat
 open Lang Dyn
 
 /-- The image with the program of Figure 5(c) and a given formula. -/
-@[expose] def imgOf (f : TwoSat) : Image := ⟨fig5cS, f, fun _ => true⟩
+@[expose] def imgOf (f : TwoSat) : Image := ⟨fig5cS, f⟩
 
 theorem ob5c : Obfuscates fig5a fig5cS := .c5 trivial trivial fun _ => ⟨trivial, trivial⟩
 

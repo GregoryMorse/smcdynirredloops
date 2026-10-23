@@ -39,7 +39,8 @@ not part of the statement and are listed as non-claims in `lean/PAPER_MAP.md`.
   block, to the encryption of the FIPS-197 specification.
 * `SecurityModel`: relative to the explicit threat model of `lean/THREAT_MODEL.md` (structural assumptions on the design;
   adversary classes given as capability structures), correctness of the obfuscated image (T1) and unsoundness of analyzers that
-  report supplied static cell values (T2), both for the parameterized Figure 5/6 transformations of arbitrary goto-free blocks, the limit of analyzers that implement the machine semantics (T3), the
+  report the placeholder value found in the program's own compiled code (T2), both for the parameterized Figure 5/6
+  transformations of arbitrary goto-free blocks, the limit of analyzers that implement the machine semantics (T3), the
   structuring costs (T4), faults (T5), differential computation analysis on aligned traces (T6) and the absence of
   indistinguishability for the vertex count (T7), with a witness for the necessity of each assumption. No claim is made
   about any real tool, processor or compiler. -/
@@ -147,8 +148,9 @@ and stamped formula, cells that are required variables with false intended value
 topologically numbered circuit), and analyzers given by their capability.
 T1: the image behaves as the original (`Image.Behaves`) and the schedule's final values are the circuit's, for `S; T` or
 `if (cd) S; T` with arbitrary goto-free blocks and the parameterized Figure 5/6 transformations (`Obfuscates`).
-T2: an analyzer that reports the independently supplied static values of the cells (`blueprint`, an input of the model, not
-derived from a modeled code image or stamping transition) fails to determine some design, for every such pair.
+T2: an analyzer that reports the placeholder value a predicate cell has in the program's own compiled code before the
+self-modifying write (`Image.blueprint`, computed mechanically from `prog` by `codeStatic`, not an independent input)
+fails to determine some design, for every such pair.
 T3: the solver succeeds on the stamped formula, an analyzer that implements the machine semantics reports the intended values,
 and the reference Tarjan run on the stamped formula's graph (`recoverWork`) takes at most `2|V| + |E|` ticks in the clean cost
 model (the analyzer's own work is not modeled).

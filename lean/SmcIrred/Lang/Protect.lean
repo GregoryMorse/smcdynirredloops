@@ -21,6 +21,30 @@ false the run of the protected code is the run of the original: whatever `exec` 
 
 theorem shiftI_zero (i : Instr) : shiftI 0 i = i := by cases i <;> rfl
 
+/-- Shifting a jump target changes neither the generator outputs an instruction reads nor its static placeholder: both
+come from the condition alone, which `shiftI` leaves untouched. -/
+theorem shiftI_reads (d : Nat) (i : Instr) : (shiftI d i).reads = i.reads := by cases i <;> rfl
+
+theorem codeReads_shiftI (d : Nat) (l : List Instr) : codeReads (l.map (shiftI d)) = codeReads l := by
+  induction l with
+  | nil => rfl
+  | cons i l ih =>
+    show (shiftI d i).reads ++ codeReads (l.map (shiftI d)) = i.reads ++ codeReads l
+    rw [shiftI_reads, ih]
+
+theorem codeStatic_shiftI (d k : Nat) (l : List Instr) : codeStatic (l.map (shiftI d)) k = codeStatic l k := by
+  have hpt : ∀ i : Instr, (match shiftI d i with | .jmpIf c _ => c.staticVal k | _ => none) =
+      (match i with | .jmpIf c _ => c.staticVal k | _ => none) := by intro i; cases i <;> rfl
+  suffices h : (l.map (shiftI d)).filterMap (fun i => match i with | .jmpIf c _ => c.staticVal k | _ => none) =
+      l.filterMap (fun i => match i with | .jmpIf c _ => c.staticVal k | _ => none) by
+    unfold codeStatic
+    exact congrArg (·.headD false) h
+  induction l with
+  | nil => rfl
+  | cons i l ih =>
+    show List.filterMap _ (shiftI d i :: l.map (shiftI d)) = List.filterMap _ (i :: l)
+    rw [List.filterMap_cons, List.filterMap_cons, hpt, ih]
+
 theorem comp_shift (labs : List (Nat × Nat)) (d : Nat) : ∀ (s : Stmt), Structured s → ∀ p,
     comp labs (p + d) s = (comp labs p s).map (shiftI d) := by
   intro s
@@ -262,13 +286,13 @@ theorem prot5_equiv {S T : Stmt} (hS : Structured S) (hT : Structured T) {sol : 
   have hP : compile (.seq S T) = (comp [] 0 S ++ comp [] S.size T) ++ [.halt] := by
     have := compile_structured hst
     rw [this]; simp [comp]
-  have hQ : compile (prot5 S T) = .jmpIf (.out 1) (1 + S.size) ::
-      ((comp [] 0 S ++ comp [] S.size T).map (shiftI 1) ++ [.jmpIf (.out 2) 1, .halt]) := by
-    show compile (prot (.out 1) S T (.out 2)) = _
+  have hQ : compile (prot5 S T) = .jmpIf (.out 1 true) (1 + S.size) ::
+      ((comp [] 0 S ++ comp [] S.size T).map (shiftI 1) ++ [.jmpIf (.out 2 true) 1, .halt]) := by
+    show compile (prot (.out 1 true) S T (.out 2 true)) = _
     rw [compile_prot hS hT, hsh1, hsh2]
     simp [List.map_append]
   have hKm : ((comp [] 0 S ++ comp [] S.size T).map (shiftI 1)).length = S.size + T.size := by rw [List.length_map, hK]
-  have hag : Agree (compile (.seq S T)) (compile (prot5 S T)) sol env 1 (S.size + T.size) (.out 2) := by
+  have hag : Agree (compile (.seq S T)) (compile (prot5 S T)) sol env 1 (S.size + T.size) (.out 2 true) := by
     refine ⟨fun a ha => ?_, fun a t ha ht => ?_, ?_, ⟨1, ?_⟩, ?_, fun v => ?_⟩
     · rw [hP, hQ, getD_app_l (by omega), List.getD_cons_succ, getD_app_l (by rw [hKm]; omega),
         getD_map_shift]
@@ -277,11 +301,11 @@ theorem prot5_equiv {S T : Stmt} (hS : Structured S) (hT : Structured T) {sol : 
     · rw [hP, ← hK]
       simpa using getD_app_r (comp [] 0 S ++ comp [] S.size T) [.halt] 0
     · rw [hQ, List.getD_cons_succ, ← hKm]
-      simpa using getD_app_r ((comp [] 0 S ++ comp [] S.size T).map (shiftI 1)) [.jmpIf (.out 2) 1, .halt] 0
+      simpa using getD_app_r ((comp [] 0 S ++ comp [] S.size T).map (shiftI 1)) [.jmpIf (.out 2 true) 1, .halt] 0
     · rw [hQ, List.getD_cons_succ, ← hKm]
-      simpa using getD_app_r ((comp [] 0 S ++ comp [] S.size T).map (shiftI 1)) [.jmpIf (.out 2) 1, .halt] 1
+      simpa using getD_app_r ((comp [] 0 S ++ comp [] S.size T).map (shiftI 1)) [.jmpIf (.out 2 true) 1, .halt] 1
     · simp [Cond.eval, h2]
-  have hjmp : (compile (prot5 S T)).getD 0 .halt = .jmpIf (.out 1) (1 + S.size) := by rw [hQ]; rfl
+  have hjmp : (compile (prot5 S T)).getD 0 .halt = .jmpIf (.out 1 true) (1 + S.size) := by rw [hQ]; rfl
   constructor
   · rintro ⟨f, hf⟩
     have := hag.fwd f 0 v [] r (by omega) hf
@@ -309,13 +333,13 @@ theorem prot6_equiv {S T : Stmt} (hS : Structured S) (hT : Structured T) (cd : C
     rw [compile_structured hst]
     simp only [comp, Stmt.size, Nat.zero_add, List.cons_append, List.append_assoc]
   have hQ : compile (prot6 cd S T) =
-      (.jmpIf (.neg cd) (1 + S.size) :: (comp [] 1 S ++ comp [] (1 + S.size) T)) ++ [.jmpIf (.out 1) 1, .halt] := by
-    show compile (prot (.neg cd) S T (.out 1)) = _
+      (.jmpIf (.neg cd) (1 + S.size) :: (comp [] 1 S ++ comp [] (1 + S.size) T)) ++ [.jmpIf (.out 1 true) 1, .halt] := by
+    show compile (prot (.neg cd) S T (.out 1 true)) = _
     rw [compile_prot hS hT]
     simp only [List.cons_append, List.append_assoc]
   have hK : (Instr.jmpIf (.neg cd) (1 + S.size) :: (comp [] 1 S ++ comp [] (1 + S.size) T)).length = S.size + T.size + 1 := by
     simp only [List.length_cons, List.length_append, comp_length]
-  have hag : Agree (compile (.seq (.ite1 cd S) T)) (compile (prot6 cd S T)) sol env 0 (S.size + T.size + 1) (.out 1) := by
+  have hag : Agree (compile (.seq (.ite1 cd S) T)) (compile (prot6 cd S T)) sol env 0 (S.size + T.size + 1) (.out 1 true) := by
     refine ⟨fun a ha => ?_, fun a t ha ht => ?_, ?_, ⟨1, ?_⟩, ?_, fun v => ?_⟩
     · rw [hP, hQ, Nat.add_zero, getD_app_l (by omega), getD_app_l (by omega), shiftI_zero]
     · have := tgt_le hst ht
@@ -325,10 +349,10 @@ theorem prot6_equiv {S T : Stmt} (hS : Structured S) (hT : Structured T) (cd : C
       simpa using getD_app_r (Instr.jmpIf (.neg cd) (1 + S.size) :: (comp [] 1 S ++ comp [] (1 + S.size) T)) [.halt] 0
     · rw [hQ, Nat.add_zero, ← hK]
       simpa using getD_app_r (Instr.jmpIf (.neg cd) (1 + S.size) :: (comp [] 1 S ++ comp [] (1 + S.size) T))
-        [.jmpIf (.out 1) 1, .halt] 0
+        [.jmpIf (.out 1 true) 1, .halt] 0
     · rw [hQ, ← hK]
       simpa using getD_app_r (Instr.jmpIf (.neg cd) (1 + S.size) :: (comp [] 1 S ++ comp [] (1 + S.size) T))
-        [.jmpIf (.out 1) 1, .halt] 1
+        [.jmpIf (.out 1 true) 1, .halt] 1
     · simp [Cond.eval, h1]
   constructor
   · rintro ⟨f, hf⟩

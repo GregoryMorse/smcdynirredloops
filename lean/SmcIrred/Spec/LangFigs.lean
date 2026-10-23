@@ -44,16 +44,16 @@ the generator outputs are `sol` (the listings below do not read them). -/
 desired assignment makes them false. -/
 
 /-- Figure 5(b) with solver-output conditions. -/
-@[expose] def fig5bS : Stmt := .seq (.ifGoto (.out 1) 9) (.doWhile (.seq blkA (.lab 9 blkB)) (.out 2))
+@[expose] def fig5bS : Stmt := .seq (.ifGoto (.out 1 true) 9) (.doWhile (.seq blkA (.lab 9 blkB)) (.out 2 true))
 
 /-- Figure 5(c) with a solver-output condition. -/
-@[expose] def fig5cS : Stmt := .seq (.ifGoto (.out 1) 9) (.while .ttf (.seq blkA (.lab 9 blkB)))
+@[expose] def fig5cS : Stmt := .seq (.ifGoto (.out 1 true) 9) (.while .ttf (.seq blkA (.lab 9 blkB)))
 
 /-- Figure 6(b) with a solver-output condition. -/
-@[expose] def fig6bS : Stmt := .seq (.ifGoto (.neg .c) 9) (.doWhile (.seq blkA (.lab 9 blkB)) (.out 1))
+@[expose] def fig6bS : Stmt := .seq (.ifGoto (.neg .c) 9) (.doWhile (.seq blkA (.lab 9 blkB)) (.out 1 true))
 
 /-- Figure 6(c) with a solver-output condition. -/
-@[expose] def fig6cS : Stmt := .seq (.ifGoto (.out 1) 8) (.seq (.while (.and .c .ttf) (.lab 8 blkA)) blkB)
+@[expose] def fig6cS : Stmt := .seq (.ifGoto (.out 1 true) 8) (.seq (.while (.and .c .ttf) (.lab 8 blkA)) blkB)
 
 /-! ### The protected forms for arbitrary code
 
@@ -64,9 +64,9 @@ theorems carry no labels). Figure 5(b) is `prot5` (conditions `out 1`, `out 2`),
 @[expose] def prot (h : Cond) (S T : Stmt) (k : Cond) : Stmt :=
   .seq (.ifGoto h 9) (.doWhile (.seq S (.lab 9 T)) k)
 
-@[expose] def prot5 (S T : Stmt) : Stmt := prot (.out 1) S T (.out 2)
+@[expose] def prot5 (S T : Stmt) : Stmt := prot (.out 1 true) S T (.out 2 true)
 
-@[expose] def prot6 (cd : Cond) (S T : Stmt) : Stmt := prot (.neg cd) S T (.out 1)
+@[expose] def prot6 (cd : Cond) (S T : Stmt) : Stmt := prot (.neg cd) S T (.out 1 true)
 
 theorem fig5bS_eq : fig5bS = prot5 blkA blkB := rfl
 
@@ -85,9 +85,9 @@ Figure 6(c) for `if (cd) S; T`. -/
 @[expose] def protC6 (cd h : Cond) (S T : Stmt) : Stmt :=
   .seq (.ifGoto h 8) (.seq (.while (.and cd .ttf) (.lab 8 S)) T)
 
-theorem fig5cS_eq : fig5cS = protC (.out 1) blkA blkB := rfl
+theorem fig5cS_eq : fig5cS = protC (.out 1 true) blkA blkB := rfl
 
-theorem fig6cS_eq : fig6cS = protC6 .c (.out 1) blkA blkB := rfl
+theorem fig6cS_eq : fig6cS = protC6 .c (.out 1 true) blkA blkB := rfl
 
 /-- A condition that does not read the toggled variable: its value does not depend on it and it leaves it unchanged. -/
 @[expose] def PureC (sol : Nat → Bool) (env : Bool) (k : Cond) : Prop := ∃ b, ∀ v, k.eval sol env v = (b, v)

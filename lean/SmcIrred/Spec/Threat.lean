@@ -16,27 +16,31 @@ open Lang Dyn
 
 **System.** The original program is a program of the transformation language (`Spec.Lang`) whose blocks are arbitrary
 computations; the obfuscator `Obfuscates` applies the static scheme of Section 5 (Figures 5 and 6: the loop and
-conditional transformations whose opaque conditions are read from predicate cells), and the predicate cells are filled at
-run time by the self-modifying-code 2-SAT solver (`smcSolve`) on a planted formula (Sections 3 and 3.1). An obfuscated
-*image* is the transformed program, the stamped formula and the placeholder values of the predicate cells in the static code
-bytes (the blueprint).
+conditional transformations whose opaque conditions are read from predicate cells, each cell's placeholder baked into the
+condition itself, `Cond.out`'s second field), and the predicate cells are filled at run time by the self-modifying-code
+2-SAT solver (`smcSolve`) on a planted formula (Sections 3 and 3.1). An obfuscated *image* is the transformed program and
+the stamped formula; the static placeholder values of its predicate cells (the blueprint an `ImmCap` analyzer reads) are
+not a separate input but `codeStatic`, read mechanically out of the program's own compiled code (`Image.blueprint`) —
+the initial code image before any self-modifying write.
 
 **Adversary classes** are interfaces: an analyzer reports a value for every predicate cell; a class is a structure stating
-its capability, never a claim that a tool exists. `ImmCap`: the analyzer reports the supplied static cell values (it
-assumes code bytes are constant). `SmcSemCap`: the analyzer implements stamping and the machine semantics (it can run the
-solver on the stamped formula). The classes for structuring, faults, traces and correlation are added with their theorems.
+its capability, never a claim that a tool exists. `ImmCap`: the analyzer reports the placeholder found in the program's
+own static code (it assumes code bytes are constant, i.e. it never observes the self-modifying write). `SmcSemCap`: the
+analyzer implements stamping and the machine semantics (it can run the solver on the stamped formula). The classes for
+structuring, faults, traces and correlation are added with their theorems.
 
 **Goals** are predicates on an analyzer and an image. **Assumptions** (`Assumptions`) are structural properties of the design;
 no field mentions a goal (`validation/threat_audit.py`). -/
 
-/-- An obfuscated image. -/
+/-- An obfuscated image: the transformed program and the stamped formula. There is no separate "static value" field — an
+`ImmCap` analyzer's reading (`Image.blueprint`) is computed from `prog`'s own compiled code (`codeStatic`), the initial
+code image before the self-modifying write that `rtVal` models. -/
 structure Image where
   prog : Stmt
   formula : TwoSat
-  /-- The static values of the predicate cells handed to an analyzer: an independent input, not computed from the code. -/
-  blueprint : Nat → Bool
 
-/-- The value of predicate cell `k` at run time: the output of the self-modifying-code solver on the stamped formula. -/
+/-- The value of predicate cell `k` at run time: the output of the self-modifying-code solver on the stamped formula —
+the value the self-modifying write leaves in the cell before `prog` is executed. -/
 @[expose] def rtVal (img : Image) (k : Nat) : Bool :=
   match smcSolve img.formula with
   | some sol => decide (2 * k ∈ sol)
@@ -48,7 +52,11 @@ structure Image where
 /-- The behaviour of the image: the block trace with the run-time cell values (the toggled variable starts true). -/
 @[expose] def Image.run (img : Image) (c : Bool) : Option (List Nat × Bool) := traceS (rtVal img) img.prog c true
 
-/-- What an analyzer that reports the supplied static cell values concludes the program does. -/
+/-- The placeholder value of predicate cell `k` as it stands in `prog`'s own compiled code, before any self-modifying
+write: the value an `ImmCap` analyzer, reading only the static bytes, reports for that cell. -/
+@[expose] def Image.blueprint (img : Image) (k : Nat) : Bool := codeStatic (compile img.prog) k
+
+/-- What an analyzer that reports the placeholder found in the static code concludes the program does. -/
 @[expose] def Image.staticRun (img : Image) (c : Bool) : Option (List Nat × Bool) :=
   traceS img.blueprint img.prog c true
 
@@ -61,15 +69,22 @@ structure Image where
   ∀ c r, Runs (rtVal img) img.prog c r ↔ Runs (fun _ => false) orig c r
 
 /-- The static scheme for goto-free blocks `S`, `T`: `S; T` and `if (cd) S; T` become the irreducible forms of Figures 5(b), 5(c),
-6(b), 6(c) with conditions read from predicate cells; the toggled-variable forms need conditions that do not read it. -/
+6(b), 6(c) with conditions read from predicate cells, each a fresh `out k true` (the generator's placeholder is `true`,
+reflecting the compiled bytes before the self-modifying write); the toggled-variable forms need conditions that do not
+read it. `b6`'s side condition (`1 ∉ codeReads (compile (.seq (.ite1 cd S) T))`) says the generator assigns a cell number
+the original program does not already read: without it, `S`, `T` or `cd` could themselves test cell `1` with a different
+placeholder, making the static value of the obfuscator's own injected predicate ambiguous (it sits last in `prot6 cd S T`'s
+compiled code, after `S` and `T`); the other three schemes inject their predicate first, so no such hypothesis is needed
+there. -/
 inductive Obfuscates : Stmt → Stmt → Prop
   | b5 {S T : Stmt} : Structured S → Structured T → Obfuscates (.seq S T) (prot5 S T)
   | c5 {S T : Stmt} : Structured S → Structured T → (∀ c, PureS (fun _ => false) c S ∧ PureS (fun _ => false) c T) →
-      Obfuscates (.seq S T) (protC (.out 1) S T)
-  | b6 {cd : Cond} {S T : Stmt} : Structured S → Structured T → Obfuscates (.seq (.ite1 cd S) T) (prot6 cd S T)
+      Obfuscates (.seq S T) (protC (.out 1 true) S T)
+  | b6 {cd : Cond} {S T : Stmt} : Structured S → Structured T →
+      1 ∉ codeReads (compile (.seq (.ite1 cd S) T)) → Obfuscates (.seq (.ite1 cd S) T) (prot6 cd S T)
   | c6 {cd : Cond} {S T : Stmt} : Structured S → Structured T →
       (∀ c, PureS (fun _ => false) c S ∧ PureS (fun _ => false) c T ∧ PureC (fun _ => false) c cd) →
-      Obfuscates (.seq (.ite1 cd S) T) (protC6 cd (.out 1) S T)
+      Obfuscates (.seq (.ite1 cd S) T) (protC6 cd (.out 1 true) S T)
 
 /-- A design: the image, the original program, the planted formula data (variables `n`, intended assignment `σ`, required
 variables `req`, the planted forest and the extra implications) and the dynamic scheme's circuit and schedule. -/
@@ -103,7 +118,8 @@ structure Assumptions (d : Design) : Prop where
 structure Analyzer where
   predict : Image → Nat → Bool
 
-/-- Capability of the class `Imm`: the analyzer reports the supplied static value (`blueprint`) of every cell. -/
+/-- Capability of the class `Imm`: the analyzer reports the placeholder found in the program's own static code
+(`blueprint`, computed from `prog`'s compiled bytes, not an independent input) for every cell. -/
 structure ImmCap (A : Analyzer) : Prop where
   static_read : ∀ img k, A.predict img k = img.blueprint k
 

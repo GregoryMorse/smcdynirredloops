@@ -28,7 +28,7 @@ inductive TCell where
   | .falseC, v => (false, v)
   | .ttf, v => v.run
   | .c, v => (env, v)
-  | .out k, v => (sol k, v)
+  | .out k _, v => (sol k, v)
   | .neg k, v => ((!(k.evalC sol env v).1), (k.evalC sol env v).2)
   | .and k l, v =>
     if (k.evalC sol env v).1 then l.evalC sol env (k.evalC sol env v).2 else (false, (k.evalC sol env v).2)

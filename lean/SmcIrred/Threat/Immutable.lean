@@ -23,9 +23,9 @@ theorem imm_determines_iff {A : Analyzer} (hC : ImmCap A) (img : Image) :
    fun h k hk => by rw [hC.static_read img k]; exact h k hk⟩
 
 /-- The witness design: three variables, intended assignment all false, variables 1 and 2 required with the planted forest
-`x ⇒ ¬x`, no extra implications, the blueprint (the placeholder bytes) all true, and the circuit with its ordered schedule. -/
+`x ⇒ ¬x`, no extra implications, and the circuit with its ordered schedule. -/
 @[expose] def witness (orig prog : Stmt) : Design where
-  img := ⟨prog, impFormula 3 [(⟨1, true⟩, ⟨1, false⟩), (⟨2, true⟩, ⟨2, false⟩)], fun _ => true⟩
+  img := ⟨prog, impFormula 3 [(⟨1, true⟩, ⟨1, false⟩), (⟨2, true⟩, ⟨2, false⟩)]⟩
   orig := orig
   n := 3
   σ := fun _ => false
@@ -63,14 +63,6 @@ theorem witness_assumptions {orig prog : Stmt} (hc : ∀ k ∈ codeReads (compil
   schedule_topo := wcirc_topo
   schedule_ordered := wcirc_ordered_01
 
-theorem witness_cells_diff {orig prog : Stmt} (hc : ∀ k ∈ codeReads (compile prog), k = 1 ∨ k = 2)
-    {k : Nat} (hk : k ∈ codeReads (compile prog)) :
-    (witness orig prog).img.blueprint k ≠ rtVal (witness orig prog).img k := by
-  have hA := witness_assumptions (orig := orig) hc
-  obtain ⟨hn, hr, hs⟩ := hA.cells_planted k hk
-  rw [rtVal_planted hA hn hr]
-  simp [witness]
-
 theorem reads_fig5bS : codeReads (compile fig5bS) = [1, 2] := by decide
 theorem reads_fig5cS : codeReads (compile fig5cS) = [1] := by decide
 theorem reads_fig6bS : codeReads (compile fig6bS) = [1] := by decide
@@ -103,10 +95,10 @@ theorem cellForest_planted (cs : List Nat) : Planted (cs.sum + 1) (fun _ => fals
     intro x _ hx
     exact .step (List.mem_map.2 ⟨x, hx, rfl⟩) (.refl _)
 
-/-- The witness design for any program: the variables are numbered beyond every cell the program reads, the cells are the
-required variables with intended value false and the forest `x ⇒ ¬x`, the blueprint is all true. -/
+/-- The witness design for any program: the variables are numbered beyond every cell the program reads, and the cells are
+the required variables with intended value false and the forest `x ⇒ ¬x`. -/
 @[expose] def witnessG (orig prog : Stmt) : Design where
-  img := ⟨prog, impFormula ((codeReads (compile prog)).sum + 1) (cellForest (codeReads (compile prog))), fun _ => true⟩
+  img := ⟨prog, impFormula ((codeReads (compile prog)).sum + 1) (cellForest (codeReads (compile prog)))⟩
   orig := orig
   n := (codeReads (compile prog)).sum + 1
   σ := fun _ => false
@@ -125,33 +117,74 @@ theorem witnessG_assumptions (orig prog : Stmt) : Assumptions (witnessG orig pro
   schedule_topo := wcirc_topo
   schedule_ordered := wcirc_ordered_01
 
-theorem witnessG_cells_diff (orig prog : Stmt) {k : Nat} (hk : k ∈ codeReads (compile prog)) :
-    (witnessG orig prog).img.blueprint k ≠ rtVal (witnessG orig prog).img k := by
-  have hA := witnessG_assumptions orig prog
-  obtain ⟨hn, hr, hs⟩ := hA.cells_planted k hk
-  rw [rtVal_planted hA hn hr]
-  simp [witnessG]
-
 /-- Every program of the static scheme reads the predicate cell `1`. -/
 theorem obf_cell {orig prog : Stmt} (ho : Obfuscates orig prog) : 1 ∈ codeReads (compile prog) := by
   cases ho with
   | b5 hS hT =>
-    show 1 ∈ codeReads (compile (prot (.out 1) _ _ (.out 2)))
+    show 1 ∈ codeReads (compile (prot (.out 1 true) _ _ (.out 2 true)))
     simp [codeReads, compile_prot hS hT, Instr.reads, Cond.reads]
   | c5 hS hT _ => simp [codeReads, compile_protC hS hT, Instr.reads, Cond.reads]
-  | b6 hS hT =>
-    show 1 ∈ codeReads (compile (prot (.neg _) _ _ (.out 1)))
+  | b6 hS hT _ =>
+    show 1 ∈ codeReads (compile (prot (.neg _) _ _ (.out 1 true)))
     simp [codeReads, compile_prot hS hT, Instr.reads, Cond.reads]
   | c6 hS hT _ => simp [codeReads, compile_protC6 hS hT, Instr.reads, Cond.reads]
 
+/-- The placeholder the generator writes for predicate cell `1` in every obfuscated program of the static scheme is
+`true`: it sits in the first compiled instruction of `b5`, `c5`, `c6` (so whatever `S`, `T` compile to afterwards cannot
+hide it), and in `b6` it sits last, after `S` and `T`, but `b6`'s side condition rules out any earlier instruction of the
+original program testing cell `1` (`codeStatic_append_of_not_mem`). -/
+theorem obf_cell_static {orig prog : Stmt} (ho : Obfuscates orig prog) : codeStatic (compile prog) 1 = true := by
+  cases ho with
+  | b5 hS hT =>
+    rename_i S T
+    show codeStatic (compile (prot (Cond.out 1 true) S T (Cond.out 2 true))) 1 = true
+    rw [compile_prot hS hT]
+    exact codeStatic_cons_eq (by simp [Cond.staticVal])
+  | c5 hS hT hp =>
+    rename_i S T
+    show codeStatic (compile (protC (Cond.out 1 true) S T)) 1 = true
+    rw [compile_protC hS hT]
+    exact codeStatic_cons_eq (by simp [Cond.staticVal])
+  | c6 hS hT hp =>
+    rename_i cd S T
+    show codeStatic (compile (protC6 cd (Cond.out 1 true) S T)) 1 = true
+    rw [compile_protC6 hS hT]
+    exact codeStatic_cons_eq (by simp [Cond.staticVal])
+  | b6 hS hT hfresh =>
+    rename_i cd S T
+    show codeStatic (compile (prot (Cond.neg cd) S T (Cond.out 1 true))) 1 = true
+    have hsh1 : comp [] 1 S = (comp [] 0 S).map (shiftI 1) := comp_shift [] 1 S hS 0
+    have hsh2 : comp [] (1 + S.size) T = (comp [] 0 T).map (shiftI (1 + S.size)) := by
+      have := comp_shift [] (1 + S.size) T hT 0; rwa [Nat.zero_add] at this
+    rw [compile_ite1_seq hS hT, ← hsh1, ← hsh2] at hfresh
+    have hpre : 1 ∉ codeReads
+        (Instr.jmpIf (Cond.neg cd) (1 + S.size) :: (comp [] 1 S ++ comp [] (1 + S.size) T)) := by
+      intro hmem
+      apply hfresh
+      simp only [codeReads, List.flatMap_cons, List.flatMap_append, List.flatMap_nil, List.mem_append,
+        Instr.reads, List.not_mem_nil, or_false] at hmem ⊢
+      exact hmem
+    have hsplit : (Instr.jmpIf (Cond.neg cd) (1 + S.size) ::
+        (comp [] 1 S ++ (comp [] (1 + S.size) T ++ [Instr.jmpIf (Cond.out 1 true) 1, Instr.halt]))) =
+      (Instr.jmpIf (Cond.neg cd) (1 + S.size) :: (comp [] 1 S ++ comp [] (1 + S.size) T)) ++
+        [Instr.jmpIf (Cond.out 1 true) 1, Instr.halt] := by simp [List.append_assoc]
+    rw [compile_prot hS hT, hsplit, codeStatic_append_of_not_mem hpre]
+    exact codeStatic_cons_eq (by simp [Cond.staticVal])
+
 /-- T2 (the class `Imm` is unsound on the scheme). For every obfuscated program of the static scheme (arbitrary goto-free
-blocks, Figures 5 and 6) there is a design satisfying S1–S3 (in which the placeholder bytes of the cells are true, the run-time
-values false) whose image the class `Imm` provably fails to determine, whatever the analyzer does beyond reading the code
-bytes. -/
+blocks, Figures 5 and 6) there is a design satisfying S1–S3 (in which the generator's placeholder for the predicate cells is
+true, the run-time value false) whose image the class `Imm` provably fails to determine, whatever the analyzer does beyond
+reading the code bytes. -/
 theorem imm_unsound {orig prog : Stmt} (ho : Obfuscates orig prog) {A : Analyzer} (hC : ImmCap A) :
-    ∃ d : Design, Assumptions d ∧ d.orig = orig ∧ d.img.prog = prog ∧ ¬ Determines A d.img :=
-  ⟨witnessG orig prog, witnessG_assumptions orig prog, rfl, rfl,
-    imm_fails hC _ (obf_cell ho) (witnessG_cells_diff orig prog (obf_cell ho))⟩
+    ∃ d : Design, Assumptions d ∧ d.orig = orig ∧ d.img.prog = prog ∧ ¬ Determines A d.img := by
+  have hA := witnessG_assumptions orig prog
+  obtain ⟨hn, hr, hs⟩ := hA.cells_planted 1 (obf_cell ho)
+  refine ⟨witnessG orig prog, hA, rfl, rfl, imm_fails hC _ (obf_cell ho) ?_⟩
+  show (witnessG orig prog).img.blueprint 1 ≠ rtVal (witnessG orig prog).img 1
+  rw [rtVal_planted hA hn hr, hs]
+  show codeStatic (compile prog) 1 ≠ false
+  rw [obf_cell_static ho]
+  decide
 
 /-- At the level of behaviour: with placeholder bytes all true the static reading of the obfuscated programs is not the
 behaviour of the original program (so a class that trusts the code bytes misreads the control flow). -/

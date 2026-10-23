@@ -17,7 +17,9 @@ inductive Cond where
   | falseC : Cond
   | ttf : Cond
   | c : Cond
-  | out : Nat → Cond
+  /-- Reads predicate cell `k` at run time; the second field is the value written into the code's bytes for this site
+  before any self-modifying write (the placeholder read by a class that trusts the static code, `ImmCap`). -/
+  | out : Nat → Bool → Cond
   | neg : Cond → Cond
   | and : Cond → Cond → Cond
 /-- Flat code. -/

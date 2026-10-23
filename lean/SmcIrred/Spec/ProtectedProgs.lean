@@ -22,12 +22,12 @@ Modular exponentiation (`modexp_plain`): block 0 initialisation, a loop over the
 /-- AES-128 as a program over blocks: 0 setup, 1 SubBytes, 2 ShiftRows, 3 MixColumns, 4 AddRoundKey of a round, 5 the end. -/
 @[expose] def aesPlain : Stmt :=
   .seq (.blk 0)
-    (.seq (.while (.out 3) (.seq (.seq (.blk 1) (.blk 2)) (.seq (.blk 3) (.blk 4))))
+    (.seq (.while (.out 3 true) (.seq (.seq (.blk 1) (.blk 2)) (.seq (.blk 3) (.blk 4))))
       (.seq (.seq (.blk 1) (.blk 2)) (.blk 5)))
 
 /-- Modular exponentiation: 0 setup, 1 multiplication into the accumulator, 2 squaring, 3 result; the multiplication is
 conditional on the exponent bit (condition 4), the loop on the bit counter (condition 3). -/
 @[expose] def modexpPlain : Stmt :=
-  .seq (.blk 0) (.seq (.while (.out 3) (.seq (.ite1 (.out 4) (.blk 1)) (.blk 2))) (.blk 3))
+  .seq (.blk 0) (.seq (.while (.out 3 true) (.seq (.ite1 (.out 4 true) (.blk 1)) (.blk 2))) (.blk 3))
 
 end SmcIrred.Lang

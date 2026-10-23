@@ -16,16 +16,19 @@ inductive Cond where
   | falseC : Cond
   | ttf : Cond
   | c : Cond
-  | out : Nat → Cond
+  /-- Reads predicate cell `k` at run time; the second field is the value written into the code's bytes for this site
+  before any self-modifying write (the placeholder read by a class that trusts the static code, `ImmCap`). -/
+  | out : Nat → Bool → Cond
   | neg : Cond → Cond
   | and : Cond → Cond → Cond
 
-/-- Value and new state of the variable read by `ttf`. -/
+/-- Value and new state of the variable read by `ttf`. The placeholder of `out` plays no role at run time: the running
+machine always reads the predicate cell, after self-modification has written the solver's output into it. -/
 @[expose] def Cond.eval (sol : Nat → Bool) (env : Bool) : Cond → Bool → Bool × Bool
   | .falseC, v => (false, v)
   | .ttf, v => (v, !v)
   | .c, v => (env, v)
-  | .out k, v => (sol k, v)
+  | .out k _, v => (sol k, v)
   | .neg k, v => ((!(k.eval sol env v).1), (k.eval sol env v).2)
   | .and k l, v => if (k.eval sol env v).1 then l.eval sol env (k.eval sol env v).2 else (false, (k.eval sol env v).2)
 
@@ -154,7 +157,7 @@ inductive Stmt where
 
 /-- The generator outputs read by a condition. -/
 @[expose] def Cond.reads : Cond → List Nat
-  | .out k => [k]
+  | .out k _ => [k]
   | .neg k => k.reads
   | .and a b => a.reads ++ b.reads
   | _ => []
@@ -165,6 +168,71 @@ inductive Stmt where
 
 /-- The generator outputs read by some instruction of the code. -/
 @[expose] def codeReads (code : List Instr) : List Nat := code.flatMap Instr.reads
+
+/-- The placeholder written into the code for predicate cell `k` by this condition, if it tests `k` directly or through
+`neg`/`and` (the self-modifying write has not happened yet; this is the value an `ImmCap` analyzer reads). `none` if the
+condition does not test `k`. -/
+@[expose] def Cond.staticVal (k : Nat) : Cond → Option Bool
+  | .out j b => if j = k then some b else none
+  | .neg d => d.staticVal k
+  | .and a b => a.staticVal k <|> b.staticVal k
+  | _ => none
+
+/-- The placeholder value of predicate cell `k` in the static bytes of compiled code: the first `jmpIf` condition that
+tests it (scanning the code in order), or `false` if none does. -/
+@[expose] def codeStatic (code : List Instr) (k : Nat) : Bool :=
+  (code.filterMap fun i => match i with | .jmpIf c _ => c.staticVal k | _ => none).headD false
+
+theorem Cond.staticVal_none_of_not_mem_reads {p : Cond} {k : Nat} (h : k ∉ p.reads) : p.staticVal k = none := by
+  induction p with
+  | falseC => rfl
+  | ttf => rfl
+  | c => rfl
+  | out j _ =>
+    simp only [Cond.reads, List.mem_singleton] at h
+    simp [Cond.staticVal, Ne.symm h]
+  | neg d ih =>
+    simp only [Cond.reads] at h
+    exact ih h
+  | and a b iha ihb =>
+    simp only [Cond.reads, List.mem_append, not_or] at h
+    simp [Cond.staticVal, iha h.1, ihb h.2]
+
+/-- No instruction of `code` matches cell `k`'s condition, so scanning for its static placeholder finds nothing. -/
+theorem filterMap_static_nil_of_not_mem {code : List Instr} {k : Nat} (h : k ∉ codeReads code) :
+    (code.filterMap fun i => match i with | .jmpIf c _ => c.staticVal k | _ => none) = [] := by
+  induction code with
+  | nil => rfl
+  | cons i code ih =>
+    simp only [codeReads, List.flatMap_cons, List.mem_append, not_or] at h
+    have hih := ih h.2
+    cases i with
+    | jmpIf c t =>
+      have hc : c.staticVal k = none := Cond.staticVal_none_of_not_mem_reads (by simpa [Instr.reads] using h.1)
+      simp [List.filterMap_cons, hc, hih]
+    | blk _ => simpa using hih
+    | jmp _ => simpa using hih
+    | halt => simpa using hih
+
+theorem codeStatic_eq_false_of_not_mem {code : List Instr} {k : Nat} (h : k ∉ codeReads code) :
+    codeStatic code k = false := by
+  unfold codeStatic
+  rw [filterMap_static_nil_of_not_mem h]
+  rfl
+
+/-- Scanning an appended code list for cell `k`'s placeholder skips a first part that does not read `k` at all. -/
+theorem codeStatic_append_of_not_mem {A B : List Instr} {k : Nat} (h : k ∉ codeReads A) :
+    codeStatic (A ++ B) k = codeStatic B k := by
+  unfold codeStatic
+  rw [List.filterMap_append, filterMap_static_nil_of_not_mem h]
+  rfl
+
+/-- The static placeholder of a condition tested directly by the first instruction: scanning finds it immediately,
+whatever instructions follow. -/
+theorem codeStatic_cons_eq {code : List Instr} {h : Cond} {t : Nat} {k : Nat} {b : Bool} (hs : h.staticVal k = some b) :
+    codeStatic (Instr.jmpIf h t :: code) k = b := by
+  unfold codeStatic
+  simp [List.filterMap_cons, hs]
 
 /-- The statements of the transformation language without `goto`, `ifGoto` and labels (structured programs). -/
 @[expose] def Structured : Stmt → Prop

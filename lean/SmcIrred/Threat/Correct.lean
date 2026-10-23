@@ -31,7 +31,7 @@ theorem obf_runs {orig prog : Stmt} (ho : Obfuscates orig prog) (c : Bool) (r : 
   cases ho with
   | b5 hS hT => exact (prot5_equiv hS hT rfl rfl c true r).symm
   | c5 hS hT hp => exact (protC_equiv hS hT (hp c).1 (hp c).2 (by simp [Cond.eval]) r).symm
-  | b6 hS hT => exact (prot6_equiv hS hT _ rfl c true r).symm
+  | b6 hS hT _ => exact (prot6_equiv hS hT _ rfl c true r).symm
   | c6 hS hT hp => exact (protC6_equiv hS hT (hp c).1 (hp c).2.1 (hp c).2.2 (by simp [Cond.eval]) r).symm
 
 /-- T1 (correctness). Under S1 and S2 the obfuscated image behaves as the original program, for both values of its condition

@@ -15,7 +15,7 @@ code has an irreducible loop in every valid jungle (and valid jungles exist); an
 false the protected code returns what the plain code returns. -/
 theorem aes_protected :
     let Q := protectMany (compile aesPlain)
-      [⟨7, 8, 9, .out 1, .out 2⟩, ⟨4, 5, 6, .out 1, .out 2⟩, ⟨2, 3, 4, .out 1, .out 2⟩]
+      [⟨7, 8, 9, .out 1 true, .out 2 true⟩, ⟨4, 5, 6, .out 1 true, .out 2 true⟩, ⟨2, 3, 4, .out 1 true, .out 2 true⟩]
     (cfgOf (compile aesPlain)).Reducible 0 ∧
     (∀ {J : Jungle}, J.Valid (cfgOf (compile aesPlain)) 0 → ∀ w, ¬ (cfgOf (compile aesPlain)).Irreducible J w) ∧
     (∀ {J : Jungle}, J.Valid (cfgOf Q) 0 → ∃ w, (cfgOf Q).Irreducible J w) ∧
@@ -26,11 +26,11 @@ theorem aes_protected :
   have hsub : Sub (.seq (.blk 1) (.blk 2)) 2 aesPlain 0 :=
     Sub.seqR (Sub.seqL (Sub.whl (Sub.seqL Sub.refl)))
   have hok : RegsOk (compile aesPlain).length
-      ([⟨7, 8, 9, .out 1, .out 2⟩, ⟨4, 5, 6, .out 1, .out 2⟩] ++
-        [⟨2, 2 + (Stmt.blk 1).size, 2 + (Stmt.blk 1).size + (Stmt.blk 2).size, .out 1, .out 2⟩]) := by
+      ([⟨7, 8, 9, .out 1 true, .out 2 true⟩, ⟨4, 5, 6, .out 1 true, .out 2 true⟩] ++
+        [⟨2, 2 + (Stmt.blk 1).size, 2 + (Stmt.blk 1).size + (Stmt.blk 2).size, .out 1 true, .out 2 true⟩]) := by
     simp [RegsOk, compile_length, aesPlain, Stmt.size]
-  have := protect_many_structured hs hsub (by simp [Stmt.size]) (by simp [Stmt.size]) (.out 1) (.out 2)
-    [⟨7, 8, 9, .out 1, .out 2⟩, ⟨4, 5, 6, .out 1, .out 2⟩] hok
+  have := protect_many_structured hs hsub (by simp [Stmt.size]) (by simp [Stmt.size]) (.out 1 true) (.out 2 true)
+    [⟨7, 8, 9, .out 1 true, .out 2 true⟩, ⟨4, 5, 6, .out 1 true, .out 2 true⟩] hok
   obtain ⟨h1, h2, h3, h4, h5⟩ := this
   refine ⟨h1, h2, ?_, ?_, ?_⟩
   · intro J hv; exact h3 hv
@@ -44,7 +44,7 @@ theorem aes_protected :
 /-- **Protected modular exponentiation** (`modexp_protected`): `PROT6` (Figure 6(b)) around the conditional multiplication and the
 squaring in the exponent loop. -/
 theorem modexp_protected :
-    let Q := protectClose (compile modexpPlain) 2 5 (.out 1)
+    let Q := protectClose (compile modexpPlain) 2 5 (.out 1 true)
     (cfgOf (compile modexpPlain)).Reducible 0 ∧
     (∀ {J : Jungle}, J.Valid (cfgOf (compile modexpPlain)) 0 → ∀ w, ¬ (cfgOf (compile modexpPlain)).Irreducible J w) ∧
     (∀ {J : Jungle}, J.Valid (cfgOf Q) 0 → ∃ w, (cfgOf Q).Irreducible J w) ∧
@@ -52,9 +52,9 @@ theorem modexp_protected :
     (∀ {sol : Nat → Bool} {env : Bool}, sol 1 = false → ∀ (v : Bool) (res : List Nat × Bool),
       ((∃ f, exec f (compile modexpPlain) sol env 0 v [] = some res) ↔ ∃ f, exec f Q sol env 0 v [] = some res)) := by
   have hs : Structured modexpPlain := by simp [modexpPlain, Structured]
-  have hsub : Sub (.seq (.ite1 (.out 4) (.blk 1)) (.blk 2)) 2 modexpPlain 0 :=
+  have hsub : Sub (.seq (.ite1 (.out 4 true) (.blk 1)) (.blk 2)) 2 modexpPlain 0 :=
     Sub.seqR (Sub.seqL (Sub.whl Sub.refl))
-  have := protect6_structured hs hsub (by simp [Stmt.size]) (by simp [Stmt.size]) (.out 1)
+  have := protect6_structured hs hsub (by simp [Stmt.size]) (by simp [Stmt.size]) (.out 1 true)
   obtain ⟨h1, h2, h3, h4, h5⟩ := this
   refine ⟨h1, h2, ?_, ?_, ?_⟩
   · intro J hv; exact h3 hv
