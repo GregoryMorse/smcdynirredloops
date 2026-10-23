@@ -18,18 +18,14 @@ order (the order a depth-first search follows). -/
 structure Digraph where
   n : Nat
   succ : Nat → List Nat
-
 /-- `a → b` is an edge: both ends are vertices and `b` is listed among the successors of `a`. -/
 @[expose] def Digraph.edge (g : Digraph) (a b : Nat) : Prop := a < g.n ∧ b < g.n ∧ b ∈ g.succ a
-
 /-- Reachability along edges (reflexive-transitive closure). -/
 inductive Digraph.Reach (g : Digraph) : Nat → Nat → Prop
   | refl (a : Nat) : Digraph.Reach g a a
   | step {a b c : Nat} : g.edge a b → Digraph.Reach g b c → Digraph.Reach g a c
-
 /-- A control-flow graph with root `h`: every vertex is reachable from `h`. -/
 @[expose] def Digraph.IsCFG (g : Digraph) (h : Nat) : Prop := h < g.n ∧ ∀ v, v < g.n → g.Reach h v
-
 end SmcIrred
 -- ===== SmcIrred.Spec.TwoSat =====
 namespace SmcIrred
@@ -38,46 +34,34 @@ structure Lit where
   var : Nat
   pos : Bool
   deriving DecidableEq
-
 @[expose] def Lit.neg (l : Lit) : Lit := ⟨l.var, !l.pos⟩
-
 /-- The vertex of the implication graph of a literal: `2x` for `x`, `2x + 1` for `¬x`. -/
 @[expose] def Lit.node (l : Lit) : Nat := 2 * l.var + (if l.pos then 0 else 1)
-
 /-- A 2-SAT formula: `n` variables and `m` clauses of at most two literals each (`Wf`); the empty clause is allowed and
 is unsatisfiable. -/
 structure TwoSat where
   n : Nat
   clauses : List (List Lit)
-
 @[expose] def TwoSat.Wf (f : TwoSat) : Prop := ∀ c ∈ f.clauses, c.length ≤ 2 ∧ ∀ l ∈ c, l.var < f.n
-
 /-- The literal is true under the assignment `a`. -/
 @[expose] def Lit.Holds (a : Nat → Bool) (l : Lit) : Prop := a l.var = l.pos
-
 /-- A clause is satisfied when one of its literals holds (the empty clause is never satisfied). -/
 @[expose] def ClauseSat (a : Nat → Bool) (c : List Lit) : Prop := ∃ l ∈ c, l.Holds a
-
 @[expose] def TwoSat.Sat (f : TwoSat) (a : Nat → Bool) : Prop := ∀ c ∈ f.clauses, ClauseSat a c
-
 /-- The implications of a clause: `(p ∨ q)` gives `¬p → q` and `¬q → p`; a unit clause `(p)` gives `¬p → p`; the empty
 clause gives none. -/
 @[expose] def clauseImps : List Lit → List (Lit × Lit)
   | [a, b] => [(a.neg, b), (b.neg, a)]
   | [a] => [(a.neg, a)]
   | _ => []
-
 @[expose] def TwoSat.imps (f : TwoSat) : List (Lit × Lit) := f.clauses.flatMap clauseImps
-
 /-- The implication graph on the `2n` literal vertices (successor order: clause order). -/
 @[expose] def TwoSat.graph (f : TwoSat) : Digraph where
   n := 2 * f.n
   succ u := (f.imps.filter fun e => e.1.node == u).map fun e => e.2.node
-
 /-- The Aspvall–Plass–Tarjan assignment: `x` is true iff `label(x) < label(¬x)`. -/
 @[expose] def aptAssign (lab : Nat → Nat) (x : Nat) : Bool :=
   decide (lab (Lit.node ⟨x, true⟩) < lab (Lit.node ⟨x, false⟩))
-
 end SmcIrred
 -- ===== SmcIrred.Spec.Generator =====
 namespace SmcIrred
@@ -85,15 +69,12 @@ namespace SmcIrred
 inductive ImpPath (imps : List (Lit × Lit)) : Lit → Lit → Prop
   | refl (l : Lit) : ImpPath imps l l
   | step {a b c : Lit} : (a, b) ∈ imps → ImpPath imps b c → ImpPath imps a c
-
 /-- The 2-SAT formula of a list of implications: `p ⇒ q` is the clause `(¬p ∨ q)`; its contrapositive `¬q ⇒ ¬p` is the
 same clause, so the implication graph of the formula is closed under contraposition. -/
 @[expose] def impFormula (n : Nat) (imps : List (Lit × Lit)) : TwoSat :=
   ⟨n, imps.map fun e => [e.1.neg, e.2]⟩
-
 /-- An implication that the desired assignment `σ` respects: it does not lead from a true to a false literal. -/
 @[expose] def Respecting (σ : Nat → Bool) (e : Lit × Lit) : Prop := ¬ (e.1.Holds σ ∧ ¬ e.2.Holds σ)
-
 /-- The planted generator (Section 3.1) with the desired assignment `σ` on the required variables `req` (the other
 variables below `n` are free and `σ` is extended arbitrarily): a forest of implications that respects `σ` and gives
 every required variable `x` a forcing path from its `σ`-false literal to its `σ`-true literal. -/
@@ -101,23 +82,18 @@ structure Planted (n : Nat) (σ : Nat → Bool) (req : Nat → Prop) (forest : L
   wf : ∀ e ∈ forest, e.1.var < n ∧ e.2.var < n
   respect : ∀ e ∈ forest, Respecting σ e
   forcing : ∀ x, x < n → req x → ImpPath forest ⟨x, !σ x⟩ ⟨x, σ x⟩
-
 /-- The chain from the literal `cur` through the variables `ms` (each reached at its `σ`-true literal) to `(x, σ x)`. -/
 @[expose] def chainFrom (σ : Nat → Bool) : Lit → List Nat → Nat → List (Lit × Lit)
   | cur, [], x => [(cur, ⟨x, σ x⟩)]
   | cur, m :: ms, x => (cur, ⟨m, σ m⟩) :: chainFrom σ ⟨m, σ m⟩ ms x
-
 /-- The forcing chain of the required variable `x`. -/
 @[expose] def chain (σ : Nat → Bool) (x : Nat) (ms : List Nat) : List (Lit × Lit) := chainFrom σ ⟨x, !σ x⟩ ms x
-
 /-- The forest of the chains of the specification `(x, intermediate variables)`. -/
 @[expose] def genForest (σ : Nat → Bool) (specs : List (Nat × List Nat)) : List (Lit × Lit) :=
   specs.flatMap fun s => chain σ s.1 s.2
-
 /-- The random implications kept by the generator: those that respect `σ` and stay among the `n` variables. -/
 @[expose] def genExtra (n : Nat) (σ : Nat → Bool) (cands : List (Lit × Lit)) : List (Lit × Lit) :=
   cands.filter fun e => !(σ e.1.var == e.1.pos && σ e.2.var != e.2.pos) && decide (e.1.var < n) && decide (e.2.var < n)
-
 end SmcIrred
 -- ===== SmcIrred.Spec.Tarjan =====
 namespace SmcIrred
@@ -131,19 +107,14 @@ structure TState where
   stk : List Nat
   out : List (List Nat)
   ticks : Nat
-
 @[expose] def TState.init : TState := ⟨0, fun _ => 0, fun _ => 0, [], [], 0⟩
-
 @[expose] def tupd (f : Nat → Nat) (k x : Nat) : Nat → Nat := fun j => if j = k then x else f j
-
 /-- The in-range successors of `v` (the vertices of the graph; the 2-SAT implication graph has no others). -/
 @[expose] def tsuccs (g : Digraph) (v : Nat) : List Nat := (g.succ v).filter fun w => decide (w < g.n)
-
 /-- Pop the stack down to and including `v`: the popped component and the remaining stack. -/
 @[expose] def popTo (v : Nat) : List Nat → List Nat × List Nat
   | [] => ([], [])
   | x :: xs => if x = v then ([x], xs) else ((x :: (popTo v xs).1), (popTo v xs).2)
-
 /-- One iteration of the successor loop of `v` for the successor `w`: an unvisited `w` is visited recursively (the
 call updates the lowlink of `v` on return); a visited `w` still on the stack lowers the lowlink of `v` to its index. -/
 @[expose] def tEdge (vis : Nat → Nat → TState → TState) (v w : Nat) (s : TState) : TState :=
@@ -151,11 +122,9 @@ call updates the lowlink of `v` on return); a visited `w` still on the stack low
   if s.num w = 0 then vis w v s0
   else if w ∈ s.stk then { s0 with low := tupd s0.low v (min (s0.low v) (s0.num w)) }
   else s0
-
 @[expose] def tScan (vis : Nat → Nat → TState → TState) (v : Nat) : List Nat → TState → TState
   | [], s => s
   | w :: ws, s => tScan vis v ws (tEdge vis v w s)
-
 /-- The end of `strongconnect` for `v` after its successor loop: emit the component if `v` is a root, then return the
 lowlink to the parent `par`. -/
 @[expose] def tFinish (v : Nat) (par : Option Nat) (s2 : TState) : TState :=
@@ -167,7 +136,6 @@ lowlink to the parent `par`. -/
   match par with
   | none => s3
   | some p => { s3 with low := tupd s3.low p (min (s3.low p) (s3.low v)) }
-
 /-- `strongconnect` with a fuel bound: enter `v`, loop over its successors, then finish. -/
 @[expose] def tVisit (g : Digraph) : Nat → Nat → Option Nat → TState → TState
   | 0, _, _, s => s
@@ -176,29 +144,23 @@ lowlink to the parent `par`. -/
     let s1 : TState := { s with cnt := c, num := tupd s.num v c, low := tupd s.low v c, stk := v :: s.stk,
                                 ticks := s.ticks + 1 }
     tFinish v par (tScan (fun w p t => tVisit g f w (some p) t) v (tsuccs g v) s1)
-
 /-- The outer loop over the vertices, **skipping visited ones** (the corrected loop, L01). -/
 @[expose] def tRun (g : Digraph) : List Nat → TState → TState
   | [], s => s
   | v :: vs, s => tRun g vs (if s.num v = 0 then tVisit g g.n v none s else s)
-
 /-- Tarjan's strongly connected component algorithm on the vertices `0 … n-1`. -/
 @[expose] def tarjan (g : Digraph) : TState := tRun g (List.range g.n) TState.init
-
 /-- The components in emission order. -/
 @[expose] def tarjanSccs (g : Digraph) : List (List Nat) := (tarjan g).out
-
 /-- The number of in-range edges of the vertices `0 … k-1`. -/
 @[expose] def tEdges (g : Digraph) : Nat → Nat
   | 0 => 0
   | k + 1 => tEdges g k + (tsuccs g k).length
-
 end SmcIrred
 -- ===== SmcIrred.Spec.TarjanCode =====
 namespace SmcIrred
 /-- The negation of a literal node (`2x ↔ 2x+1`, the integer `-v` of the code). -/
 @[expose] def nneg (v : Nat) : Nat := if v % 2 = 0 then v + 1 else v - 1
-
 end SmcIrred
 -- ===== SmcIrred.Spec.SmcMachine =====
 namespace SmcIrred
@@ -213,16 +175,12 @@ structure SState where
   set : Nat → Nat
   stk : List (Option Nat)
   chain : List Nat
-
 /-- The freshly stamped image of a graph with `n` nodes. -/
 @[expose] def SState.init (n : Nat) : SState :=
   ⟨0, fun _ => none, fun _ => 0, fun _ => false, fun _ => 0, fun _ => false, fun _ => n, [], []⟩
-
 @[expose] def fupd {α : Type} (f : Nat → α) (k : Nat) (x : α) : Nat → α := fun j => if j = k then x else f j
-
 /-- The graph with every successor list reversed (the order in which the blueprint visits them). -/
 @[expose] def revG (g : Digraph) : Digraph := ⟨g.n, fun v => (g.succ v).reverse⟩
-
 /-- The component extraction at a root `w`: pop cells until `w` is popped; each popped node `u` is appended to the
 chain, assigned to the component `w` and marked finished (`return n`). -/
 @[expose] def sExtract (n w : Nat) : Nat → SState → SState
@@ -234,16 +192,13 @@ chain, assigned to the component `w` and marked finished (`return n`). -/
     | some u :: rest =>
       let s' : SState := { s with stk := rest, chain := s.chain ++ [u], set := fupd s.set u w, ent := fupd s.ent u (some n) }
       if u = w then s' else sExtract n w k s'
-
 /-- After a call returned the value `r`: lower the lowlink of the caller `x` (and patch its check). -/
 @[expose] def sStep (x : Nat) (rs : Nat × SState) : SState :=
   if rs.1 < rs.2.low x then { rs.2 with low := fupd rs.2.low x rs.1, chk := fupd rs.2.chk x true } else rs.2
-
 /-- The successor loop of node `x` (successors in the given order). -/
 @[expose] def sLoop (call : Nat → Nat → SState → Nat × SState) (x : Nat) : List Nat → SState → SState
   | [], s => s
   | w :: ws, s => sLoop call x ws (sStep x (call x w s))
-
 /-- The start of the code of an unvisited node `w`, entered with the return cell on top of the stack: record the
 index, pop or peek the return cell, record the depth, become a `return` stub. -/
 @[expose] def sEnter (w : Nat) (s1 : SState) : SState :=
@@ -251,24 +206,20 @@ index, pop or peek the return cell, record the depth, become a `return` stub. -/
   let s2 : SState := { s1 with idx := k + 1, ent := fupd s1.ent w (some k), low := fupd s1.low w k,
                                chk := fupd s1.chk w false, stk := if s1.pk w then s1.stk else s1.stk.tail }
   { s2 with dep := fupd s2.dep w s2.stk.length }
-
 /-- The end of the code of `w`: push the own return cell when nothing was pushed since the entry, extract the component
 when no lowlink was lowered. -/
 @[expose] def sLeave (n w : Nat) (s4 : SState) : SState :=
   let s5 : SState := if s4.stk.length = s4.dep w then { s4 with stk := some w :: s4.stk } else s4
   if s5.chk w then s5 else sExtract n w s5.stk.length s5
-
 /-- The code of an unvisited node `w`: start, loop over the successors, end, return the lowlink. -/
 @[expose] def sBody (g : Digraph) (call : Nat → Nat → SState → Nat × SState) (w : Nat) (s1 : SState) : Nat × SState :=
   let s6 := sLeave g.n w (sLoop call w (tsuccs (revG g) w) (sEnter w s1))
   (s6.low w, s6)
-
 /-- The start of the call of `w` from `x`: patch `w` to peek when nothing was pushed since the entry of `x`, then push
 the return cell (the return address inside the code of `x`). -/
 @[expose] def sPre (x w : Nat) (s : SState) : SState :=
   let s0 : SState := if s.stk.length = s.dep x then { s with pk := fupd s.pk w true } else s
   { s0 with stk := some x :: s0.stk }
-
 /-- The call of `w` from `x`: a visited `w` returns its marker and pops the cell (no fuel needed), an unvisited one runs
 its code (`fuel` bounds the call depth; it is never exhausted on a graph with enough fuel). -/
 @[expose] def sCall (g : Digraph) : Nat → Nat → Nat → SState → Nat × SState
@@ -277,7 +228,6 @@ its code (`fuel` bounds the call depth; it is never exhausted on a graph with en
     | some k, _ => (k, { sPre x w s with stk := (sPre x w s).stk.tail })
     | none, 0 => (0, sPre x w s)
     | none, f + 1 => sBody g (sCall g f) w (sPre x w s)
-
 /-- The outer loop: call every node that is still unvisited (`callblueprint`). The call pushes a `none` cell. -/
 @[expose] def sRun (g : Digraph) (fuel : Nat) : List Nat → SState → SState
   | [], s => s
@@ -285,21 +235,18 @@ its code (`fuel` bounds the call depth; it is never exhausted on a graph with en
     sRun g fuel vs (match s.ent v with
       | some _ => s
       | none => (sBody g (sCall g fuel) v { s with stk := none :: s.stk }).2)
-
 /-- The solution phase: walk the topological chain; a node in the same component as its negation ends the run with
 `unsat` (the set is cleared); otherwise the node is added to the solution unless its negation is in it. -/
 @[expose] def sSolFold (set : Nat → Nat) : List Nat → List Nat → Option (List Nat)
   | [], sol => some sol
   | x :: xs, sol =>
     if set x = set (nneg x) then none else sSolFold set xs (if nneg x ∈ sol then sol else x :: sol)
-
 /-- The whole SMC solver on the implication graph of `f`: `none` is unsatisfiable, `some sol` lists the true literal
 nodes (`2x` for the variable `x`). -/
 @[expose] def smcSolve (f : TwoSat) : Option (List Nat) :=
   let g := f.graph
   let s := sRun g (g.n - 1) (List.range g.n) (SState.init g.n)
   sSolFold s.set s.chain []
-
 end SmcIrred
 -- ===== SmcIrred.Spec.Lang =====
 namespace SmcIrred.Lang
@@ -310,7 +257,6 @@ inductive Cond where
   | out : Nat → Cond
   | neg : Cond → Cond
   | and : Cond → Cond → Cond
-
 /-- Value and new state of the variable read by `ttf`. -/
 @[expose] def Cond.eval (sol : Nat → Bool) (env : Bool) : Cond → Bool → Bool × Bool
   | .falseC, v => (false, v)
@@ -319,14 +265,12 @@ inductive Cond where
   | .out k, v => (sol k, v)
   | .neg k, v => ((!(k.eval sol env v).1), (k.eval sol env v).2)
   | .and k l, v => if (k.eval sol env v).1 then l.eval sol env (k.eval sol env v).2 else (false, (k.eval sol env v).2)
-
 /-- Flat code. -/
 inductive Instr where
   | blk : Nat → Instr
   | jmp : Nat → Instr
   | jmpIf : Cond → Nat → Instr
   | halt : Instr
-
 /-- Execution with a fuel bound: the block trace and the final value of the variable read by `ttf`, if the
 code halts within the fuel (running off the end counts as `halt`). -/
 @[expose] def exec : Nat → List Instr → (Nat → Bool) → Bool → Nat → Bool → List Nat → Option (List Nat × Bool)
@@ -337,7 +281,6 @@ code halts within the fuel (running off the end counts as `halt`). -/
     | .jmp t => exec f code sol env t v tr
     | .jmpIf k t => exec f code sol env (if (k.eval sol env v).1 then t else pc + 1) (k.eval sol env v).2 tr
     | .halt => some (tr, v)
-
 /-- Structured statements. `ifGoto k l` is `if (k) goto l;`. -/
 inductive Stmt where
   | skip : Stmt
@@ -350,7 +293,6 @@ inductive Stmt where
   | goto : Nat → Stmt
   | ifGoto : Cond → Nat → Stmt
   | lab : Nat → Stmt → Stmt
-
 @[expose] def Stmt.size : Stmt → Nat
   | .skip => 0
   | .blk _ => 1
@@ -362,12 +304,10 @@ inductive Stmt where
   | .goto _ => 1
   | .ifGoto _ _ => 1
   | .lab _ s => s.size
-
 @[expose] def lookupLabel (labs : List (Nat × Nat)) (l : Nat) : Nat :=
   match labs.find? (fun q => q.1 == l) with
   | some q => q.2
   | none => 0
-
 /-- Code of a statement placed at address `p`. -/
 @[expose] def comp (labs : List (Nat × Nat)) : Nat → Stmt → List Instr
   | _, .skip => []
@@ -381,7 +321,6 @@ inductive Stmt where
   | _, .goto l => [.jmp (lookupLabel labs l)]
   | _, .ifGoto k l => [.jmpIf k (lookupLabel labs l)]
   | p, .lab _ s => comp labs p s
-
 /-- Addresses of the labels of a statement placed at address `p`. -/
 @[expose] def labelsOf : Nat → Stmt → List (Nat × Nat)
   | _, .skip => []
@@ -394,32 +333,24 @@ inductive Stmt where
   | _, .goto _ => []
   | _, .ifGoto _ _ => []
   | p, .lab l s => (l, p) :: labelsOf p s
-
 /-- The flat code of a program: its instructions followed by `halt`. -/
 @[expose] def compile (s : Stmt) : List Instr := comp (labelsOf 0 s) 0 s ++ [.halt]
-
 @[expose] def Instr.target : Instr → Option Nat
   | .jmp t => some t
   | .jmpIf _ t => some t
   | _ => none
-
 @[expose] def Instr.isTerm : Instr → Bool
   | .blk _ => false
   | _ => true
-
 /-- Address `i` starts a basic block: it is the first instruction, a jump target, or follows a jump or `halt`. -/
 @[expose] def isLeader (code : List Instr) (i : Nat) : Bool :=
   i == 0 || (List.range code.length).any fun j =>
     (code.getD j .halt).target == some i || (j + 1 == i && (code.getD j .halt).isTerm)
-
 @[expose] def leaders (code : List Instr) : List Nat := (List.range code.length).filter (isLeader code)
-
 /-- Number of the block containing address `i`. -/
 @[expose] def blockOf (code : List Instr) (i : Nat) : Nat := ((leaders code).filter (· ≤ i)).length - 1
-
 /-- Address of the last instruction of block `k`. -/
 @[expose] def blockEnd (code : List Instr) (k : Nat) : Nat := (leaders code).getD (k + 1) code.length - 1
-
 /-- Successors of block `k`: the jump target then the fall-through for a conditional jump. -/
 @[expose] def blockSucc (code : List Instr) (k : Nat) : List Nat :=
   let e := blockEnd code k
@@ -428,26 +359,21 @@ inductive Stmt where
   | .jmpIf _ t => [blockOf code t, blockOf code (e + 1)]
   | .halt => []
   | .blk _ => if e + 1 < code.length then [blockOf code (e + 1)] else []
-
 /-- The control-flow graph of flat code: one vertex per basic block. -/
 @[expose] def cfgOf (code : List Instr) : Digraph where
   n := (leaders code).length
   succ := blockSucc code
-
 /-- The generator outputs read by a condition. -/
 @[expose] def Cond.reads : Cond → List Nat
   | .out k => [k]
   | .neg k => k.reads
   | .and a b => a.reads ++ b.reads
   | _ => []
-
 @[expose] def Instr.reads : Instr → List Nat
   | .jmpIf k _ => k.reads
   | _ => []
-
 /-- The generator outputs read by some instruction of the code. -/
 @[expose] def codeReads (code : List Instr) : List Nat := code.flatMap Instr.reads
-
 /-- The statements of the transformation language without `goto`, `ifGoto` and labels (structured programs). -/
 @[expose] def Structured : Stmt → Prop
   | .skip => True
@@ -460,26 +386,19 @@ inductive Stmt where
   | .goto _ => False
   | .ifGoto _ _ => False
   | .lab _ _ => False
-
 end SmcIrred.Lang
 -- ===== SmcIrred.Spec.LangFigs =====
 namespace SmcIrred.Lang
 @[expose] def prot (h : Cond) (S T : Stmt) (k : Cond) : Stmt :=
   .seq (.ifGoto h 9) (.doWhile (.seq S (.lab 9 T)) k)
-
 @[expose] def prot5 (S T : Stmt) : Stmt := prot (.out 1) S T (.out 2)
-
 @[expose] def prot6 (cd : Cond) (S T : Stmt) : Stmt := prot (.neg cd) S T (.out 1)
-
 @[expose] def protC (h : Cond) (S T : Stmt) : Stmt :=
   .seq (.ifGoto h 9) (.while .ttf (.seq S (.lab 9 T)))
-
 @[expose] def protC6 (cd h : Cond) (S T : Stmt) : Stmt :=
   .seq (.ifGoto h 8) (.seq (.while (.and cd .ttf) (.lab 8 S)) T)
-
 /-- A condition that does not read the toggled variable: its value does not depend on it and it leaves it unchanged. -/
 @[expose] def PureC (sol : Nat → Bool) (env : Bool) (k : Cond) : Prop := ∃ b, ∀ v, k.eval sol env v = (b, v)
-
 @[expose] def PureS (sol : Nat → Bool) (env : Bool) : Stmt → Prop
   | .skip | .blk _ | .goto _ | .ifGoto _ _ => True
   | .seq s t => PureS sol env s ∧ PureS sol env t
@@ -488,7 +407,6 @@ namespace SmcIrred.Lang
   | .while k s => PureC sol env k ∧ PureS sol env s
   | .doWhile s k => PureS sol env s ∧ PureC sol env k
   | .lab _ s => PureS sol env s
-
 end SmcIrred.Lang
 -- ===== SmcIrred.Spec.Dynamic =====
 namespace SmcIrred.Dyn
@@ -496,32 +414,24 @@ structure DCirc (α : Type) where
   n : Nat
   ps : Nat → List Nat
   f : Nat → List α → α
-
 /-- The vertices are numbered topologically: every predecessor of `v` is smaller. -/
 @[expose] def DCirc.Topo {α : Type} (c : DCirc α) : Prop := ∀ v, v < c.n → ∀ u ∈ c.ps v, u < v
-
 /-- An action: execute `v` (`none`) or write the arbitrary value `d` into `v` (`some d`, a faulty execution of `v`). -/
 abbrev Act (α : Type) := Nat × Option α
-
 @[expose] def stepA {α : Type} (c : DCirc α) (σ : Nat → α) : Act α → (Nat → α)
   | (v, none) => fun w => if w = v then c.f v ((c.ps v).map σ) else σ w
   | (v, some d) => fun w => if w = v then d else σ w
-
 /-- The values after running the actions from the initial values `σ`. -/
 @[expose] def runA {α : Type} (c : DCirc α) (σ : Nat → α) (acts : List (Act α)) : Nat → α := acts.foldl (stepA c) σ
-
 /-- A schedule without faults. -/
 @[expose] def execs {α : Type} (s : List Nat) : List (Act α) := s.map fun v => (v, none)
-
 /-- The final executions are in order: every vertex `v` is executed (not faultily) at its last write, and after that last
 execution no predecessor of `v` is written. -/
 @[expose] def FinalOrdered {α : Type} (c : DCirc α) (acts : List (Act α)) : Prop :=
   ∀ v, v < c.n → ∃ pre post, acts = pre ++ (v, none) :: post ∧ (∀ a ∈ post, a.1 ≠ v) ∧
     ∀ u ∈ c.ps v, ∀ a ∈ post, a.1 ≠ u
-
 /-- The values of the circuit: the result of executing every vertex once in the topological order. -/
 @[expose] def valOf {α : Type} (c : DCirc α) (σ : Nat → α) : Nat → α := runA c σ (execs (List.range c.n))
-
 end SmcIrred.Dyn
 -- ===== SmcIrred.Spec.Threat =====
 namespace SmcIrred.Threat
@@ -533,24 +443,19 @@ structure Image where
   formula : TwoSat
   /-- The static values of the predicate cells handed to an analyzer: an independent input, not computed from the code. -/
   blueprint : Nat → Bool
-
 /-- The value of predicate cell `k` at run time: the output of the self-modifying-code solver on the stamped formula. -/
 @[expose] def rtVal (img : Image) (k : Nat) : Bool :=
   match smcSolve img.formula with
   | some sol => decide (2 * k ∈ sol)
   | none => false
-
 /-- The predicate cells the program reads. -/
 @[expose] def Image.cells (img : Image) : List Nat := codeReads (compile img.prog)
-
 /-- `p`, run with generator outputs `sol` and condition `c`, halts within some fuel with block trace and toggled value `r`. -/
 @[expose] def Runs (sol : Nat → Bool) (p : Stmt) (c : Bool) (r : List Nat × Bool) : Prop :=
   ∃ f, exec f (compile p) sol c 0 true [] = some r
-
 /-- The image halts with the same block trace and final value as `orig` (reading no generator output), for both conditions. -/
 @[expose] def Image.Behaves (img : Image) (orig : Stmt) : Prop :=
   ∀ c r, Runs (rtVal img) img.prog c r ↔ Runs (fun _ => false) orig c r
-
 /-- The static scheme for goto-free blocks `S`, `T`: `S; T` and `if (cd) S; T` become the irreducible forms of Figures 5(b), 5(c),
 6(b), 6(c) with conditions read from predicate cells; the toggled-variable forms need conditions that do not read it. -/
 inductive Obfuscates : Stmt → Stmt → Prop
@@ -561,7 +466,6 @@ inductive Obfuscates : Stmt → Stmt → Prop
   | c6 {cd : Cond} {S T : Stmt} : Structured S → Structured T →
       (∀ c, PureS (fun _ => false) c S ∧ PureS (fun _ => false) c T ∧ PureC (fun _ => false) c cd) →
       Obfuscates (.seq (.ite1 cd S) T) (protC6 cd (.out 1) S T)
-
 /-- A design: the image, the original program, the planted formula data (variables `n`, intended assignment `σ`, required
 variables `req`, the planted forest and the extra implications) and the dynamic scheme's circuit and schedule. -/
 structure Design where
@@ -577,7 +481,6 @@ structure Design where
   extra_wf : ∀ e ∈ extra, e.1.var < n ∧ e.2.var < n
   circ : DCirc Bool
   acts : List (Act Bool)
-
 /-- The structural assumptions. S1: the stamped formula is a planted formula generated under the conditions of the generator
 (`Planted`, every extra implication respects the intended assignment and stays among the variables). S2: the predicate cells
 the program reads are planted, required variables whose intended value is false (the opaque conditions are false conditions,
@@ -589,43 +492,33 @@ structure Assumptions (d : Design) : Prop where
   cells_planted : ∀ k ∈ d.img.cells, k < d.n ∧ d.req k ∧ d.σ k = false
   schedule_topo : d.circ.Topo
   schedule_ordered : FinalOrdered d.circ d.acts
-
 /-- An analyzer reports a predicted value for every predicate cell of an image. -/
 structure Analyzer where
   predict : Image → Nat → Bool
-
 /-- Capability of the class `Imm`: the analyzer reports the supplied static value (`blueprint`) of every cell. -/
 structure ImmCap (A : Analyzer) : Prop where
   static_read : ∀ img k, A.predict img k = img.blueprint k
-
 /-- Capability of the class `SmcSem`: the analyzer implements stamping and the machine semantics, so its report is the
 run-time value of the cell. -/
 structure SmcSemCap (A : Analyzer) : Prop where
   runs_machine : ∀ img k, A.predict img k = rtVal img k
-
 /-- Goal: the analyzer reports every predicate cell the program reads with its run-time value. -/
 @[expose] def Determines (A : Analyzer) (img : Image) : Prop := ∀ k ∈ img.cells, A.predict img k = rtVal img k
-
 /-- The tick count of the reference Tarjan run on the stamped formula's implication graph (one unit per vertex entry, examined
 edge and popped vertex): the cost of recovering the solver output by that algorithm. It is not the work of any analyzer. -/
 @[expose] def recoverWork (img : Image) : Nat := (tarjan img.formula.graph).ticks
-
 /-- The pairs (vertex, final value) of a schedule: the data a correlation attack aligned by address has for every vertex. -/
 @[expose] def finalObs {α : Type} (c : DCirc α) (σ : Nat → α) (acts : List (Act α)) : List (Nat × α) :=
   (List.range c.n).map fun v => (v, runA c σ acts v)
-
 /-- The observable size of a program: the number of vertices of its control-flow graph. -/
 @[expose] def vcount (s : Stmt) : Nat := (cfgOf (compile s)).n
-
 /-- Functional equivalence of programs (no generator outputs): for both values of the condition and of the toggled variable,
 the same block traces and final values are produced by terminating runs, whatever the fuel. -/
 @[expose] def Equiv (p q : Stmt) : Prop :=
   ∀ c v r, (∃ f, exec f (compile p) (fun _ => false) c 0 v [] = some r) ↔ ∃ f, exec f (compile q) (fun _ => false) c 0 v [] = some r
-
 /-- The property of an obfuscator that a notion of indistinguishability must have for the size observable: equivalent programs
 get obfuscations with the same number of vertices. -/
 @[expose] def SizeIndist (O : Stmt → Stmt) : Prop := ∀ p q, Equiv p q → vcount (O p) = vcount (O q)
-
 end SmcIrred.Threat
 -- ===== SmcIrred.Spec.DFS =====
 namespace SmcIrred
@@ -634,14 +527,11 @@ spanning tree is determined by the timestamps, see `Jungle.IsParent`). -/
 structure Jungle where
   pre : Nat → Nat
   post : Nat → Nat
-
 /-- `a` is an ancestor of `b` (or `b` itself): the interval of `b` lies inside the interval of `a`. -/
 @[expose] def Jungle.Anc (J : Jungle) (a b : Nat) : Prop := J.pre a ≤ J.pre b ∧ J.post b ≤ J.post a
-
 /-- `u` is the parent of `v` in the tree: its innermost proper ancestor. -/
 @[expose] def Jungle.IsParent (g : Digraph) (J : Jungle) (u v : Nat) : Prop :=
   u < g.n ∧ u ≠ v ∧ J.Anc u v ∧ ∀ w, w < g.n → w ≠ v → J.Anc w v → J.Anc w u
-
 /-- `J` is the timestamping of a depth-first search of `g` from `r` (in some order of the successors): intervals
 are well formed, distinct and nested or disjoint; the root encloses everything; every other vertex has an
 innermost proper ancestor which has an edge to it (the tree edge); and no edge leads to a vertex discovered after
@@ -655,7 +545,6 @@ structure Jungle.Valid (g : Digraph) (r : Nat) (J : Jungle) : Prop where
   root : ∀ v, v < g.n → J.Anc r v
   parent : ∀ v, v < g.n → v ≠ r → ∃ u, J.IsParent g u v ∧ g.edge u v
   no_rightward : ∀ a b, g.edge a b → ¬ J.post a < J.pre b
-
 end SmcIrred
 -- ===== SmcIrred.Spec.LNF =====
 namespace SmcIrred
@@ -663,45 +552,36 @@ namespace SmcIrred
 inductive PathIn (g : Digraph) (S : Nat → Prop) : Nat → Nat → Prop
   | refl {a : Nat} : a < g.n → S a → PathIn g S a a
   | step {a b c : Nat} : S a → g.edge a b → PathIn g S b c → PathIn g S a c
-
 /-- `t → w` is a back edge of the jungle `J`: its target is an ancestor of its source (a self-loop is a back edge). -/
 @[expose] def Digraph.BackEdge (g : Digraph) (J : Jungle) (t w : Nat) : Prop := g.edge t w ∧ J.Anc w t
-
 /-- `w` is a loop header: some back edge leads to it. -/
 @[expose] def Digraph.IsHeader (g : Digraph) (J : Jungle) (w : Nat) : Prop := ∃ t, g.BackEdge J t w
-
 /-- The Havlak loop body of the header `w`: `w` itself and every proper descendant of `w` that reaches the source of a
 back edge to `w` (other than a self-loop) inside the subtree of `w` without passing through `w`. Nested loops are
 contained in it. -/
 @[expose] def Digraph.Body (g : Digraph) (J : Jungle) (w x : Nat) : Prop :=
   g.IsHeader J w ∧ (x = w ∨ ∃ t, t ≠ w ∧ g.BackEdge J t w ∧ PathIn g (fun z => J.Anc w z ∧ z ≠ w) x t)
-
 /-- The loop of `w` is irreducible: a vertex of its body other than `w` has a predecessor that is not a descendant of
 `w` (a second entry). -/
 @[expose] def Digraph.Irreducible (g : Digraph) (J : Jungle) (w : Nat) : Prop :=
   g.IsHeader J w ∧ ∃ x y, g.Body J w x ∧ x ≠ w ∧ g.edge y x ∧ ¬ J.Anc w y
-
 /-- A multiple-entry edge: it enters the body of a loop, at a vertex other than the header, from outside the subtree of
 the header. -/
 @[expose] def Digraph.IsMEE (g : Digraph) (J : Jungle) (x y : Nat) : Prop :=
   g.edge x y ∧ ∃ w, g.Body J w y ∧ y ≠ w ∧ ¬ J.Anc w x
-
 /-- `w` dominates `x` (with respect to the entry `r`): `x` is reachable from `r` and every path from `r` to `x` passes through
 `w`. -/
 @[expose] def Digraph.Dom (g : Digraph) (r w x : Nat) : Prop :=
   PathIn g (fun _ => True) r x ∧ ¬ PathIn g (fun u => u ≠ w) r x
-
 /-- A path of one or more edges, each leaving a vertex reachable from `r` and not entering a vertex that dominates the
 vertex it leaves (that is, no edge of the path is a back edge in the sense of dominance). -/
 inductive Digraph.NonDomPath (g : Digraph) (r : Nat) : Nat → Nat → Prop
   | single {a b : Nat} : g.edge a b → PathIn g (fun _ => True) r a → ¬ g.Dom r b a → Digraph.NonDomPath g r a b
   | step {a b c : Nat} : g.edge a b → PathIn g (fun _ => True) r a → ¬ g.Dom r b a → Digraph.NonDomPath g r b c →
       Digraph.NonDomPath g r a c
-
 /-- The flow graph is reducible (Hecht–Ullman): the edges that do not enter a vertex dominating their source contain no
 cycle. -/
 @[expose] def Digraph.Reducible (g : Digraph) (r : Nat) : Prop := ∀ v, ¬ g.NonDomPath r v v
-
 end SmcIrred
 -- ===== SmcIrred.Spec.Extremal =====
 namespace SmcIrred
@@ -710,41 +590,34 @@ depth-first order), successors in ascending order. -/
 @[expose] def Kn (n : Nat) : Digraph where
   n := n
   succ i := (List.range n).filter fun j => decide (j ≠ i)
-
 /-- The reduced graph `M_n` (Definition 4): tree edges `v_i → v_{i+1}`, back edges `v_n → v_i` (`i < n`), and the edges
 `v_i → v_j` for `j ≥ i + 2`, which are the multiple-entry edges. -/
 @[expose] def Mn (n : Nat) : Digraph where
   n := n
   succ i := (List.range n).filter fun j => decide (j = i + 1 ∨ (i + 1 = n ∧ j + 1 < n) ∨ i + 2 ≤ j)
-
 /-- `M_n` without the back edge `v_n → v_1` (which is not needed to keep the maximal number of multiple-entry edges). -/
 @[expose] def MnLite (n : Nat) : Digraph where
   n := n
   succ i := (List.range n).filter fun j => decide (j = i + 1 ∨ (i + 1 = n ∧ 1 ≤ j ∧ j + 1 < n) ∨ i + 2 ≤ j)
-
 /-- The depth-first jungle of a chain `0 → 1 → … → n-1` with the clock starting at 2. -/
 @[expose] def chainJungle (n : Nat) : Jungle where
   pre i := 2 + i
   post i := 2 * n + 1 - i
-
 open Classical in
 
 /-- The number of edges. -/
 @[expose] noncomputable def Digraph.edgeCount (g : Digraph) : Nat :=
   ((List.range g.n).map fun a => ((List.range g.n).filter fun b => decide (g.edge a b)).length).sum
-
 open Classical in
 
 /-- The number of irreducible loops of the jungle `J`. -/
 @[expose] noncomputable def Digraph.irrCount (g : Digraph) (J : Jungle) : Nat :=
   ((List.range g.n).filter fun w => decide (g.Irreducible J w)).length
-
 open Classical in
 
 /-- The number of multiple-entry edges of the jungle `J`. -/
 @[expose] noncomputable def Digraph.meeCount (g : Digraph) (J : Jungle) : Nat :=
   ((List.range g.n).map fun y => ((List.range g.n).filter fun x => decide (g.IsMEE J x y)).length).sum
-
 end SmcIrred
 -- ===== SmcIrred.Spec.TwoSatSolve =====
 namespace SmcIrred
@@ -752,18 +625,15 @@ namespace SmcIrred
 @[expose] def compIdx : List (List Nat) → Nat → Nat
   | [], _ => 0
   | C :: cs, v => if v ∈ C then 0 else compIdx cs v + 1
-
 /-- The Aspvall–Plass–Tarjan rule on a list of components in emission order, with the component index as label: `none`
 when a variable shares its component with its negation. -/
 @[expose] def twoSatSolveOf (comps : List (List Nat)) (f : TwoSat) : Option (Nat → Bool) :=
   let lab := compIdx comps
   if (List.range f.n).any (fun x => lab (Lit.node ⟨x, true⟩) == lab (Lit.node ⟨x, false⟩)) then none
   else some (aptAssign lab)
-
 /-- The reference 2-SAT solver: Tarjan's components of the implication graph in emission order, then the
 Aspvall–Plass–Tarjan rule. -/
 @[expose] def twoSatSolve (f : TwoSat) : Option (Nat → Bool) := twoSatSolveOf (tarjanSccs f.graph) f
-
 end SmcIrred
 -- ===== SmcIrred.Spec.RunDFS =====
 namespace SmcIrred
@@ -773,27 +643,22 @@ structure DfsState where
   clock : Nat
   pre : Nat → Nat
   post : Nat → Nat
-
 /-- Discover `v`: stamp its preorder time. -/
 @[expose] def DfsState.opening (s : DfsState) (v : Nat) : DfsState :=
   { s with clock := s.clock + 1, pre := fun x => if x = v then s.clock else s.pre x }
-
 /-- Finish `v`: stamp its postorder time. -/
 @[expose] def DfsState.closing (s : DfsState) (v : Nat) : DfsState :=
   { s with clock := s.clock + 1, post := fun x => if x = v then s.clock else s.post x }
-
 /-- Visit `v` (fuel-bounded recursion): stamp the preorder time, visit every not yet discovered successor in list
 order, stamp the postorder time. -/
 @[expose] def dfsVisit (g : Digraph) : Nat → Nat → DfsState → DfsState
   | 0, _, s => s
   | fuel + 1, v, s =>
     ((g.succ v).foldl (fun s w => if w < g.n ∧ s.pre w = 0 then dfsVisit g fuel w s else s) (s.opening v)).closing v
-
 /-- The timestamps of the depth-first search from `r` whose clock starts at `c ≥ 1` (undiscovered vertices get 0). -/
 @[expose] def dfsRun (g : Digraph) (r c : Nat) : Jungle :=
   let s := dfsVisit g (g.n + 1) r ⟨c, fun _ => 0, fun _ => 0⟩
   ⟨s.pre, s.post⟩
-
 end SmcIrred
 -- ===== SmcIrred.Spec.Edges =====
 namespace SmcIrred.Lang
@@ -801,53 +666,43 @@ namespace SmcIrred.Lang
 @[expose] def pathG (n : Nat) : Digraph where
   n := n
   succ k := if k + 1 < n then [k + 1] else []
-
 /-- Add the edge `x → y` (listed last at `x`). -/
 @[expose] def addEdge (g : Digraph) (x y : Nat) : Digraph where
   n := g.n
   succ k := if k = x then g.succ k ++ [y] else g.succ k
-
 /-- No vertex heads an irreducible loop of the depth-first jungle of the code order. -/
 @[expose] def NoIrr (g : Digraph) : Prop :=
   ∀ w, w < g.n → ¬ g.Irreducible (dfsRun g 0 2) w
-
 /-- An `n`-way conditional: vertex `0` is the condition, `1 … k` the branches, `k + 1` the join. -/
 @[expose] def nwayG (k : Nat) : Digraph where
   n := k + 2
   succ v := if v = 0 then (List.range k).map (· + 1) else if v ≤ k then [k + 1] else []
-
 /-- The `n`-way conditional with the edge from the join back into the first branch. -/
 @[expose] def nwayE (k : Nat) : Digraph := addEdge (nwayG k) (k + 1) 1
-
 end SmcIrred.Lang
 -- ===== SmcIrred.Spec.Circuit =====
 namespace SmcIrred
 /-- Number of vertices of `l` accepted by `acc`. -/
 @[expose] def cnt (acc : Nat → Bool) (l : List Nat) : Nat := (l.filter acc).length
-
 end SmcIrred
 -- ===== SmcIrred.Spec.Flatten =====
 namespace SmcIrred.Struct
 /-- The successor chosen at the `k`-th selection from the vertex `v` (the exit state if there is none). -/
 @[expose] def nextState (g : Digraph) (ch : Nat → Nat) (v k : Nat) : Nat :=
   (g.succ v).getD (ch k % (g.succ v).length) g.n
-
 /-- The CFG semantics: the blocks executed (labels `lab v`) along the run from `v` at selection index `k`. -/
 inductive Walk (g : Digraph) (lab : Nat → List Nat) (ch : Nat → Nat) : Nat → Nat → List Nat → Prop
   | stop {v k : Nat} : g.succ v = [] → Walk g lab ch v k (lab v)
   | go {v k : Nat} {t : List Nat} : g.succ v ≠ [] →
       Walk g lab ch (nextState g ch v k) (k + 1) t → Walk g lab ch v k (lab v ++ t)
-
 /-- The flat program: the loop runs while `state ≠ EXIT` and dispatches on `state` (`case v`: the block of `v`, then
 the assignment to `state`). `FRun g lab ch state k t`: the loop halts with the trace `t`. -/
 inductive FRun (g : Digraph) (lab : Nat → List Nat) (ch : Nat → Nat) : Nat → Nat → List Nat → Prop
   | exit {k : Nat} : FRun g lab ch g.n k []
   | step {s k : Nat} {t : List Nat} : s ≠ g.n →
       FRun g lab ch (nextState g ch s k) (k + 1) t → FRun g lab ch s k (lab s ++ t)
-
 /-- Well-formed graph: all successors are vertices. -/
 @[expose] def WFg (g : Digraph) : Prop := ∀ v, v < g.n → ∀ w, w ∈ g.succ v → w < g.n
-
 end SmcIrred.Struct
 -- ===== SmcIrred.Spec.Paper =====
 namespace SmcIrred.Paper
@@ -874,10 +729,9 @@ produces such a forest for every choice of those variables and candidates, with 
     Planted n σ req (genForest σ specs) ∧ (∀ e ∈ genExtra n σ cands, Respecting σ e ∧ e.1.var < n ∧ e.2.var < n) ∧
     ∃ sol, smcSolve (impFormula n (genForest σ specs ++ genExtra n σ cands)) = some sol ∧
       ∀ x, x < n → req x → decide (2 * x ∈ sol) = σ x)
-
 /-- **Extremal irreducible loops and multiple-entry edges** (Section 5, Definition 4). Counts are taken over a valid
 depth-first jungle `J` of a control-flow graph with root `r`. (1) At most `n − 2` irreducible loops and at most
-`(n − 1)(n − 2) / 2` multiple-entry edges. (2) The complete graph `K_n` and (3) the reduced graph `M_n` with the chain jungle
+`(n − 1)(n − 2) / 2` multiple-entry edges, for `n ≥ 2`. (2) The complete graph `K_n` and (3) the reduced graph `M_n` with the chain jungle
 attain both bounds. (4) A graph with the maximal number of multiple-entry edges has at least `2n − 3` further edges, and
 (5) `M_n` without its back edge to the first vertex (`MnLite n`) is valid for the chain jungle, has the maximal number of
 multiple-entry edges and exactly that many further edges. -/
@@ -892,10 +746,9 @@ multiple-entry edges and exactly that many further edges. -/
     2 * g.meeCount J = (g.n - 1) * (g.n - 2) → g.meeCount J + (2 * g.n - 3) ≤ g.edgeCount) ∧
   (∀ n : Nat, 2 ≤ n → (chainJungle n).Valid (MnLite n) 0 ∧ 2 * (MnLite n).meeCount (chainJungle n) = (n - 1) * (n - 2) ∧
     (MnLite n).edgeCount = (Kn n).meeCount (chainJungle n) + (2 * n - 3))
-
 /-- **The irreducible-loop transformations** (Section 5). (1) One edge added to a path never creates an irreducible loop
-(for the depth-first order of the code). (2) An `n`-way conditional (`n ≥ 2`) has none, and one edge from the join back into
-its first branch creates one. (3) For a planted formula whose intended assignment makes the variables `1` and `2` false and
+(for the depth-first jungle `dfsRun` from the entry). (2) An `n`-way conditional (`n ≥ 2`) has none, and one edge from the
+join back into its first branch creates one (for the same jungle). (3) For a planted formula whose intended assignment makes the variables `1` and `2` false and
 any structured programs `S`, `T` (`S` nonempty), the solver outputs `1` and `2` are false and, with them as the opaque
 conditions, the transformed program of Figure 5(b) returns the same trace and state as `S; T` for every environment and
 state of the toggled variable; `S; T` has a reducible control-flow graph and every valid depth-first jungle of the
@@ -928,23 +781,32 @@ the single opaque condition `1`. -/
            ∃ f, exec f (compile (prot6 cd S T)) o env 0 v [] = some r)) ∧
       (cfgOf (compile (.seq (.ite1 cd S) T))).Reducible 0 ∧
       (∀ {J : Jungle}, J.Valid (cfgOf (compile (prot6 cd S T))) 0 → ∃ w, (cfgOf (compile (prot6 cd S T))).Irreducible J w))
-
 /-- **The security model** (Section 5.1, `lean/THREAT_MODEL.md`). Every statement is about the explicit model: a design `d`
 (image, original program, planted data, circuit and schedule) satisfying the structural assumptions `Assumptions d` (planted
-and stamped formula, false cells, dependency-respecting schedule), and analyzers given by their capability. T1: the image
-behaves as the original (`Image.Behaves`) and the schedule's final values are the circuit's, for `S; T` or `if (cd) S; T` with
-arbitrary goto-free blocks and the parameterized Figure 5/6 transformations (`Obfuscates`). T2: an analyzer that reports the
-independently supplied static values of the cells (`blueprint`, an input of the model, not derived from a modeled code image or
-stamping transition) fails to determine some design, for every such pair. T3: an analyzer that implements the machine
-semantics reports the intended values, and the reference Tarjan run on the stamped formula's graph (`recoverWork`) takes at most
-`2|V| + |E|` ticks in the clean cost model (the analyzer's own work is not modeled). T4: one state variable resolves any
-flattening and the multiple-entry edges of `K_n` number `(n − 1)(n − 2) / 2`. T5: a fault outside the final execution of a vertex
-leaves every final value unchanged, one in it overwrites it. T6: address-aligned traces determine the same (vertex, final value)
-pairs for every dependency-respecting schedule. T7: no obfuscator whose output size is within four vertices of its input's, in either direction, is
-size-indistinguishable (equivalence: the same terminating runs, whatever the fuel). Necessity: for each assumption a design (or circuit) violating only it for which the conclusion fails;
-for the schedule and the numbering, a topologically numbered circuit with a schedule not in order that changes a final value, a
-circuit with a dependency cycle (no ordered schedule) and an acyclic circuit not numbered topologically with an ordered schedule
-whose final value differs from `valOf`. -/
+and stamped formula, cells that are required variables with false intended value, dependency-respecting schedule on a
+topologically numbered circuit), and analyzers given by their capability.
+T1: the image behaves as the original (`Image.Behaves`) and the schedule's final values are the circuit's, for `S; T` or
+`if (cd) S; T` with arbitrary goto-free blocks and the parameterized Figure 5/6 transformations (`Obfuscates`).
+T2: an analyzer that reports the independently supplied static values of the cells (`blueprint`, an input of the model, not
+derived from a modeled code image or stamping transition) fails to determine some design, for every such pair.
+T3: the solver succeeds on the stamped formula, an analyzer that implements the machine semantics reports the intended values,
+and the reference Tarjan run on the stamped formula's graph (`recoverWork`) takes at most `2|V| + |E|` ticks in the clean cost
+model (the analyzer's own work is not modeled).
+T4: for every graph whose edges stay among its vertices, the walks of the graph are exactly the runs of a dispatch loop on one
+state variable (which stays in range); and `2 · MEE(K_n) = (n − 1)(n − 2)` for the chain jungle.
+T5: for a topologically numbered circuit and a schedule whose final executions respect the dependencies, a fault in an
+execution of `x` that is not its last leaves every final value unchanged; a fault in the last execution of `x` (any circuit,
+any schedule) makes the faulty value the final value of `x`.
+T6: for a topologically numbered circuit, any two dependency-respecting schedules, from any initial states, give the same
+(vertex, final value) pairs.
+T7: no obfuscator whose output size is within four vertices of its input's, in either direction, is size-indistinguishable
+(equivalence: the same terminating runs, whatever the fuel).
+Necessity, each witness keeping every other assumption: violating stamping, the forcing paths, the cells being required, or
+their false intended values gives an image that does not behave as the original; an implication of the forest or an extra
+implication that the intended assignment does not respect makes the solver return nothing (T3's first conclusion fails); a
+topologically numbered circuit has a schedule not in dependency order that changes a final value; a circuit that is not
+topologically numbered may have no dependency-respecting schedule at all, and another has one whose final value differs from
+`valOf`. The bounds `k < n` on the cells and on the forest's variables say that they are variables of the formula (typing). -/
 @[expose] def SecurityModel : Prop :=
   (∀ d : Design, Assumptions d → Obfuscates d.orig d.img.prog →
     d.img.Behaves d.orig ∧
@@ -952,7 +814,7 @@ whose final value differs from `valOf`. -/
   (∀ {orig prog : Stmt}, Obfuscates orig prog → ∀ {A : Analyzer}, ImmCap A →
     ∃ d : Design, Assumptions d ∧ d.orig = orig ∧ d.img.prog = prog ∧ ¬ Determines A d.img) ∧
   (∀ {A : Analyzer}, SmcSemCap A → ∀ {d : Design}, Assumptions d →
-    (∀ k ∈ d.img.cells, A.predict d.img k = d.σ k) ∧
+    (∀ k ∈ d.img.cells, A.predict d.img k = d.σ k) ∧ smcSolve d.img.formula ≠ none ∧
     recoverWork d.img ≤ 2 * d.img.formula.graph.n + tEdges d.img.formula.graph d.img.formula.graph.n) ∧
   (∀ (n : Nat), 2 * (Kn n).meeCount (chainJungle n) = (n - 1) * (n - 2)) ∧
   (∀ (g : Digraph), WFg g → ∀ (lab : Nat → List Nat) (ch : Nat → Nat),
@@ -979,15 +841,24 @@ whose final value differs from `valOf`. -/
     (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧ d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧
     (∀ k ∈ d.img.cells, k < d.n ∧ d.req k) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧
     ¬ d.img.Behaves d.orig) ∧
-  (∃ d : Design, Planted d.n d.σ d.req d.forest ∧ (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧
-    d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧ ¬ (∀ e ∈ d.extra, Respecting d.σ e) ∧
-    smcSolve d.img.formula = none) ∧
+  (∃ d : Design, Obfuscates d.orig d.img.prog ∧ Planted d.n d.σ d.req d.forest ∧ (∀ e ∈ d.extra, Respecting d.σ e) ∧
+    (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧ d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧
+    (∀ k ∈ d.img.cells, k < d.n ∧ ¬ d.req k ∧ d.σ k = false) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧
+    ¬ d.img.Behaves d.orig) ∧
+  (∃ d : Design, Obfuscates d.orig d.img.prog ∧ Planted d.n d.σ d.req d.forest ∧
+    (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧ d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧
+    (∀ k ∈ d.img.cells, k < d.n ∧ d.req k ∧ d.σ k = false) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧
+    ¬ (∀ e ∈ d.extra, Respecting d.σ e) ∧ smcSolve d.img.formula = none) ∧
+  (∃ d : Design, Obfuscates d.orig d.img.prog ∧ (∀ e ∈ d.forest, e.1.var < d.n ∧ e.2.var < d.n) ∧
+    (∀ x, x < d.n → d.req x → ImpPath d.forest ⟨x, !d.σ x⟩ ⟨x, d.σ x⟩) ∧ (∀ e ∈ d.extra, Respecting d.σ e) ∧
+    (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧ d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧
+    (∀ k ∈ d.img.cells, k < d.n ∧ d.req k ∧ d.σ k = false) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧
+    ¬ (∀ e ∈ d.forest, Respecting d.σ e) ∧ smcSolve d.img.formula = none) ∧
   (∃ c : DCirc Bool, c.Topo ∧ ∃ acts : List (Act Bool), ¬ FinalOrdered c acts ∧
     ∃ v, runA c (fun _ => false) acts v ≠ valOf c (fun _ => false) v) ∧
   (∃ c : DCirc Bool, ¬ c.Topo ∧ ∀ acts : List (Act Bool), ¬ FinalOrdered c acts) ∧
   (∃ c : DCirc Bool, ¬ c.Topo ∧ ∃ acts : List (Act Bool), FinalOrdered c acts ∧
     ∃ v, v < c.n ∧ runA c (fun _ => false) acts v ≠ valOf c (fun _ => false) v)
-
 end SmcIrred.Paper
 namespace PalomarSIL
 /-- The self-modifying-code 2-SAT solver and the planted generator (`SmcTwoSatCorrect`); the extremal numbers of irreducible loops and multiple-entry edges (`IrreducibleExtremal`); the irreducible-loop transformations of Figures 5 and 6 (`TransformCorrect`); the security model of Section 5.1 relative to explicit structural assumptions (`SecurityModel`). -/

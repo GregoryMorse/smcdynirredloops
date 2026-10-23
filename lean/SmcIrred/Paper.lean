@@ -1,6 +1,7 @@
 module
 
 public import SmcIrred.Spec.Paper
+public import SmcIrred.AES.Vectors
 public import SmcIrred.Smc.Solve
 public import SmcIrred.Tarjan.Solver
 public import SmcIrred.Gen.Planted
@@ -45,22 +46,23 @@ theorem transformCorrect : TransformCorrect :=
       static_scheme_general hp hx hwx h1 h2 hr1 hr2 hs1 hs2 hS hT hS1,
     fun _ _ _ _ _ hp hx hwx h1 hr1 hs1 _ _ hS hT hS1 cd => static_scheme_general6 hp hx hwx h1 hr1 hs1 hS hT hS1 cd⟩
 
-/-- `CircuitCFGCorrect`: `aes128Graph_correct`, `aes192Graph_correct`, `aes256Graph_correct`. -/
+/-- `CircuitCFGCorrect`: `aes128Graph_correct`, `aes192Graph_correct`, `aes256Graph_correct`, and the FIPS-197 Appendix C
+vectors `AES.enc128`, `AES.enc192`, `AES.enc256`. -/
 theorem circuitCFGCorrect : CircuitCFGCorrect :=
   ⟨fun key inp hinp => (aes128Graph_correct key inp hinp).2.2, fun key inp hinp => (aes192Graph_correct key inp hinp).2.2,
-    fun key inp hinp => (aes256Graph_correct key inp hinp).2.2⟩
+    fun key inp hinp => (aes256Graph_correct key inp hinp).2.2, AES.enc128, AES.enc192, AES.enc256⟩
 
 /-- `SecurityModel`: T1 `correct`, T2 `imm_unsound`, T3 `recover`, T4 `Kn_meeCount`, `one_variable_suffices`, T5 `fault_class`,
 `fault_final_overwrites`, T6 `dca_final_obs`, T7 `not_size_indist`, and the necessity witnesses `nec_stamped`, `nec_forcing`,
 `nec_false_cells`, `nec_extra_respects`, `nec_schedule`, `nec_topo`. -/
 theorem securityModel : SecurityModel :=
-  ⟨fun _ hA ho => correct hA ho, fun ho _ hC => imm_unsound ho hC, fun hC _ hA => recover hC hA, fun n => Kn_meeCount n,
+  ⟨fun _ hA ho => correct hA ho, fun ho _ hC => imm_unsound ho hC, fun hC _ hA => ⟨(recover hC hA).1, solver_succeeds hA, (recover hC hA).2⟩, fun n => Kn_meeCount n,
     fun g hwf lab ch => one_variable_suffices g hwf lab ch,
     fun c hT _ _ _ hord hx δ σ τ => fault_class c hT hord hx δ σ τ,
     fun c _ _ _ hx δ σ => fault_final_overwrites c hx δ σ,
     fun c hT _ _ ha hb σ σ' => dca_final_obs c hT ha hb σ σ',
     fun O hb => not_size_indist O hb,
-    ⟨dStamp, nec_stamped⟩, ⟨dForce, nec_forcing⟩, ⟨dFalse, nec_false_cells⟩, ⟨dExtra, nec_extra_respects⟩,
+    ⟨dStamp, nec_stamped⟩, ⟨dForce, nec_forcing⟩, ⟨dFalse, nec_false_cells⟩, ⟨dReq, nec_req_cells⟩, ⟨dExtra, nec_extra_respects⟩, ⟨dForestBad, nec_forest_respects⟩,
     ⟨wcirc, wcirc_topo, execs [1, 0], wcirc_bad_not_ordered, 1, wcirc_bad_order⟩, ⟨ccirc, nec_topo⟩,
     ⟨ncirc, ncirc_not_topo, execs [1, 0], ncirc_ordered, 0, by decide, ncirc_bad⟩⟩
 

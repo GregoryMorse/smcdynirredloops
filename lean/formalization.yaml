@@ -69,23 +69,26 @@ sources:
   - title: "Advanced Encryption Standard (AES), FIPS 197"
     type: "other"
     relationship: "background"
-    note: "The AES-128/192/256 encryption function is defined in the development following FIPS 197 and checked against the published test vectors; the Boolean graph is proved correct relative to that definition."
+    note: "The AES-128/192/256 encryption function is defined in the development following FIPS 197 and checked against the FIPS-197 Appendix C example vectors (part of the CircuitCFGCorrect statement); the Boolean graph is proved correct relative to that definition."
     license: "unknown"
     author_endorsement: "n/a"
 
 status:
   scope: >-
-    Formalized and proved: the SMC 2-SAT solver, and the planted generator as an algorithm (a forcing chain for each
+    Formalized and proved: the SMC 2-SAT solver on well-formed formulas without empty clauses, and the planted generator as an algorithm (a forcing chain for each
     required variable and the kept respecting implications, for every choice of its random parameters) whose output the
     solver solves with the intended values (SmcTwoSatCorrect); the upper bounds for irreducible loops and multiple-entry
-    edges, the families Kn and Mn attaining them, and the bound of at least 2n-3 further edges for a graph with the maximal
+    edges (n >= 2), the families Kn and Mn attaining them, and the bound of at least 2n-3 further edges for a graph with the maximal
     number of multiple-entry edges, attained by M_n without its back edge (IrreducibleExtremal; no classification of all
-    extremal graphs is claimed); the path and n-way transformations of Figures 5 and 6 and the general static scheme for
-    arbitrary structured programs (TransformCorrect); the Boolean control-flow graphs
+    extremal graphs is claimed); one added edge to a path (no irreducible loop) and to an n-way conditional (an irreducible
+    loop, for the depth-first jungle computed from the entry), and the static scheme of Figures 5(b) and 6(b) for arbitrary
+    structured programs with a nonempty first block (TransformCorrect); the Boolean control-flow graphs
     of AES-128, AES-192 and AES-256 computing the FIPS-197 encryption (CircuitCFGCorrect, separate Challenge
     ChallengeAES.lean); and the security model of Section 5.1 (SecurityModel) as theorems relative to explicit structural
-    assumptions on the protected program (stamped, forcing, fault-class, final-overwrite and schedule assumptions), each
-    with a necessity witness showing the assumption cannot be dropped; its correctness (T1) and unsoundness-of-static-reading
+    assumptions on the design (planted and stamped formula, cells that are required variables with false intended value,
+    a dependency-respecting schedule on a topologically numbered circuit); each assumption has a witness that keeps every
+    other assumption and breaks a conclusion (the image's behaviour, or the solver's success for the two respecting
+    conditions), and the bounds below n are typing conditions; its correctness (T1) and unsoundness-of-static-reading
     (T2) results range over the parameterized Figure 5/6 transformations of arbitrary goto-free blocks (the toggled-variable forms
     for blocks that do not read the toggled variable). Not formalized: processors, compilers,
     decompilers and timers are black boxes; timings, tool experiments, the generated x86-64 code, literature statements
@@ -140,7 +143,7 @@ alignment:
       lean: "SmcIrred.Paper.SmcTwoSatCorrect"
       module: "Challenge"
       status: "proved"
-      note: "The solver returns a satisfying assignment exactly when one exists; for the output of the planted generator (a forcing chain for each required variable through arbitrary intermediate variables, plus the kept respecting implications) the solver succeeds with the intended values on the required variables."
+      note: "On well-formed formulas without empty clauses the solver returns a satisfying assignment exactly when one exists; for the output of the planted generator (a forcing chain for each required variable through arbitrary intermediate variables, plus the kept respecting implications) the solver succeeds with the intended values on the required variables."
     - source: "Section 1 and Section 4, irreducible loops and multiple-entry edges (bounds and extremal families Kn, Mn)"
       lean: "SmcIrred.Paper.IrreducibleExtremal"
       module: "Challenge"
@@ -150,16 +153,16 @@ alignment:
       lean: "SmcIrred.Paper.TransformCorrect"
       module: "Challenge"
       status: "adapted"
-      note: "Path and n-way transformations and the general static scheme, with Definitions 3 and 4 corrected (P16)."
+      note: "One added edge to a path or an n-way conditional (for the depth-first jungle computed from the entry) and the static scheme of Figures 5(b) and 6(b) for structured programs with a nonempty first block, with Definitions 3 and 4 corrected (P16)."
     - source: "Section 5.1, security of the transformation"
       lean: "SmcIrred.Paper.SecurityModel"
       module: "Challenge"
       status: "adapted"
-      note: "Proved relative to explicit structural assumptions that the paper does not state; each assumption has a necessity witness. T1 and T2 range over the parameterized Figure 5/6 transformations of arbitrary goto-free blocks S and T (Obfuscates). T2 concerns analyzers that report an independently supplied static value for each cell (the blueprint is an input, not derived from a modeled code image). T3 bounds the tick count of the reference Tarjan run, not an analyzer's work. T7 covers obfuscators whose output size is within four vertices of the input's in either direction."
+      note: "Proved relative to explicit structural assumptions that the paper does not state; each assumption has a necessity witness that keeps the others and breaks a conclusion (the image's behaviour, or for the two respecting conditions the solver's success, which T3 states). T1 and T2 range over the parameterized Figure 5/6 transformations of arbitrary goto-free blocks S and T (Obfuscates). T2 concerns analyzers that report an independently supplied static value for each cell (the blueprint is an input, not derived from a modeled code image). T3 bounds the tick count of the reference Tarjan run, not an analyzer's work. T7 covers obfuscators whose output size is within four vertices of the input's in either direction."
     - source: "Section 4, Boolean control-flow graphs of AES"
       lean: "SmcIrred.Paper.CircuitCFGCorrect"
       module: "ChallengeAES"
       status: "proved"
-      note: "Separate Challenge (line limit); the generated graphs evaluate to the FIPS-197 encryption for every key and block."
+      note: "Separate Challenge (line limit); the generated graphs evaluate to the encryption function encrypt for every key and block, and the statement also contains the three FIPS-197 Appendix C example vectors for encrypt."
 
 acknowledgements: "The Lean 4 core library and Lake; Claude Code and the Claude models; the Palomar project and the Comparator for the verification pipeline."

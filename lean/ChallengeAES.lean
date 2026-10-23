@@ -20,14 +20,12 @@ inductive Cond where
   | out : Nat → Cond
   | neg : Cond → Cond
   | and : Cond → Cond → Cond
-
 /-- Flat code. -/
 inductive Instr where
   | blk : Nat → Instr
   | jmp : Nat → Instr
   | jmpIf : Cond → Nat → Instr
   | halt : Instr
-
 /-- Structured statements. `ifGoto k l` is `if (k) goto l;`. -/
 inductive Stmt where
   | skip : Stmt
@@ -40,7 +38,6 @@ inductive Stmt where
   | goto : Nat → Stmt
   | ifGoto : Cond → Nat → Stmt
   | lab : Nat → Stmt → Stmt
-
 @[expose] def Stmt.size : Stmt → Nat
   | .skip => 0
   | .blk _ => 1
@@ -52,12 +49,10 @@ inductive Stmt where
   | .goto _ => 1
   | .ifGoto _ _ => 1
   | .lab _ s => s.size
-
 @[expose] def lookupLabel (labs : List (Nat × Nat)) (l : Nat) : Nat :=
   match labs.find? (fun q => q.1 == l) with
   | some q => q.2
   | none => 0
-
 /-- Code of a statement placed at address `p`. -/
 @[expose] def comp (labs : List (Nat × Nat)) : Nat → Stmt → List Instr
   | _, .skip => []
@@ -71,7 +66,6 @@ inductive Stmt where
   | _, .goto l => [.jmp (lookupLabel labs l)]
   | _, .ifGoto k l => [.jmpIf k (lookupLabel labs l)]
   | p, .lab _ s => comp labs p s
-
 end SmcIrred.Lang
 -- ===== SmcIrred.Spec.Circuit =====
 namespace SmcIrred
@@ -79,14 +73,12 @@ inductive Kind
   | flow | any | add | addneg
   | tbl (sel : List Nat) (tab : List Bool)
   | call (sid : Nat) (ins outs : List Nat) (reps : Nat)
-
 end SmcIrred
 -- ===== SmcIrred.Spec.GraphGen =====
 namespace SmcIrred
 inductive Wire
   | cst (b : Bool)
   | nd (i : Nat)
-
 /-- Decidable equality, written out (a derived instance carries the name of its module in a private helper, which differs between
 the development and the single-file Challenge). -/
 @[expose] instance instDecidableEqWire : DecidableEq Wire := fun a b =>
@@ -95,28 +87,21 @@ the development and the single-file Challenge). -/
   | .nd i, .nd j => if h : i = j then isTrue (by subst h; rfl) else isFalse (by intro e; cases e; exact h rfl)
   | .cst _, .nd _ => isFalse (by intro e; cases e)
   | .nd _, .cst _ => isFalse (by intro e; cases e)
-
 @[expose] def Wire.isc : Wire → Bool
   | .cst _ => true
   | .nd _ => false
-
 @[expose] def Wire.idx : Wire → Nat
   | .cst _ => 0
   | .nd i => i
-
 /-- The generator state: the nodes created so far (the node `i` is the `i`-th entry). -/
 structure GB where
   nodes : List (Kind × List Nat)
-
 @[expose] def GB.n (gb : GB) : Nat := gb.nodes.length
-
 /-- The number of predecessor edges of the generated graph. -/
 @[expose] def GB.e (gb : GB) : Nat := (gb.nodes.map fun x => x.2.length).sum
-
 /-- A fresh node (kind and predecessors). -/
 @[expose] def GB.add (gb : GB) (k : Kind) (ps : List Nat) : Wire × GB :=
   (.nd gb.n, ⟨gb.nodes ++ [(k, ps)]⟩)
-
 /-- `make_input`: `k` input nodes (`FLOW`, no predecessors). -/
 @[expose] def mkInputs (gb : GB) : Nat → List Wire × GB
   | 0 => ([], gb)
@@ -124,7 +109,6 @@ structure GB where
     let r := gb.add .flow []
     let t := mkInputs r.2 k
     (r.1 :: t.1, t.2)
-
 /-- Thread the generator through a list. -/
 @[expose] def mapG {α β : Type} (f : GB → α → β × GB) : GB → List α → List β × GB
   | gb, [] => ([], gb)
@@ -132,17 +116,14 @@ structure GB where
     let r := f gb a
     let t := mapG f r.2 l
     (r.1 :: t.1, t.2)
-
 /-- `not_to_virtual`. -/
 @[expose] def notV (gb : GB) (w : Wire) : Wire × GB :=
   match w with
   | .cst b => (.cst !b, gb)
   | .nd i => gb.add .addneg [i]
-
 /-- The duplicate-free copy of a list (a Python `set`), keeping first occurrences. -/
 @[expose] def dedupW (l : List Wire) : List Wire :=
   l.foldl (fun acc a => if acc.contains a then acc else acc ++ [a]) []
-
 /-- `and_to_virtual`. -/
 @[expose] def andV (gb : GB) (ws : List Wire) : Wire × GB :=
   if ws.all Wire.isc then (.cst (ws.all fun w => w == .cst true), gb)
@@ -151,7 +132,6 @@ structure GB where
     match dedupW (ws.filter fun w => !w.isc) with
     | [w] => (w, gb)
     | nums => gb.add .flow (nums.map Wire.idx)
-
 /-- `or_to_virtual`. -/
 @[expose] def orV (gb : GB) (ws : List Wire) : Wire × GB :=
   if ws.all Wire.isc then (.cst (ws.any fun w => w == .cst true), gb)
@@ -160,11 +140,9 @@ structure GB where
     match dedupW (ws.filter fun w => !w.isc) with
     | [w] => (w, gb)
     | nums => gb.add .any (nums.map Wire.idx)
-
 /-- The duplicate-cancelling set of `xor_to_virtual`. -/
 @[expose] def toggle (l : List Wire) : List Wire :=
   l.foldl (fun acc x => if acc.contains x then acc.erase x else acc ++ [x]) []
-
 /-- `xor_to_virtual`. -/
 @[expose] def xorV (gb : GB) (ws : List Wire) : Wire × GB :=
   let flip := ((ws.filter fun w => w == .cst true).length % 2 == 1)
@@ -174,41 +152,33 @@ structure GB where
     | [] => (.cst flip, gb)
     | [w] => if flip then notV gb w else (w, gb)
     | nums => gb.add (if flip then .addneg else .add) (nums.map Wire.idx)
-
 /-- `zero_extend_virtual`: pad a number with constant zeros. -/
 @[expose] def zeroExt (n : Nat) (ws : List Wire) : List Wire := ws ++ List.replicate (n - ws.length) (.cst false)
-
 /-- `multi_to_virtual` for two numbers and a bitwise operation on a pair of wires. -/
 @[expose] def multiV (f : GB → List Wire → Wire × GB) (gb : GB) (a b : List Wire) : List Wire × GB :=
   let m := max a.length b.length
   mapG (fun gb p => f gb [p.1, p.2]) gb ((zeroExt m a).zip (zeroExt m b))
-
 /-- `bit_length` of a natural number. -/
 @[expose] def bitLen : Nat → Nat
   | 0 => 0
   | n + 1 => bitLen ((n + 1) / 2) + 1
 termination_by n => n
 decreasing_by omega
-
 /-- `constant_to_virtual`. -/
 @[expose] def constBits (x : Nat) : List Wire := (List.range (bitLen x)).map fun j => .cst (x.testBit j)
-
 /-- `decoder_shift_to_virtual`: the loop body for one bit `s` of the argument. -/
 @[expose] def decStep (gb : GB) (num : List Wire) (s : Wire) : List Wire × GB :=
   let r0 := notV gb s
   let r1 := mapG (fun gb w => andV gb [w, r0.1]) r0.2 num
   let r2 := mapG (fun gb w => andV gb [w, s]) r1.2 num
   (r1.1 ++ r2.1, r2.2)
-
 @[expose] def decLoop : GB → List Wire → List Wire → List Wire × GB
   | gb, num, [] => (num, gb)
   | gb, num, s :: rest =>
     let r := decStep gb num s
     decLoop r.2 r.1 rest
-
 @[expose] def decoderShift (gb : GB) (shift : List Wire) : List Wire × GB :=
   decLoop gb [.cst true] shift
-
 /-- `addition_bit_to_virtual` with `need_carry = True`: the sum bit and the carry (borrow) out. -/
 @[expose] def addBit (gb : GB) (n1 n2 carry issub : Wire) : (Wire × Wire) × GB :=
   let a := xorV gb [issub, n1]
@@ -230,10 +200,8 @@ decreasing_by omega
       let t := andV c0.2 [num1sub, n2]
       let c := xorV t.2 [t.1, c0.1]
       ((res.1, c.1), c.2)
-
 /-- `addition_bit_to_virtual` with `need_carry = False`. -/
 @[expose] def addBitNoCarry (gb : GB) (n1 n2 carry : Wire) : Wire × GB := xorV gb [n1, n2, carry]
-
 /-- `addition_to_virtual`: ripple loop over the bit pairs; the last pair appends the final carry (borrow). -/
 @[expose] def addLoop (issub : Wire) (needCarry : Bool) : GB → Wire → List (Wire × Wire) → List Wire × GB
   | gb, _, [] => ([], gb)
@@ -248,16 +216,13 @@ decreasing_by omega
     let r := addBit gb p.1 p.2 carry issub
     let t := addLoop issub needCarry r.2 r.1.2 rest
     (r.1.1 :: t.1, t.2)
-
 @[expose] def addition (gb : GB) (a b : List Wire) (issub : Wire) (needCarry : Bool) : List Wire × GB :=
   let m := max a.length b.length
   addLoop issub needCarry gb (.cst false) ((zeroExt m a).zip (zeroExt m b))
-
 /-- The number represented by a little-endian bit list. -/
 @[expose] def bv : List Bool → Nat
   | [] => 0
   | b :: bs => (if b then 1 else 0) + 2 * bv bs
-
 end SmcIrred
 namespace SmcIrred
 /-- The scan of `multi_selection_to_virtual`: the early return (`some`), the surviving terms and the state. -/
@@ -274,35 +239,29 @@ namespace SmcIrred
         let r := andV gb [.nd i, .nd j]
         selLoop r.2 (acc ++ [r.1]) ss ns
   | gb, acc, _, _ => (none, acc, gb)
-
 /-- `multi_selection_to_virtual` for one-bit numbers. -/
 @[expose] def selV (gb : GB) (sels nums : List Wire) : Wire × GB :=
   match selLoop gb [] sels nums with
   | (some w, _, gb') => (w, gb')
   | (none, [], gb') => (.cst false, gb')
   | (none, acc, gb') => xorV gb' acc
-
 /-- `multi_to_virtual` for a list of numbers: zero extension to the longest, one call of `f` per bit position. -/
 @[expose] def colsV (f : GB → List Wire → Wire × GB) (gb : GB) (nums : List (List Wire)) : List Wire × GB :=
   let m := (nums.map List.length).foldl max 0
   mapG (fun gb j => f gb ((nums.map (zeroExt m)).map fun x => x.getD j (.cst false))) gb (List.range m)
-
 /-- `selection_to_virtual(selector, a, b)`: `a` where the selector wire is true, else `b`; the negation is rebuilt per bit. -/
 @[expose] def iteV (gb : GB) (s : Wire) (a b : List Wire) : List Wire × GB :=
   colsV (fun gb col => let r0 := notV gb s; selV r0.2 [s, r0.1] col) gb [a, b]
-
 /-- `table_lookup_virtual` (decoder inline): the entries of the table are constants. -/
 @[expose] def tableLookupV (gb : GB) (idx : List Wire) (tab : List Nat) : List Wire × GB :=
   let d := decoderShift gb idx
   colsV (fun gb col => selV gb d.1 col) d.2 (tab.map constBits)
-
 end SmcIrred
 namespace SmcIrred
 /-- The bits of a natural number in `m` positions, least significant first. -/
 @[expose] def natBits : Nat → Nat → List Bool
   | _, 0 => []
   | i, m + 1 => decide (i % 2 = 1) :: natBits (i / 2) m
-
 inductive BvExp where
   | inp (ws : List Wire)
   | lit (n : Nat)
@@ -320,7 +279,6 @@ inductive BvExp where
   | ite (c a b : BvExp)
   /-- `table_lookup_virtual`: the entry of the constant table selected by `idx`. -/
   | tbl (idx : BvExp) (tab : List Nat)
-
 /-- The compiler: nodes emitted left to right, the second operand in the state after the first. -/
 @[expose] def BvExp.comp : GB → BvExp → List Wire × GB
   | gb, .inp ws => (ws, gb)
@@ -342,38 +300,28 @@ inductive BvExp where
     iteV (b.comp (a.comp (c.comp gb).2).2).2 ((c.comp gb).1.getD 0 (.cst false))
       (a.comp (c.comp gb).2).1 (b.comp (a.comp (c.comp gb).2).2).1
   | gb, .tbl idx tab => tableLookupV (idx.comp gb).2 (idx.comp gb).1 tab
-
 end SmcIrred
 namespace SmcIrred.AES
 /-- Multiplication by `x` in GF(2^8) modulo 0x11B (`aes.py: xtime`). -/
 @[expose] def xtime (a : Nat) : Nat := if a &&& 0x80 ≠ 0 then ((a <<< 1) ^^^ 0x1B) &&& 0xFF else a <<< 1
-
 @[expose] def gmulAux : Nat → Nat → Nat → Nat → Nat
   | 0, _, _, acc => acc
   | n + 1, a, b, acc => gmulAux n (xtime a) (b >>> 1) (if b &&& 1 ≠ 0 then acc ^^^ a else acc)
-
 /-- Multiplication in GF(2^8) modulo 0x11B (shift-and-add over eight bits). -/
 @[expose] def gmul (a b : Nat) : Nat := gmulAux 8 a b 0
-
 @[expose] def gpowAux : Nat → Nat → Nat → Nat → Nat
   | 0, _, _, acc => acc
   | n + 1, b, e, acc => gpowAux n (gmul b b) (e >>> 1) (if e &&& 1 ≠ 0 then gmul acc b else acc)
-
 /-- `a ^ e` in GF(2^8) by square-and-multiply, for exponents below 256. -/
 @[expose] def gpow (a e : Nat) : Nat := gpowAux 8 a e 1
-
 /-- Multiplicative inverse in GF(2^8) (`0 ↦ 0`), computed as `a^254`. -/
 @[expose] def ginv (a : Nat) : Nat := gpow a 254
-
 @[expose] def rotl8 (x k : Nat) : Nat := ((x <<< k) ||| (x >>> (8 - k))) &&& 0xFF
-
 /-- The affine map of the S-box (FIPS-197 (5.2)). -/
 @[expose] def affine (b : Nat) : Nat :=
   b ^^^ rotl8 b 1 ^^^ rotl8 b 2 ^^^ rotl8 b 3 ^^^ rotl8 b 4 ^^^ 0x63
-
 /-- S-box: multiplicative inverse followed by the affine map. -/
 @[expose] def sbox (x : Nat) : Nat := affine (ginv x)
-
 /-- The S-box table of `aes.py` (`s_box`). -/
 @[expose] def sBoxTable : List Nat :=
   [
@@ -393,18 +341,14 @@ namespace SmcIrred.AES
     0x70, 0x3E, 0xB5, 0x66, 0x48, 0x03, 0xF6, 0x0E, 0x61, 0x35, 0x57, 0xB9, 0x86, 0xC1, 0x1D, 0x9E, 
     0xE1, 0xF8, 0x98, 0x11, 0x69, 0xD9, 0x8E, 0x94, 0x9B, 0x1E, 0x87, 0xE9, 0xCE, 0x55, 0x28, 0xDF, 
     0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16]
-
 /-- The round constant table of `aes.py` (`r_con`). -/
 @[expose] def rconTable : List Nat :=
   [
     0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36, 0x6C, 0xD8, 0xAB, 0x4D, 0x9A, 
     0x2F, 0x5E, 0xBC, 0x63, 0xC6, 0x97, 0x35, 0x6A, 0xD4, 0xB3, 0x7D, 0xFA, 0xEF, 0xC5, 0x91, 0x39]
-
 @[expose] def subBytes (s : List Nat) : List Nat := s.map sbox
-
 @[expose] def shiftRows (s : List Nat) : List Nat :=
   (List.range 16).map fun i => s.getD (4 * (((i / 4) + (i % 4)) % 4) + i % 4) 0
-
 /-- One column, as `mix_single_column` of `aes.py`. -/
 @[expose] def mixColumn : List Nat → List Nat
   | [a0, a1, a2, a3] =>
@@ -412,39 +356,28 @@ namespace SmcIrred.AES
     [a0 ^^^ t ^^^ xtime (a0 ^^^ a1), a1 ^^^ t ^^^ xtime (a1 ^^^ a2),
      a2 ^^^ t ^^^ xtime (a2 ^^^ a3), a3 ^^^ t ^^^ xtime (a3 ^^^ a0)]
   | s => s
-
 @[expose] def mapCols (f : List Nat → List Nat) (s : List Nat) : List Nat :=
   (List.range 4).flatMap fun c => f ((List.range 4).map fun r => s.getD (4 * c + r) 0)
-
 @[expose] def mixColumns (s : List Nat) : List Nat := mapCols mixColumn s
-
 @[expose] def addRoundKey (s k : List Nat) : List Nat := List.zipWith (· ^^^ ·) s k
-
 structure Alg (α : Type) where
   zero : α
   xor : α → α → α
   sb : α → α
   rc : Nat → α
-
 @[expose] def natAlg : Alg Nat := ⟨0, (· ^^^ ·), sbox, fun j => rconTable.getD j 0⟩
-
 section KeyExp
 variable {α : Type} (A : Alg α)
 
 @[expose] def zW : List α := [A.zero, A.zero, A.zero, A.zero]
-
 @[expose] def wxor (u v : List α) : List α := List.zipWith A.xor u v
-
 @[expose] def rotW : List α → List α
   | [a, b, c, d] => [b, c, d, a]
   | w => w
-
 @[expose] def subW (w : List α) : List α := w.map A.sb
-
 @[expose] def rcW (j : Nat) : List α → List α
   | a :: t => A.xor a (A.rc j) :: t
   | [] => []
-
 @[expose] def expandStep (Nk : Nat) (ws : List (List α)) : List (List α) :=
   let i := ws.length
   let prev := ws.getD (i - 1) (zW A)
@@ -454,38 +387,29 @@ variable {α : Type} (A : Alg α)
     else if 6 < Nk ∧ i % Nk = 4 then subW A prev
     else prev
   ws ++ [wxor A back temp]
-
 @[expose] def expandN (Nk : Nat) : Nat → List (List α) → List (List α)
   | 0, ws => ws
   | n + 1, ws => expandN Nk n (expandStep A Nk ws)
-
 /-- The expanded key as `4 * (Nr + 1)` words, from a key of `4 * Nk` bytes. -/
 @[expose] def keyExp (Nk Nr : Nat) (key : List α) : List (List α) :=
   expandN A Nk (4 * (Nr + 1) - Nk)
     ((List.range Nk).map fun j => (List.range 4).map fun r => key.getD (4 * j + r) A.zero)
-
 end KeyExp
 @[expose] def roundKey (rk : List (List Nat)) (r : Nat) : List Nat :=
   (List.range 4).flatMap fun c => rk.getD (4 * r + c) []
-
 /-- AES encryption with `Nr` rounds and expanded key `rk` (FIPS-197 Cipher). -/
 @[expose] def encrypt (Nr : Nat) (rk : List (List Nat)) (inp : List Nat) : List Nat :=
   let s0 := addRoundKey inp (roundKey rk 0)
   let s := (List.range (Nr - 1)).foldl
     (fun s i => addRoundKey (mixColumns (shiftRows (subBytes s))) (roundKey rk (i + 1))) s0
   addRoundKey (shiftRows (subBytes s)) (roundKey rk Nr)
-
 /-- Big-endian bytes of a number. -/
 @[expose] def beBytes (n : Nat) : Nat → List Nat
   | 0 => []
   | k + 1 => (n >>> (8 * k)) % 256 :: beBytes n k
-
 @[expose] def aes128 (key : Nat) : List (List Nat) := keyExp natAlg 4 10 (beBytes key 16)
-
 @[expose] def aes192 (key : Nat) : List (List Nat) := keyExp natAlg 6 12 (beBytes key 24)
-
 @[expose] def aes256 (key : Nat) : List (List Nat) := keyExp natAlg 8 14 (beBytes key 32)
-
 end SmcIrred.AES
 namespace SmcIrred.AES
 open SmcIrred
@@ -494,34 +418,24 @@ open SmcIrred
 @[expose] def catAll : List BvExp → BvExp
   | [] => .inp []
   | e :: es => .cat e (catAll es)
-
 /-- Byte `b` of a state. -/
 @[expose] def byteE (W : List Wire) (b : Nat) : BvExp := .slice (.inp W) (8 * b) 8
-
 /-- The constant byte `n` as eight constant wires (`constant_to_virtual` after `zero_extend_virtual`). -/
 @[expose] def lit8 (n : Nat) : BvExp := .inp ((List.range 8).map fun j => Wire.cst (n.testBit j))
-
 /-- Shift left by one inside a byte. -/
 @[expose] def shlE (x : BvExp) : BvExp := .cat (.inp [.cst false]) (.slice x 0 7)
-
 /-- `xtime` as a selection on the top bit (`aes.py: xtime_virtual`). -/
 @[expose] def xtimeE (x : BvExp) : BvExp := .ite (.slice x 7 1) (.bxor (shlE x) (lit8 0x1B)) (shlE x)
-
 /-- The byte that `ShiftRows` moves to position `i`. -/
 @[expose] def srcIdx (i : Nat) : Nat := 4 * (((i / 4) + (i % 4)) % 4) + i % 4
-
 /-- The S-box lookup of the byte that `ShiftRows` moves to position `i`. -/
 @[expose] def subByteE (W : List Wire) (i : Nat) : BvExp := .tbl (byteE W (srcIdx i)) sBoxTable
-
 /-- `SubBytes` and `ShiftRows`. -/
 @[expose] def subShiftE (W : List Wire) : BvExp := catAll ((List.range 16).map (subByteE W))
-
 /-- Byte `i` of `AddRoundKey` with the constant bytes `key`. -/
 @[expose] def arkByteE (W : List Wire) (key : List Nat) (i : Nat) : BvExp := .bxor (byteE W i) (lit8 (key.getD i 0))
-
 /-- `AddRoundKey` with the constant bytes `key`. -/
 @[expose] def arkE (W : List Wire) (key : List Nat) : BvExp := catAll ((List.range 16).map (arkByteE W key))
-
 /-- Byte `i = 4c + r` of `MixColumns` followed by `AddRoundKey`: `a_r ^ t ^ xtime(a_r ^ a_{r+1}) ^ key` with the column
 bytes `a_j` and `t = a_0 ^ a_1 ^ a_2 ^ a_3`. -/
 @[expose] def mixByteE (W : List Wire) (key : List Nat) (i : Nat) : BvExp :=
@@ -532,15 +446,12 @@ bytes `a_j` and `t = a_0 ^ a_1 ^ a_2 ^ a_3`. -/
           (byteE W (4 * (i / 4) + 3))))
       (xtimeE (.bxor (byteE W (4 * (i / 4) + i % 4)) (byteE W (4 * (i / 4) + (i % 4 + 1) % 4)))))
     (lit8 (key.getD i 0))
-
 /-- `MixColumns` and `AddRoundKey`. -/
 @[expose] def mixE (W : List Wire) (key : List Nat) : BvExp := catAll ((List.range 16).map (mixByteE W key))
-
 /-- One inner round: `SubBytes`, `ShiftRows`, `MixColumns`, `AddRoundKey`; the wires of the first stage are shared. -/
 @[expose] def aesRound (key : List Nat) (gb : GB) (W : List Wire) : List Wire × GB :=
   let a := (subShiftE W).comp gb
   (mixE a.1 key).comp a.2
-
 /-- The compiled AES with `Nr` rounds and the constant expanded key `rk`, from the 128 wires `W` of the block. -/
 @[expose] def aesCircuit (Nr : Nat) (rk : List (List Nat)) (gb : GB) (W : List Wire) : List Wire × GB :=
   let r0 := (arkE W (roundKey rk 0)).comp gb
@@ -548,19 +459,15 @@ bytes `a_j` and `t = a_0 ^ a_1 ^ a_2 ^ a_3`. -/
     (fun (st : List Wire × GB) i => aesRound (roundKey rk (i + 1)) st.2 st.1) r0
   let a := (subShiftE rs.1).comp rs.2
   (arkE a.1 (roundKey rk Nr)).comp a.2
-
 /-- The little-endian bits of a list of bytes. -/
 @[expose] def bits8 (bs : List Nat) : List Bool := bs.flatMap fun x => natBits x 8
-
 /-- The block read from the 128 input nodes. -/
 @[expose] def blockBytes (inp : Nat → Bool) : List Nat :=
   (List.range 16).map fun b => bv ((List.range 8).map fun j => inp (8 * b + j))
-
 /-- The graph of AES: 128 input nodes followed by the compiled stages. -/
 @[expose] def aesGraph (Nr : Nat) (rk : List (List Nat)) : List Wire × GB :=
   let i := mkInputs ⟨[]⟩ 128
   aesCircuit Nr rk i.2 i.1
-
 end SmcIrred.AES
 namespace SmcIrred
 /-- The local rule of a vertex of kind `k` with predecessor values `vs` and an active input `t`: `flow` needs all active and
@@ -574,23 +481,18 @@ some present, `any` some active, `add` an odd number, `addneg` an even number of
   | .add => decide (a % 2 = 1)
   | .addneg => decide (a % 2 = 0)
   | _ => false
-
 /-- Append the value of the next vertex to the values computed so far. -/
 @[expose] def stepE (inp : Nat → Bool) (vs : List Bool) (nd : Kind × List Nat) : List Bool :=
   vs ++ [nodeVal nd.1 (nd.2.map fun u => vs.getD u false) (inp vs.length)]
-
 /-- The values of all vertices of a generator state, in the order the vertices were added. -/
 @[expose] def evalNodes (inp : Nat → Bool) (nodes : List (Kind × List Nat)) : List Bool :=
   nodes.foldl (stepE inp) []
-
 /-- The value of a wire. -/
 @[expose] def Wire.ev (vs : List Bool) : Wire → Bool
   | .cst b => b
   | .nd i => vs.getD i false
-
 /-- The value of a wire in the state `gb` under the active inputs `inp`. -/
 @[expose] def wev (gb : GB) (inp : Nat → Bool) (w : Wire) : Bool := w.ev (evalNodes inp gb.nodes)
-
 end SmcIrred
 -- ===== SmcIrred.Spec.Paper =====
 namespace SmcIrred.Paper
@@ -599,7 +501,7 @@ open SmcIrred.Lang
 /-- **The Boolean control-flow graphs of AES** (Section 4). The generated graph of AES with 10, 12 and 14 rounds (key
 lengths 128, 192 and 256 bits), whose vertices are evaluated in the order they were generated (`evalNodes`), has as outputs
 the bits of the FIPS-197 encryption (`encrypt`) of the block read from the first 128 input vertices, for every key and
-block. -/
+block; and `encrypt` gives the ciphertexts of the FIPS-197 Appendix C examples (plaintext `00112233…ff`, keys `000102…`). -/
 @[expose] def CircuitCFGCorrect : Prop :=
   (∀ (key : Nat) (inp : Nat → Bool), (∀ i, 128 ≤ i → inp i = false) →
     (AES.aesGraph 10 (AES.aes128 key)).1.map (wev (AES.aesGraph 10 (AES.aes128 key)).2 inp) =
@@ -609,8 +511,13 @@ block. -/
       AES.bits8 (AES.encrypt 12 (AES.aes192 key) (AES.blockBytes inp))) ∧
   (∀ (key : Nat) (inp : Nat → Bool), (∀ i, 128 ≤ i → inp i = false) →
     (AES.aesGraph 14 (AES.aes256 key)).1.map (wev (AES.aesGraph 14 (AES.aes256 key)).2 inp) =
-      AES.bits8 (AES.encrypt 14 (AES.aes256 key) (AES.blockBytes inp)))
-
+      AES.bits8 (AES.encrypt 14 (AES.aes256 key) (AES.blockBytes inp))) ∧
+  AES.encrypt 10 (AES.aes128 0x000102030405060708090a0b0c0d0e0f) (AES.beBytes 0x00112233445566778899aabbccddeeff 16) =
+    AES.beBytes 0x69c4e0d86a7b0430d8cdb78070b4c55a 16 ∧
+  AES.encrypt 12 (AES.aes192 0x000102030405060708090a0b0c0d0e0f1011121314151617)
+    (AES.beBytes 0x00112233445566778899aabbccddeeff 16) = AES.beBytes 0xdda97ca4864cdfe06eaf70a0ec0d7191 16 ∧
+  AES.encrypt 14 (AES.aes256 0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f)
+    (AES.beBytes 0x00112233445566778899aabbccddeeff 16) = AES.beBytes 0x8ea2b7ca516745bfeafc49904b496089 16
 end SmcIrred.Paper
 namespace PalomarSIL
 /-- The Boolean control-flow graphs of AES-128, AES-192 and AES-256 (`CircuitCFGCorrect`). -/

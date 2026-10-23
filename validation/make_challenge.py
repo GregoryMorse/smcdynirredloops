@@ -148,7 +148,8 @@ def build(name="Challenge"):
                 continue
             if inside and not kept_block[inside[-1]]: continue
             if i in keep:
-                parts.append(c[3] + "\n")
+                # no blank line between declarations: a Challenge may have at most 1,000 lines
+                parts.append(c[3])
             elif c[2] == "other" and re.match(r"^(open|set_option|variable)\b", c[3]):
                 # `open X in` and `set_option ... in` belong to the declaration after them; other opens, set_options and
                 # variables are kept for every block that contributes a declaration

@@ -106,16 +106,74 @@ theorem nec_false_cells :
 @[expose] def dExtra : Design :=
   { witness fig5a fig5cS with extra := extraBad, extra_wf := by intro e he; simp [extraBad] at he; subst he; decide, img := imgOf (impFormula 3 ((witness fig5a fig5cS).forest ++ extraBad)) }
 
-/-- Necessity of the extra implications respecting the intended assignment (`extra_respects`): with one that does not, the
-stamped formula is unsatisfiable and the solver returns nothing, so T1's premise that the solver produces the cells fails. -/
+/-- Necessity of the extra implications respecting the intended assignment (`extra_respects`): with one that does not and
+every other assumption kept, the stamped formula is unsatisfiable and the solver returns nothing (T3's conclusion that the
+solver succeeds fails). -/
 theorem nec_extra_respects :
-    Planted dExtra.n dExtra.σ dExtra.req dExtra.forest ∧ (∀ e ∈ dExtra.extra, e.1.var < dExtra.n ∧ e.2.var < dExtra.n) ∧
+    Obfuscates dExtra.orig dExtra.img.prog ∧ Planted dExtra.n dExtra.σ dExtra.req dExtra.forest ∧
+      (∀ e ∈ dExtra.extra, e.1.var < dExtra.n ∧ e.2.var < dExtra.n) ∧
       dExtra.img.formula = impFormula dExtra.n (dExtra.forest ++ dExtra.extra) ∧
+      (∀ k ∈ dExtra.img.cells, k < dExtra.n ∧ dExtra.req k ∧ dExtra.σ k = false) ∧ dExtra.circ.Topo ∧
+      FinalOrdered dExtra.circ dExtra.acts ∧
       ¬ (∀ e ∈ dExtra.extra, Respecting dExtra.σ e) ∧ smcSolve dExtra.img.formula = none := by
-  refine ⟨hw5.planted, by decide, rfl, ?_, by decide⟩
+  refine ⟨ob5c, hw5.planted, by decide, rfl, hw5.cells_planted, hw5.schedule_topo, hw5.schedule_ordered, ?_, by decide⟩
   intro h
   have := h (⟨1, false⟩, ⟨1, true⟩) (by simp [dExtra, witness, extraBad])
   simp [Respecting, Lit.Holds, dExtra, witness] at this
+
+/-- No required variable. -/
+@[expose] def dReq : Design :=
+  { witness fig5a fig5cS with req := fun _ => False, forest := [], img := imgOf (impFormula 3 []) }
+
+/-- Necessity of the cells being required variables (`cells_planted`, second conjunct): with no required variable the
+planted data hold vacuously, every other assumption is kept, and the solver gives the free cell the value true, so the image
+misbehaves. -/
+theorem nec_req_cells :
+    Obfuscates dReq.orig dReq.img.prog ∧ Planted dReq.n dReq.σ dReq.req dReq.forest ∧
+      (∀ e ∈ dReq.extra, Respecting dReq.σ e) ∧ (∀ e ∈ dReq.extra, e.1.var < dReq.n ∧ e.2.var < dReq.n) ∧
+      dReq.img.formula = impFormula dReq.n (dReq.forest ++ dReq.extra) ∧
+      (∀ k ∈ dReq.img.cells, k < dReq.n ∧ ¬ dReq.req k ∧ dReq.σ k = false) ∧ dReq.circ.Topo ∧
+      FinalOrdered dReq.circ dReq.acts ∧ ¬ dReq.img.Behaves dReq.orig :=
+  ⟨ob5c, ⟨by simp [dReq], by simp [dReq], by simp [dReq]⟩, by simp [dReq, witness], by simp [dReq, witness],
+    by simp [dReq, imgOf, witness],
+    fun k hk => ⟨(hw5.cells_planted k hk).1, by simp [dReq], (hw5.cells_planted k hk).2.2⟩,
+    hw5.schedule_topo, hw5.schedule_ordered, not_behaves_of_true (f := impFormula 3 []) (by decide)⟩
+
+/-- A forest with the forcing implication of variable `1` and one implication that the intended assignment does not
+respect. -/
+@[expose] def forestBad : List (Lit × Lit) := [(⟨1, true⟩, ⟨1, false⟩), (⟨1, false⟩, ⟨1, true⟩)]
+
+@[expose] def dForestBad : Design :=
+  { witness fig5a fig5cS with req := fun x => x = 1, forest := forestBad, img := imgOf (impFormula 3 forestBad) }
+
+/-- Necessity of the forest respecting the intended assignment (`planted.respect`): with every other assumption kept (the
+forcing paths included), the stamped formula is unsatisfiable and the solver returns nothing (T3's conclusion that the
+solver succeeds fails). -/
+theorem nec_forest_respects :
+    Obfuscates dForestBad.orig dForestBad.img.prog ∧
+      (∀ e ∈ dForestBad.forest, e.1.var < dForestBad.n ∧ e.2.var < dForestBad.n) ∧
+      (∀ x, x < dForestBad.n → dForestBad.req x →
+        ImpPath dForestBad.forest ⟨x, !dForestBad.σ x⟩ ⟨x, dForestBad.σ x⟩) ∧
+      (∀ e ∈ dForestBad.extra, Respecting dForestBad.σ e) ∧
+      (∀ e ∈ dForestBad.extra, e.1.var < dForestBad.n ∧ e.2.var < dForestBad.n) ∧
+      dForestBad.img.formula = impFormula dForestBad.n (dForestBad.forest ++ dForestBad.extra) ∧
+      (∀ k ∈ dForestBad.img.cells, k < dForestBad.n ∧ dForestBad.req k ∧ dForestBad.σ k = false) ∧
+      dForestBad.circ.Topo ∧ FinalOrdered dForestBad.circ dForestBad.acts ∧
+      ¬ (∀ e ∈ dForestBad.forest, Respecting dForestBad.σ e) ∧ smcSolve dForestBad.img.formula = none := by
+  refine ⟨ob5c, by decide, ?_, by simp [dForestBad, witness], by simp [dForestBad, witness],
+    by simp [dForestBad, imgOf, witness], ?_, hw5.schedule_topo, hw5.schedule_ordered, ?_, by decide⟩
+  · intro x _ hx
+    subst hx
+    exact .step (by simp [dForestBad, forestBad, witness]) (.refl _)
+  · intro k hk
+    have : k ∈ codeReads (compile fig5cS) := hk
+    rw [reads_fig5cS] at this
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at this
+    subst this
+    exact ⟨by decide, rfl, rfl⟩
+  · intro h
+    have := h (⟨1, false⟩, ⟨1, true⟩) (by simp [dForestBad, forestBad, witness])
+    simp [Respecting, Lit.Holds, dForestBad, witness] at this
 
 /-- Necessity of the schedule respecting dependencies (`schedule_ordered`): the circuit is topologically numbered, but the
 schedule that runs the output before its input leaves a final value different from the circuit's. -/

@@ -33,7 +33,7 @@ bounds) is the capability structures themselves. Necessity witnesses: below.
   that the blocks themselves read are cells like the others (S2 plants every cell the image reads).
 * T2 `imm_fails`, `imm_determines_iff`, `imm_unsound` (witness design satisfying S1–S3, blueprint true, run-time false),
   `static_reading_wrong` (behavioural difference for the programs of Figures 5 and 6). `imm_unsound` holds for every `Obfuscates` pair: the witness design numbers its variables beyond every cell the program reads and plants all of them.
-* T3 `recover`, `smcsem_determines`: an `SmcSem` analyzer reports the intended values; the Tarjan run on the implication graph
+* T3 `recover`, `solver_succeeds`, `smcsem_determines`: the solver succeeds on the stamped formula; an `SmcSem` analyzer reports the intended values; the Tarjan run on the implication graph
   costs at most `2|V|+|E|` steps in the clean cost model (`tarjan_cost`); this bounds that run, not the work of an arbitrary
   analyzer nor the machine (G27/R8b).
   Opacity is therefore relative to analyzers lacking the machine semantics; it is not computational hardness.
@@ -45,7 +45,11 @@ bounds) is the capability structures themselves. Necessity witnesses: below.
 * T6 `dca_last`, `dca_final_obs`, `dca_repeats_visible`, `dca_witness`: on address-aligned traces any two dependency-respecting
   schedules give the same (vertex, final value) pairs; repeated executions are visible by address.
 * T7 `not_size_indist`, `scheme_overhead`: no obfuscator whose output size is within four vertices of its input's in either direction (shrinking included) is indistinguishable for the vertex count (programs are equivalent when their terminating runs coincide for every fuel, `Equiv`, not a bounded trace comparison); no VBB claim.
-* Necessity: `nec_forcing`, `nec_stamped`, `nec_false_cells` (run misbehaves), `nec_extra_respects` (solver returns nothing),
+* Necessity (each witness keeps every other assumption): `nec_forcing`, `nec_stamped`, `nec_req_cells`, `nec_false_cells`
+  (the image does not behave as the original), `nec_extra_respects`, `nec_forest_respects` (the solver returns nothing, so
+  T3's conclusion `smcSolve ≠ none` fails; the image's behaviour is not what breaks there, because the cells are false
+  either way), `k < n` for the cells and `planted.wf` are typing conditions (the cells and the forest's literals are
+  variables of the formula),
   `nec_schedule`, `nec_topo` (no ordered schedule exists in a cyclic circuit), `ncirc_not_topo`, `ncirc_ordered`, `ncirc_bad` (an acyclic circuit that is not numbered topologically: it has an ordered schedule, yet the final value of vertex 0 differs from `valOf`, so dropping only `schedule_topo` makes the conclusion fail). `extra_wf` is not an assumption: it is a field of `Design` (a formula over its n variables), so it needs no witness.
 * `Threat.solver_succeeds`: under S1 the solver returns a solution.
 
@@ -56,7 +60,7 @@ These are scope statements: none of them is proved, assumed or hidden in a hypot
   attacker algorithms; no lower bound on the cost of any analyzer is claimed.
 * T7 concerns the vertex-count observable only; it is not a statement about any other observable and not about virtual black-box
   obfuscation.
-* Assumptions S1-S3 are structural and each has a necessity witness (`nec_*`); `extra_wf` is a typing field, not an assumption.
+* Assumptions S1-S3 are structural and each has a necessity witness (`nec_*`) that keeps the other assumptions; `extra_wf`, `planted.wf` and `k < n` in `cells_planted` are typing conditions.
 
 ## 4. Literature pass (D11 list)
 Verified online this round: Barak et al., J. ACM 59(2), 2012, doi 10.1145/2160158.2160159 (impossibility of black-box

@@ -21,16 +21,17 @@ Debrecen 100 (Supplementum) (2022) 617–637, with the corrections recorded in `
 result families; the paper's claims that are not in them (timings, tool experiments, literature statements, opinions) are
 not part of the statement and are listed as non-claims in `lean/PAPER_MAP.md`.
 
-* `SmcTwoSatCorrect`: the self-modifying-code solver is a correct 2-SAT solver (it reports unsatisfiability exactly when
-  the formula is unsatisfiable and otherwise returns a satisfying assignment); for the implications of a planted forest
+* `SmcTwoSatCorrect`: the self-modifying-code solver is a correct 2-SAT solver on well-formed formulas without empty clauses
+  (it reports unsatisfiability exactly when the formula is unsatisfiable and otherwise returns a satisfying assignment); for the implications of a planted forest
   (and for the output of the generator `genForest`/`genExtra` of Section 3.1, whatever its random choices) the solver
   succeeds and its solution takes the intended values on the required variables.
-* `IrreducibleExtremal`: for every control-flow graph on `n` vertices and every valid depth-first jungle there are at most
+* `IrreducibleExtremal`: for every control-flow graph on `n ≥ 2` vertices and every valid depth-first jungle there are at most
   `n − 2` irreducible loops and at most `(n − 1)(n − 2) / 2` multiple-entry edges; both bounds are attained by the complete
   graph `K_n` and by the reduced graph `M_n`, and a graph with the maximal number of multiple-entry edges has at least
   `2n − 3` other edges (attained by `M_n` without its back edge to the first vertex).
 * `TransformCorrect`: one added edge to a path never creates an irreducible loop, one edge from the join back into the first
-  branch of an `n`-way conditional (`n ≥ 2`) does, and the Figure 5(b) and 6(b) transformations of any structured program
+  branch of an `n`-way conditional (`n ≥ 2`) does (for the depth-first jungle `dfsRun` from the entry), and the Figure 5(b)
+  and 6(b) transformations of any structured program (first block nonempty)
   with the two solver-generated false conditions give the same result as the original (for every environment), while the
   original has a reducible control-flow graph and every valid depth-first jungle of the transformed one has an irreducible
   loop.
@@ -67,7 +68,7 @@ produces such a forest for every choice of those variables and candidates, with 
 
 /-- **Extremal irreducible loops and multiple-entry edges** (Section 5, Definition 4). Counts are taken over a valid
 depth-first jungle `J` of a control-flow graph with root `r`. (1) At most `n − 2` irreducible loops and at most
-`(n − 1)(n − 2) / 2` multiple-entry edges. (2) The complete graph `K_n` and (3) the reduced graph `M_n` with the chain jungle
+`(n − 1)(n − 2) / 2` multiple-entry edges, for `n ≥ 2`. (2) The complete graph `K_n` and (3) the reduced graph `M_n` with the chain jungle
 attain both bounds. (4) A graph with the maximal number of multiple-entry edges has at least `2n − 3` further edges, and
 (5) `M_n` without its back edge to the first vertex (`MnLite n`) is valid for the chain jungle, has the maximal number of
 multiple-entry edges and exactly that many further edges. -/
@@ -84,8 +85,8 @@ multiple-entry edges and exactly that many further edges. -/
     (MnLite n).edgeCount = (Kn n).meeCount (chainJungle n) + (2 * n - 3))
 
 /-- **The irreducible-loop transformations** (Section 5). (1) One edge added to a path never creates an irreducible loop
-(for the depth-first order of the code). (2) An `n`-way conditional (`n ≥ 2`) has none, and one edge from the join back into
-its first branch creates one. (3) For a planted formula whose intended assignment makes the variables `1` and `2` false and
+(for the depth-first jungle `dfsRun` from the entry). (2) An `n`-way conditional (`n ≥ 2`) has none, and one edge from the
+join back into its first branch creates one (for the same jungle). (3) For a planted formula whose intended assignment makes the variables `1` and `2` false and
 any structured programs `S`, `T` (`S` nonempty), the solver outputs `1` and `2` are false and, with them as the opaque
 conditions, the transformed program of Figure 5(b) returns the same trace and state as `S; T` for every environment and
 state of the toggled variable; `S; T` has a reducible control-flow graph and every valid depth-first jungle of the
@@ -122,7 +123,7 @@ the single opaque condition `1`. -/
 /-- **The Boolean control-flow graphs of AES** (Section 4). The generated graph of AES with 10, 12 and 14 rounds (key
 lengths 128, 192 and 256 bits), whose vertices are evaluated in the order they were generated (`evalNodes`), has as outputs
 the bits of the FIPS-197 encryption (`encrypt`) of the block read from the first 128 input vertices, for every key and
-block. -/
+block; and `encrypt` gives the ciphertexts of the FIPS-197 Appendix C examples (plaintext `00112233…ff`, keys `000102…`). -/
 @[expose] def CircuitCFGCorrect : Prop :=
   (∀ (key : Nat) (inp : Nat → Bool), (∀ i, 128 ≤ i → inp i = false) →
     (AES.aesGraph 10 (AES.aes128 key)).1.map (wev (AES.aesGraph 10 (AES.aes128 key)).2 inp) =
@@ -132,24 +133,40 @@ block. -/
       AES.bits8 (AES.encrypt 12 (AES.aes192 key) (AES.blockBytes inp))) ∧
   (∀ (key : Nat) (inp : Nat → Bool), (∀ i, 128 ≤ i → inp i = false) →
     (AES.aesGraph 14 (AES.aes256 key)).1.map (wev (AES.aesGraph 14 (AES.aes256 key)).2 inp) =
-      AES.bits8 (AES.encrypt 14 (AES.aes256 key) (AES.blockBytes inp)))
+      AES.bits8 (AES.encrypt 14 (AES.aes256 key) (AES.blockBytes inp))) ∧
+  AES.encrypt 10 (AES.aes128 0x000102030405060708090a0b0c0d0e0f) (AES.beBytes 0x00112233445566778899aabbccddeeff 16) =
+    AES.beBytes 0x69c4e0d86a7b0430d8cdb78070b4c55a 16 ∧
+  AES.encrypt 12 (AES.aes192 0x000102030405060708090a0b0c0d0e0f1011121314151617)
+    (AES.beBytes 0x00112233445566778899aabbccddeeff 16) = AES.beBytes 0xdda97ca4864cdfe06eaf70a0ec0d7191 16 ∧
+  AES.encrypt 14 (AES.aes256 0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f)
+    (AES.beBytes 0x00112233445566778899aabbccddeeff 16) = AES.beBytes 0x8ea2b7ca516745bfeafc49904b496089 16
 
 /-- **The security model** (Section 5.1, `lean/THREAT_MODEL.md`). Every statement is about the explicit model: a design `d`
 (image, original program, planted data, circuit and schedule) satisfying the structural assumptions `Assumptions d` (planted
-and stamped formula, false cells, dependency-respecting schedule), and analyzers given by their capability. T1: the image
-behaves as the original (`Image.Behaves`) and the schedule's final values are the circuit's, for `S; T` or `if (cd) S; T` with
-arbitrary goto-free blocks and the parameterized Figure 5/6 transformations (`Obfuscates`). T2: an analyzer that reports the
-independently supplied static values of the cells (`blueprint`, an input of the model, not derived from a modeled code image or
-stamping transition) fails to determine some design, for every such pair. T3: an analyzer that implements the machine
-semantics reports the intended values, and the reference Tarjan run on the stamped formula's graph (`recoverWork`) takes at most
-`2|V| + |E|` ticks in the clean cost model (the analyzer's own work is not modeled). T4: one state variable resolves any
-flattening and the multiple-entry edges of `K_n` number `(n − 1)(n − 2) / 2`. T5: a fault outside the final execution of a vertex
-leaves every final value unchanged, one in it overwrites it. T6: address-aligned traces determine the same (vertex, final value)
-pairs for every dependency-respecting schedule. T7: no obfuscator whose output size is within four vertices of its input's, in either direction, is
-size-indistinguishable (equivalence: the same terminating runs, whatever the fuel). Necessity: for each assumption a design (or circuit) violating only it for which the conclusion fails;
-for the schedule and the numbering, a topologically numbered circuit with a schedule not in order that changes a final value, a
-circuit with a dependency cycle (no ordered schedule) and an acyclic circuit not numbered topologically with an ordered schedule
-whose final value differs from `valOf`. -/
+and stamped formula, cells that are required variables with false intended value, dependency-respecting schedule on a
+topologically numbered circuit), and analyzers given by their capability.
+T1: the image behaves as the original (`Image.Behaves`) and the schedule's final values are the circuit's, for `S; T` or
+`if (cd) S; T` with arbitrary goto-free blocks and the parameterized Figure 5/6 transformations (`Obfuscates`).
+T2: an analyzer that reports the independently supplied static values of the cells (`blueprint`, an input of the model, not
+derived from a modeled code image or stamping transition) fails to determine some design, for every such pair.
+T3: the solver succeeds on the stamped formula, an analyzer that implements the machine semantics reports the intended values,
+and the reference Tarjan run on the stamped formula's graph (`recoverWork`) takes at most `2|V| + |E|` ticks in the clean cost
+model (the analyzer's own work is not modeled).
+T4: for every graph whose edges stay among its vertices, the walks of the graph are exactly the runs of a dispatch loop on one
+state variable (which stays in range); and `2 · MEE(K_n) = (n − 1)(n − 2)` for the chain jungle.
+T5: for a topologically numbered circuit and a schedule whose final executions respect the dependencies, a fault in an
+execution of `x` that is not its last leaves every final value unchanged; a fault in the last execution of `x` (any circuit,
+any schedule) makes the faulty value the final value of `x`.
+T6: for a topologically numbered circuit, any two dependency-respecting schedules, from any initial states, give the same
+(vertex, final value) pairs.
+T7: no obfuscator whose output size is within four vertices of its input's, in either direction, is size-indistinguishable
+(equivalence: the same terminating runs, whatever the fuel).
+Necessity, each witness keeping every other assumption: violating stamping, the forcing paths, the cells being required, or
+their false intended values gives an image that does not behave as the original; an implication of the forest or an extra
+implication that the intended assignment does not respect makes the solver return nothing (T3's first conclusion fails); a
+topologically numbered circuit has a schedule not in dependency order that changes a final value; a circuit that is not
+topologically numbered may have no dependency-respecting schedule at all, and another has one whose final value differs from
+`valOf`. The bounds `k < n` on the cells and on the forest's variables say that they are variables of the formula (typing). -/
 @[expose] def SecurityModel : Prop :=
   (∀ d : Design, Assumptions d → Obfuscates d.orig d.img.prog →
     d.img.Behaves d.orig ∧
@@ -157,7 +174,7 @@ whose final value differs from `valOf`. -/
   (∀ {orig prog : Stmt}, Obfuscates orig prog → ∀ {A : Analyzer}, ImmCap A →
     ∃ d : Design, Assumptions d ∧ d.orig = orig ∧ d.img.prog = prog ∧ ¬ Determines A d.img) ∧
   (∀ {A : Analyzer}, SmcSemCap A → ∀ {d : Design}, Assumptions d →
-    (∀ k ∈ d.img.cells, A.predict d.img k = d.σ k) ∧
+    (∀ k ∈ d.img.cells, A.predict d.img k = d.σ k) ∧ smcSolve d.img.formula ≠ none ∧
     recoverWork d.img ≤ 2 * d.img.formula.graph.n + tEdges d.img.formula.graph d.img.formula.graph.n) ∧
   (∀ (n : Nat), 2 * (Kn n).meeCount (chainJungle n) = (n - 1) * (n - 2)) ∧
   (∀ (g : Digraph), WFg g → ∀ (lab : Nat → List Nat) (ch : Nat → Nat),
@@ -184,9 +201,19 @@ whose final value differs from `valOf`. -/
     (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧ d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧
     (∀ k ∈ d.img.cells, k < d.n ∧ d.req k) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧
     ¬ d.img.Behaves d.orig) ∧
-  (∃ d : Design, Planted d.n d.σ d.req d.forest ∧ (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧
-    d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧ ¬ (∀ e ∈ d.extra, Respecting d.σ e) ∧
-    smcSolve d.img.formula = none) ∧
+  (∃ d : Design, Obfuscates d.orig d.img.prog ∧ Planted d.n d.σ d.req d.forest ∧ (∀ e ∈ d.extra, Respecting d.σ e) ∧
+    (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧ d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧
+    (∀ k ∈ d.img.cells, k < d.n ∧ ¬ d.req k ∧ d.σ k = false) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧
+    ¬ d.img.Behaves d.orig) ∧
+  (∃ d : Design, Obfuscates d.orig d.img.prog ∧ Planted d.n d.σ d.req d.forest ∧
+    (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧ d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧
+    (∀ k ∈ d.img.cells, k < d.n ∧ d.req k ∧ d.σ k = false) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧
+    ¬ (∀ e ∈ d.extra, Respecting d.σ e) ∧ smcSolve d.img.formula = none) ∧
+  (∃ d : Design, Obfuscates d.orig d.img.prog ∧ (∀ e ∈ d.forest, e.1.var < d.n ∧ e.2.var < d.n) ∧
+    (∀ x, x < d.n → d.req x → ImpPath d.forest ⟨x, !d.σ x⟩ ⟨x, d.σ x⟩) ∧ (∀ e ∈ d.extra, Respecting d.σ e) ∧
+    (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧ d.img.formula = impFormula d.n (d.forest ++ d.extra) ∧
+    (∀ k ∈ d.img.cells, k < d.n ∧ d.req k ∧ d.σ k = false) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧
+    ¬ (∀ e ∈ d.forest, Respecting d.σ e) ∧ smcSolve d.img.formula = none) ∧
   (∃ c : DCirc Bool, c.Topo ∧ ∃ acts : List (Act Bool), ¬ FinalOrdered c acts ∧
     ∃ v, runA c (fun _ => false) acts v ≠ valOf c (fun _ => false) v) ∧
   (∃ c : DCirc Bool, ¬ c.Topo ∧ ∀ acts : List (Act Bool), ¬ FinalOrdered c acts) ∧
