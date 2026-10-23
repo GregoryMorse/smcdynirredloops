@@ -7,7 +7,7 @@ definitions are `lean/SmcIrred/Spec/*.lean` (core imports only); `Challenge.lean
 them by `validation/make_challenge.py` (`--check` in CI fails when a file differs), pruned to the declarations the statements
 mention, and contain one `sorry` theorem each, `PalomarSIL.mathematical_result`. `Solution.lean` and `SolutionAES.lean`
 prove them from `SmcIrred.Paper`, which derives each family from the theorems of the development. Two Challenges are
-submitted because one Challenge may have at most 1,000 lines (`Challenge.lean` 985 lines, `ChallengeAES.lean` 626 lines;
+submitted because one Challenge may have at most 1,000 lines (`Challenge.lean` 867 lines, `ChallengeAES.lean` 526 lines;
 both exceed the 300-line warning size: the statements need the definitions of the self-modifying machine, the depth-first
 jungles, the extremal graphs and the security model, which cannot be shortened without dropping a principal claim).
 

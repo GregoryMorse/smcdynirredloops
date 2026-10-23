@@ -19,7 +19,7 @@ The user submits and registers; the assistant never does. The commit is the push
 
 AI-assisted formalization (Claude Opus 5.5 planning, Claude Sonnet 5.5 execution, Claude Code); statements, threat model and
 decisions by the author; self-assessed review. The Challenge is generated from `lean/SmcIrred/Spec/` (`validation/make_challenge.py`).
-Size: `Challenge.lean` is 985 lines (51 KB) and `ChallengeAES.lean` 626 lines (26 KB), above the 300-line/32 KiB warning size and under
+Size: `Challenge.lean` is 867 lines (57 KB) and `ChallengeAES.lean` 526 lines (27 KB), above the 300-line/32 KiB warning size and under
 the hard limit; the statements need the definitions of the self-modifying machine, DFS jungles, the extremal graphs and the
 security model. The security statements hold relative to explicit structural assumptions, each with a necessity witness, and
 claim nothing about real tools. Non-claims (timings, native code, node splitting, literature opinions) are listed in
