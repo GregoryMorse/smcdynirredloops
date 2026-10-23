@@ -155,7 +155,7 @@ alignment:
       lean: "SmcIrred.Paper.SecurityModel"
       module: "Challenge"
       status: "adapted"
-      note: "Proved relative to explicit structural assumptions that the paper does not state; each assumption has a necessity witness. T1 and T2 range over the parameterized Figure 5/6 transformations of arbitrary goto-free blocks S and T (Obfuscates)."
+      note: "Proved relative to explicit structural assumptions that the paper does not state; each assumption has a necessity witness. T1 and T2 range over the parameterized Figure 5/6 transformations of arbitrary goto-free blocks S and T (Obfuscates). T2 concerns analyzers that report an independently supplied static value for each cell (the blueprint is an input, not derived from a modeled code image). T3 bounds the tick count of the reference Tarjan run, not an analyzer's work. T7 covers obfuscators whose output size is within four vertices of the input's in either direction."
     - source: "Section 4, Boolean control-flow graphs of AES"
       lean: "SmcIrred.Paper.CircuitCFGCorrect"
       module: "ChallengeAES"

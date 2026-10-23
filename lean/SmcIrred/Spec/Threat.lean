@@ -22,7 +22,7 @@ run time by the self-modifying-code 2-SAT solver (`smcSolve`) on a planted formu
 bytes (the blueprint).
 
 **Adversary classes** are interfaces: an analyzer reports a value for every predicate cell; a class is a structure stating
-its capability, never a claim that a tool exists. `ImmCap`: the analyzer reads the cells from the static code bytes (it
+its capability, never a claim that a tool exists. `ImmCap`: the analyzer reports the supplied static cell values (it
 assumes code bytes are constant). `SmcSemCap`: the analyzer implements stamping and the machine semantics (it can run the
 solver on the stamped formula). The classes for structuring, faults, traces and correlation are added with their theorems.
 
@@ -33,6 +33,7 @@ no field mentions a goal (`validation/threat_audit.py`). -/
 structure Image where
   prog : Stmt
   formula : TwoSat
+  /-- The static values of the predicate cells handed to an analyzer: an independent input, not computed from the code. -/
   blueprint : Nat → Bool
 
 /-- The value of predicate cell `k` at run time: the output of the self-modifying-code solver on the stamped formula. -/
@@ -47,7 +48,7 @@ structure Image where
 /-- The behaviour of the image: the block trace with the run-time cell values (the toggled variable starts true). -/
 @[expose] def Image.run (img : Image) (c : Bool) : Option (List Nat × Bool) := traceS (rtVal img) img.prog c true
 
-/-- What an analyzer that reads the cells from the static code bytes concludes the program does. -/
+/-- What an analyzer that reports the supplied static cell values concludes the program does. -/
 @[expose] def Image.staticRun (img : Image) (c : Bool) : Option (List Nat × Bool) :=
   traceS img.blueprint img.prog c true
 
@@ -102,7 +103,7 @@ structure Assumptions (d : Design) : Prop where
 structure Analyzer where
   predict : Image → Nat → Bool
 
-/-- Capability of the class `Imm`: the analyzer reads the predicate cell from the static code bytes. -/
+/-- Capability of the class `Imm`: the analyzer reports the supplied static value (`blueprint`) of every cell. -/
 structure ImmCap (A : Analyzer) : Prop where
   static_read : ∀ img k, A.predict img k = img.blueprint k
 
@@ -114,8 +115,8 @@ structure SmcSemCap (A : Analyzer) : Prop where
 /-- Goal: the analyzer reports every predicate cell the program reads with its run-time value. -/
 @[expose] def Determines (A : Analyzer) (img : Image) : Prop := ∀ k ∈ img.cells, A.predict img k = rtVal img k
 
-/-- The work of the analyzer that runs the solver on the stamped formula, in the clean Tarjan cost model (one unit per
-vertex entry, examined edge and popped vertex of the implication graph). -/
+/-- The tick count of the reference Tarjan run on the stamped formula's implication graph (one unit per vertex entry, examined
+edge and popped vertex): the cost of recovering the solver output by that algorithm. It is not the work of any analyzer. -/
 @[expose] def recoverWork (img : Image) : Nat := (tarjan img.formula.graph).ticks
 
 /-! ### Observations (the `Trace`, `Dca` and `Fault` classes and the size observable) -/

@@ -59,7 +59,7 @@ theorem securityModel : SecurityModel :=
     fun c hT _ _ _ hord hx δ σ τ => fault_class c hT hord hx δ σ τ,
     fun c _ _ _ hx δ σ => fault_final_overwrites c hx δ σ,
     fun c hT _ _ ha hb σ σ' => dca_final_obs c hT ha hb σ σ',
-    fun O hlo hhi => not_size_indist O hlo hhi,
+    fun O hb => not_size_indist O hb,
     ⟨dStamp, nec_stamped⟩, ⟨dForce, nec_forcing⟩, ⟨dFalse, nec_false_cells⟩, ⟨dExtra, nec_extra_respects⟩,
     ⟨wcirc, wcirc_topo, execs [1, 0], wcirc_bad_not_ordered, 1, wcirc_bad_order⟩, ⟨ccirc, nec_topo⟩,
     ⟨ncirc, ncirc_not_topo, execs [1, 0], ncirc_ordered, 0, by decide, ncirc_bad⟩⟩

@@ -7,7 +7,7 @@ Nothing here claims that a real tool fails or succeeds; classes of analyzers are
 * Original program: a `Stmt` of the transformation language (`Spec/Lang.lean`); its blocks are abstract (any computation).
 * Obfuscator `Obfuscates`: the static scheme of Figures 5 and 6 (loop and conditional transformations), with the opaque
   conditions read as outputs `Cond.out k` of the self-modifying-code 2-SAT solver (`smcSolve`) on a planted formula.
-* Image: transformed program, stamped formula, blueprint (the placeholder values in the static code bytes).
+* Image: transformed program, stamped formula, blueprint (the static values of the cells given to an analyzer: an independently supplied oracle, not derived from a modeled initial code image or stamping transition; T2 is a claim about analyzers that trust such values).
 * Run-time value of a predicate cell: `rtVal img k`. Behaviour: `Image.run`. Static reading: `Image.staticRun`.
 
 ## 2. Adversary classes, goals, assumptions
@@ -44,7 +44,7 @@ bounds) is the capability structures themselves. Necessity witnesses: below.
 * T5 `fault_class` (non-final fault harmless), with `Dyn.fault_final_overwrites`, `fault_final_changes`, `fault_input_dependent`.
 * T6 `dca_last`, `dca_final_obs`, `dca_repeats_visible`, `dca_witness`: on address-aligned traces any two dependency-respecting
   schedules give the same (vertex, final value) pairs; repeated executions are visible by address.
-* T7 `not_size_indist`, `scheme_overhead`: not an indistinguishability obfuscator for the vertex count (programs are equivalent when their terminating runs coincide for every fuel, `Equiv`, not a bounded trace comparison); no VBB claim.
+* T7 `not_size_indist`, `scheme_overhead`: no obfuscator whose output size is within four vertices of its input's in either direction (shrinking included) is indistinguishable for the vertex count (programs are equivalent when their terminating runs coincide for every fuel, `Equiv`, not a bounded trace comparison); no VBB claim.
 * Necessity: `nec_forcing`, `nec_stamped`, `nec_false_cells` (run misbehaves), `nec_extra_respects` (solver returns nothing),
   `nec_schedule`, `nec_topo` (no ordered schedule exists in a cyclic circuit), `ncirc_not_topo`, `ncirc_ordered`, `ncirc_bad` (an acyclic circuit that is not numbered topologically: it has an ordered schedule, yet the final value of vertex 0 differs from `valOf`, so dropping only `schedule_topo` makes the conclusion fail). `extra_wf` is not an assumption: it is a field of `Design` (a formula over its n variables), so it needs no witness.
 * `Threat.solver_succeeds`: under S1 the solver returns a solution.

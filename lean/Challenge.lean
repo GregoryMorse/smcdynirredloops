@@ -531,6 +531,7 @@ open Lang Dyn
 structure Image where
   prog : Stmt
   formula : TwoSat
+  /-- The static values of the predicate cells handed to an analyzer: an independent input, not computed from the code. -/
   blueprint : Nat → Bool
 
 /-- The value of predicate cell `k` at run time: the output of the self-modifying-code solver on the stamped formula. -/
@@ -593,7 +594,7 @@ structure Assumptions (d : Design) : Prop where
 structure Analyzer where
   predict : Image → Nat → Bool
 
-/-- Capability of the class `Imm`: the analyzer reads the predicate cell from the static code bytes. -/
+/-- Capability of the class `Imm`: the analyzer reports the supplied static value (`blueprint`) of every cell. -/
 structure ImmCap (A : Analyzer) : Prop where
   static_read : ∀ img k, A.predict img k = img.blueprint k
 
@@ -605,8 +606,8 @@ structure SmcSemCap (A : Analyzer) : Prop where
 /-- Goal: the analyzer reports every predicate cell the program reads with its run-time value. -/
 @[expose] def Determines (A : Analyzer) (img : Image) : Prop := ∀ k ∈ img.cells, A.predict img k = rtVal img k
 
-/-- The work of the analyzer that runs the solver on the stamped formula, in the clean Tarjan cost model (one unit per
-vertex entry, examined edge and popped vertex of the implication graph). -/
+/-- The tick count of the reference Tarjan run on the stamped formula's implication graph (one unit per vertex entry, examined
+edge and popped vertex): the cost of recovering the solver output by that algorithm. It is not the work of any analyzer. -/
 @[expose] def recoverWork (img : Image) : Nat := (tarjan img.formula.graph).ticks
 
 /-- The pairs (vertex, final value) of a schedule: the data a correlation attack aligned by address has for every vertex. -/
@@ -932,12 +933,14 @@ the single opaque condition `1`. -/
 (image, original program, planted data, circuit and schedule) satisfying the structural assumptions `Assumptions d` (planted
 and stamped formula, false cells, dependency-respecting schedule), and analyzers given by their capability. T1: the image
 behaves as the original (`Image.Behaves`) and the schedule's final values are the circuit's, for `S; T` or `if (cd) S; T` with
-arbitrary goto-free blocks and the parameterized Figure 5/6 transformations (`Obfuscates`). T2: an analyzer that reads the cells
-from the static code bytes fails to determine some design, for every such pair. T3: an analyzer that implements the machine
-semantics reports the intended values, at a work bound in the clean Tarjan cost model. T4: one state variable resolves any
+arbitrary goto-free blocks and the parameterized Figure 5/6 transformations (`Obfuscates`). T2: an analyzer that reports the
+independently supplied static values of the cells (`blueprint`, an input of the model, not derived from a modeled code image or
+stamping transition) fails to determine some design, for every such pair. T3: an analyzer that implements the machine
+semantics reports the intended values, and the reference Tarjan run on the stamped formula's graph (`recoverWork`) takes at most
+`2|V| + |E|` ticks in the clean cost model (the analyzer's own work is not modeled). T4: one state variable resolves any
 flattening and the multiple-entry edges of `K_n` number `(n − 1)(n − 2) / 2`. T5: a fault outside the final execution of a vertex
 leaves every final value unchanged, one in it overwrites it. T6: address-aligned traces determine the same (vertex, final value)
-pairs for every dependency-respecting schedule. T7: no obfuscator whose output size is within four vertices of its input's is
+pairs for every dependency-respecting schedule. T7: no obfuscator whose output size is within four vertices of its input's, in either direction, is
 size-indistinguishable (equivalence: the same terminating runs, whatever the fuel). Necessity: for each assumption a design (or circuit) violating only it for which the conclusion fails;
 for the schedule and the numbering, a topologically numbered circuit with a schedule not in order that changes a final value, a
 circuit with a dependency cycle (no ordered schedule) and an acyclic circuit not numbered topologically with an ordered schedule
@@ -962,7 +965,7 @@ whose final value differs from `valOf`. -/
     runA c σ (execs a ++ (x, some δ) :: execs b) x = δ) ∧
   (∀ {α : Type} (c : DCirc α), c.Topo → ∀ {a b : List (Act α)}, FinalOrdered c a → FinalOrdered c b →
     ∀ (σ σ' : Nat → α), finalObs c σ a = finalObs c σ' b) ∧
-  (∀ O : Stmt → Stmt, (∀ s, vcount s ≤ vcount (O s)) → (∀ s, vcount (O s) ≤ vcount s + 4) → ¬ SizeIndist O) ∧
+  (∀ O : Stmt → Stmt, (∀ s, vcount (O s) ≤ vcount s + 4 ∧ vcount s ≤ vcount (O s) + 4) → ¬ SizeIndist O) ∧
   (∃ d : Design, Obfuscates d.orig d.img.prog ∧ Planted d.n d.σ d.req d.forest ∧ (∀ e ∈ d.extra, Respecting d.σ e) ∧
     (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧
     (∀ k ∈ d.img.cells, k < d.n ∧ d.req k ∧ d.σ k = false) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧

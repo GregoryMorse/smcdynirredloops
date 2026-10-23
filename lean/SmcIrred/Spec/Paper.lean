@@ -38,7 +38,7 @@ not part of the statement and are listed as non-claims in `lean/PAPER_MAP.md`.
   block, to the encryption of the FIPS-197 specification.
 * `SecurityModel`: relative to the explicit threat model of `lean/THREAT_MODEL.md` (structural assumptions on the design;
   adversary classes given as capability structures), correctness of the obfuscated image (T1) and unsoundness of analyzers that
-  read the cells from the static code bytes (T2), both for the parameterized Figure 5/6 transformations of arbitrary goto-free blocks, the limit of analyzers that implement the machine semantics (T3), the
+  report supplied static cell values (T2), both for the parameterized Figure 5/6 transformations of arbitrary goto-free blocks, the limit of analyzers that implement the machine semantics (T3), the
   structuring costs (T4), faults (T5), differential computation analysis on aligned traces (T6) and the absence of
   indistinguishability for the vertex count (T7), with a witness for the necessity of each assumption. No claim is made
   about any real tool, processor or compiler. -/
@@ -138,12 +138,14 @@ block. -/
 (image, original program, planted data, circuit and schedule) satisfying the structural assumptions `Assumptions d` (planted
 and stamped formula, false cells, dependency-respecting schedule), and analyzers given by their capability. T1: the image
 behaves as the original (`Image.Behaves`) and the schedule's final values are the circuit's, for `S; T` or `if (cd) S; T` with
-arbitrary goto-free blocks and the parameterized Figure 5/6 transformations (`Obfuscates`). T2: an analyzer that reads the cells
-from the static code bytes fails to determine some design, for every such pair. T3: an analyzer that implements the machine
-semantics reports the intended values, at a work bound in the clean Tarjan cost model. T4: one state variable resolves any
+arbitrary goto-free blocks and the parameterized Figure 5/6 transformations (`Obfuscates`). T2: an analyzer that reports the
+independently supplied static values of the cells (`blueprint`, an input of the model, not derived from a modeled code image or
+stamping transition) fails to determine some design, for every such pair. T3: an analyzer that implements the machine
+semantics reports the intended values, and the reference Tarjan run on the stamped formula's graph (`recoverWork`) takes at most
+`2|V| + |E|` ticks in the clean cost model (the analyzer's own work is not modeled). T4: one state variable resolves any
 flattening and the multiple-entry edges of `K_n` number `(n − 1)(n − 2) / 2`. T5: a fault outside the final execution of a vertex
 leaves every final value unchanged, one in it overwrites it. T6: address-aligned traces determine the same (vertex, final value)
-pairs for every dependency-respecting schedule. T7: no obfuscator whose output size is within four vertices of its input's is
+pairs for every dependency-respecting schedule. T7: no obfuscator whose output size is within four vertices of its input's, in either direction, is
 size-indistinguishable (equivalence: the same terminating runs, whatever the fuel). Necessity: for each assumption a design (or circuit) violating only it for which the conclusion fails;
 for the schedule and the numbering, a topologically numbered circuit with a schedule not in order that changes a final value, a
 circuit with a dependency cycle (no ordered schedule) and an acyclic circuit not numbered topologically with an ordered schedule
@@ -168,7 +170,7 @@ whose final value differs from `valOf`. -/
     runA c σ (execs a ++ (x, some δ) :: execs b) x = δ) ∧
   (∀ {α : Type} (c : DCirc α), c.Topo → ∀ {a b : List (Act α)}, FinalOrdered c a → FinalOrdered c b →
     ∀ (σ σ' : Nat → α), finalObs c σ a = finalObs c σ' b) ∧
-  (∀ O : Stmt → Stmt, (∀ s, vcount s ≤ vcount (O s)) → (∀ s, vcount (O s) ≤ vcount s + 4) → ¬ SizeIndist O) ∧
+  (∀ O : Stmt → Stmt, (∀ s, vcount (O s) ≤ vcount s + 4 ∧ vcount s ≤ vcount (O s) + 4) → ¬ SizeIndist O) ∧
   (∃ d : Design, Obfuscates d.orig d.img.prog ∧ Planted d.n d.σ d.req d.forest ∧ (∀ e ∈ d.extra, Respecting d.σ e) ∧
     (∀ e ∈ d.extra, e.1.var < d.n ∧ e.2.var < d.n) ∧
     (∀ k ∈ d.img.cells, k < d.n ∧ d.req k ∧ d.σ k = false) ∧ d.circ.Topo ∧ FinalOrdered d.circ d.acts ∧
