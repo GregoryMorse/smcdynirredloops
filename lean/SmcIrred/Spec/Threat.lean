@@ -133,8 +133,10 @@ vertex. An action `(v, none)` is an execution of `v`; `(v, some d)` a faulty one
 /-- The observable size of a program: the number of vertices of its control-flow graph. -/
 @[expose] def vcount (s : Stmt) : Nat := (cfgOf (compile s)).n
 
-/-- Functional equivalence of programs: the same block trace for both values of the condition and of the toggled variable. -/
-@[expose] def Equiv (p q : Stmt) : Prop := ∀ c v, trace p c v = trace q c v
+/-- Functional equivalence of programs (no generator outputs): for both values of the condition and of the toggled variable,
+the same block traces and final values are produced by terminating runs, whatever the fuel. -/
+@[expose] def Equiv (p q : Stmt) : Prop :=
+  ∀ c v r, (∃ f, exec f (compile p) (fun _ => false) c 0 v [] = some r) ↔ ∃ f, exec f (compile q) (fun _ => false) c 0 v [] = some r
 
 /-- The property of an obfuscator that a notion of indistinguishability must have for the size observable: equivalent programs
 get obfuscations with the same number of vertices. -/

@@ -144,7 +144,7 @@ semantics reports the intended values, at a work bound in the clean Tarjan cost 
 flattening and the multiple-entry edges of `K_n` number `(n − 1)(n − 2) / 2`. T5: a fault outside the final execution of a vertex
 leaves every final value unchanged, one in it overwrites it. T6: address-aligned traces determine the same (vertex, final value)
 pairs for every dependency-respecting schedule. T7: no obfuscator whose output size is within four vertices of its input's is
-size-indistinguishable. Necessity: for each assumption a design (or circuit) violating only it for which the conclusion fails;
+size-indistinguishable (equivalence: the same terminating runs, whatever the fuel). Necessity: for each assumption a design (or circuit) violating only it for which the conclusion fails;
 for the schedule and the numbering, a topologically numbered circuit with a schedule not in order that changes a final value, a
 circuit with a dependency cycle (no ordered schedule) and an acyclic circuit not numbered topologically with an ordered schedule
 whose final value differs from `valOf`. -/

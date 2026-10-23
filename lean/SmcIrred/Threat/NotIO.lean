@@ -1,6 +1,7 @@
 module
 
 public import SmcIrred.Spec.Threat
+public import SmcIrred.Lang.Congr
 
 public section
 
@@ -13,8 +14,21 @@ open Lang
   | 0 => p
   | k + 1 => .seq (padS p k) (.ite1 .falseC (.blk 9))
 
-theorem fig5a_pad_equiv : Equiv fig5a (padS fig5a 3) := by
-  intro c v; cases c <;> cases v <;> decide
+/-- Two programs that halt within the same fuel with the same result have the same terminating runs. -/
+theorem equiv_of_halt {p q : Stmt} (h : ∀ c v, ∃ r0, exec 100 (compile p) (fun _ => false) c 0 v [] = some r0 ∧
+    exec 100 (compile q) (fun _ => false) c 0 v [] = some r0) : Equiv p q := by
+  intro c v r
+  obtain ⟨r0, hp, hq⟩ := h c v
+  constructor
+  · rintro ⟨f, hf⟩
+    obtain rfl := exec_det f 100 _ _ _ hf hp
+    exact ⟨100, hq⟩
+  · rintro ⟨f, hf⟩
+    obtain rfl := exec_det f 100 _ _ _ hf hq
+    exact ⟨100, hp⟩
+
+theorem fig5a_pad_equiv : Equiv fig5a (padS fig5a 3) :=
+  equiv_of_halt fun c v => by cases c <;> cases v <;> exact ⟨_, rfl, rfl⟩
 
 theorem vcount_fig5a : vcount fig5a = 1 := by decide
 theorem vcount_pad : vcount (padS fig5a 3) = 7 := by decide

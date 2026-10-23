@@ -464,14 +464,6 @@ inductive Stmt where
 end SmcIrred.Lang
 -- ===== SmcIrred.Spec.LangFigs =====
 namespace SmcIrred.Lang
-/-- The block trace of a program run from a state of the `trueThenFalse` variable with condition constant `c`, when
-the generator outputs are `sol` (the listings below do not read them). -/
-@[expose] def traceS (sol : Nat → Bool) (p : Stmt) (c v : Bool) : Option (List Nat × Bool) :=
-  exec 100 (compile p) sol c 0 v []
-
-/-- The block trace of a program that reads no generator output. -/
-@[expose] def trace (p : Stmt) (c v : Bool) : Option (List Nat × Bool) := traceS (fun _ => false) p c v
-
 @[expose] def prot (h : Cond) (S T : Stmt) (k : Cond) : Stmt :=
   .seq (.ifGoto h 9) (.doWhile (.seq S (.lab 9 T)) k)
 
@@ -624,8 +616,10 @@ vertex entry, examined edge and popped vertex of the implication graph). -/
 /-- The observable size of a program: the number of vertices of its control-flow graph. -/
 @[expose] def vcount (s : Stmt) : Nat := (cfgOf (compile s)).n
 
-/-- Functional equivalence of programs: the same block trace for both values of the condition and of the toggled variable. -/
-@[expose] def Equiv (p q : Stmt) : Prop := ∀ c v, trace p c v = trace q c v
+/-- Functional equivalence of programs (no generator outputs): for both values of the condition and of the toggled variable,
+the same block traces and final values are produced by terminating runs, whatever the fuel. -/
+@[expose] def Equiv (p q : Stmt) : Prop :=
+  ∀ c v r, (∃ f, exec f (compile p) (fun _ => false) c 0 v [] = some r) ↔ ∃ f, exec f (compile q) (fun _ => false) c 0 v [] = some r
 
 /-- The property of an obfuscator that a notion of indistinguishability must have for the size observable: equivalent programs
 get obfuscations with the same number of vertices. -/
@@ -944,7 +938,7 @@ semantics reports the intended values, at a work bound in the clean Tarjan cost 
 flattening and the multiple-entry edges of `K_n` number `(n − 1)(n − 2) / 2`. T5: a fault outside the final execution of a vertex
 leaves every final value unchanged, one in it overwrites it. T6: address-aligned traces determine the same (vertex, final value)
 pairs for every dependency-respecting schedule. T7: no obfuscator whose output size is within four vertices of its input's is
-size-indistinguishable. Necessity: for each assumption a design (or circuit) violating only it for which the conclusion fails;
+size-indistinguishable (equivalence: the same terminating runs, whatever the fuel). Necessity: for each assumption a design (or circuit) violating only it for which the conclusion fails;
 for the schedule and the numbering, a topologically numbered circuit with a schedule not in order that changes a final value, a
 circuit with a dependency cycle (no ordered schedule) and an acyclic circuit not numbered topologically with an ordered schedule
 whose final value differs from `valOf`. -/

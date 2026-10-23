@@ -44,7 +44,7 @@ bounds) is the capability structures themselves. Necessity witnesses: below.
 * T5 `fault_class` (non-final fault harmless), with `Dyn.fault_final_overwrites`, `fault_final_changes`, `fault_input_dependent`.
 * T6 `dca_last`, `dca_final_obs`, `dca_repeats_visible`, `dca_witness`: on address-aligned traces any two dependency-respecting
   schedules give the same (vertex, final value) pairs; repeated executions are visible by address.
-* T7 `not_size_indist`, `scheme_overhead`: not an indistinguishability obfuscator for the vertex count; no VBB claim.
+* T7 `not_size_indist`, `scheme_overhead`: not an indistinguishability obfuscator for the vertex count (programs are equivalent when their terminating runs coincide for every fuel, `Equiv`, not a bounded trace comparison); no VBB claim.
 * Necessity: `nec_forcing`, `nec_stamped`, `nec_false_cells` (run misbehaves), `nec_extra_respects` (solver returns nothing),
   `nec_schedule`, `nec_topo` (no ordered schedule exists in a cyclic circuit), `ncirc_not_topo`, `ncirc_ordered`, `ncirc_bad` (an acyclic circuit that is not numbered topologically: it has an ordered schedule, yet the final value of vertex 0 differs from `valOf`, so dropping only `schedule_topo` makes the conclusion fail). `extra_wf` is not an assumption: it is a field of `Design` (a formula over its n variables), so it needs no witness.
 * `Threat.solver_succeeds`: under S1 the solver returns a solution.
